@@ -28,4 +28,7 @@ public class SubscriptionPlan {
 
     @OneToMany(mappedBy = "subscriptionPlan")
     private List<UserSubscription> userSubscriptions;
+
+    @OneToMany(mappedBy = "subscriptionPlan")
+    private List<Payment> payments;
 }
