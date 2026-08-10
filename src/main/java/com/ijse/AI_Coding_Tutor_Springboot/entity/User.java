@@ -19,8 +19,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
-    private String userEmail;
-    private String userPassword;
+    private String userName;
+    private String password;
     private LocalDateTime joinedDate;
     private String userRole;
     @Enumerated(EnumType.STRING)
