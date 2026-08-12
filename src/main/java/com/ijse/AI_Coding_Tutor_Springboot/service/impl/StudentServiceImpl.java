@@ -1,5 +1,6 @@
 package com.ijse.AI_Coding_Tutor_Springboot.service.impl;
 
+import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.StudentRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.StudentService;
@@ -16,13 +17,12 @@ public class StudentServiceImpl implements StudentService {
         this.studentRepository = studentRepository;
     }
 
-    public List<StudentDTO> getAllStudents(){
+    public List<GetStudentDetailsDTO> getAllStudents(){
         try{
-
+            return studentRepository.getStudentDetails();
         }
         catch(Exception e){
             throw e;
         }
-        return null;
     }
 }

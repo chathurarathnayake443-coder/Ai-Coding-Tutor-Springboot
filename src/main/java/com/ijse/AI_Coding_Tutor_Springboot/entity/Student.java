@@ -32,9 +32,6 @@ public class Student {
     @OneToMany(mappedBy = "student")
     private List<CodingSession> codingSessions;
 
-    @OneToMany(mappedBy = "student")
-    private List<Rating> ratings;
-
     @OneToOne(mappedBy = "student")
     private AnalyticRecord analyticRecord;
 

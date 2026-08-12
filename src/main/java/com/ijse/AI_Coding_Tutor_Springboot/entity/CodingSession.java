@@ -44,4 +44,7 @@ public class CodingSession {
 
     @OneToMany(mappedBy = "codingSession")
     private List<Hint> hints;
+
+    @OneToOne(mappedBy = "codingSession")
+    private Rating rating;
 }

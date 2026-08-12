@@ -22,7 +22,7 @@ public class Rating {
     private LocalDateTime submittedTime;
     private int ratingValue;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id")
-    private Student student;
+    @OneToOne
+    @JoinColumn(name = "session_id")
+    private CodingSession codingSession;
 }
