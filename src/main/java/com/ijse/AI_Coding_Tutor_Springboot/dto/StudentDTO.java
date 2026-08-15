@@ -20,25 +20,7 @@ import java.util.List;
 public class StudentDTO {
     private long studentId;
     private String studentFullName;
+    private String studentEmail;
     private String studentContact;
-
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "subscription_id")
-    private UserSubscription userSubscription;
-
-    @OneToMany(mappedBy = "student")
-    private List<CodingSession> codingSessions;
-
-    @OneToMany(mappedBy = "student")
-    private List<Rating> ratings;
-
-    @OneToOne(mappedBy = "student")
-    private AnalyticRecord analyticRecord;
-
-    @OneToOne(mappedBy = "student")
-    private Payment payment;
+    private String password;
 }

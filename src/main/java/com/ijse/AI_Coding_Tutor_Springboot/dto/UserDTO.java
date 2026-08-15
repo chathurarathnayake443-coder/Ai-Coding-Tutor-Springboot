@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,5 +18,6 @@ public class UserDTO {
     private String userName;
     private String password;
     private UserStatus userStatus;
+    private LocalDateTime joinedDate;
     private String userRoles;
 }
