@@ -2,6 +2,7 @@ package com.ijse.AI_Coding_Tutor_Springboot.service.impl;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.StudentRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.StudentService;
 import org.springframework.stereotype.Service;
@@ -25,4 +26,5 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
+
 }

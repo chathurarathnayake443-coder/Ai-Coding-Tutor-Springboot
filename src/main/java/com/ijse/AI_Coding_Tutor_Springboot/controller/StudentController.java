@@ -24,6 +24,10 @@ public class StudentController {
     @GetMapping("/students")
     public CommonResponse getAllStudents(){
         List<GetStudentDetailsDTO> studentList = studentService.getAllStudents();
+        for(int i = 0; i < studentList.size(); i++){
+            System.out.println(studentList.get(i).getStudentName());
+            System.out.println("Hello");
+        }
         return new CommonResponse(OPERATION_SUCCESS, studentList, SUCCESS_MESSAGE);
     }
 }

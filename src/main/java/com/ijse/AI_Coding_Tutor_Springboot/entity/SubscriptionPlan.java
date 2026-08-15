@@ -1,6 +1,7 @@
 package com.ijse.AI_Coding_Tutor_Springboot.entity;
 
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.PlanStatus;
+import com.ijse.AI_Coding_Tutor_Springboot.enumerations.SubscriptionPlanCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,8 @@ public class SubscriptionPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long planId;
-    private String planName;
+    @Enumerated(EnumType.STRING)
+    private SubscriptionPlanCategory subscriptionPlanCategory;
     private String price;
     private String description;
     private int maxHintCount;

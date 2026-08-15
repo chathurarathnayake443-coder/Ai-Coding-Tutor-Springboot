@@ -20,8 +20,8 @@ public class GetStudentDetailsDTO {
     private String studentName;
     private String studentEmail;
     private String studentPhone;
-    private long sessionCount;
-    private long ratings;
+    private Long sessionCount;
+    private Double avgRating;
     private LocalDateTime joinedDate;
-    private UserStatus status;
+    private UserStatus studentStatus;
 }
