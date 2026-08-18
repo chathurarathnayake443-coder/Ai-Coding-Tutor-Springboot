@@ -1,6 +1,7 @@
 package com.ijse.AI_Coding_Tutor_Springboot.service.impl;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.CodeExecutionResult;
+import com.ijse.AI_Coding_Tutor_Springboot.service.CodeExecutionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -10,12 +11,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class CodeExecutionService {
+public class CodeExecutionServiceImpl implements CodeExecutionService {
 
-    @Value("${JUDGE0_API_URL}")
+    @Value("${judge0.api.url}")
     private String apiUrl;
 
-    @Value("${JUDGE0_API_TOKEN}")
+    @Value("${judge0.api.token}")
     private String apiToken;
 
     private final RestTemplate restTemplate = new RestTemplate();

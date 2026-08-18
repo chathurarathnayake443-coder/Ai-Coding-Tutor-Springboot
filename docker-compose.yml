@@ -21,6 +21,8 @@ services:
 
   mysql:
     image: mysql:8
+    ports:
+      - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: mysql
       MYSQL_DATABASE: ai_coding_tutor_springboot
@@ -36,6 +38,8 @@ services:
 
   judge0-server:
     image: judge0/judge0:1.13.1
+    ports:
+      - "2358:2358"
     env_file: ./judge0-v1.13.1/judge0.conf
     environment:
       POSTGRES_HOST: judge0-db
