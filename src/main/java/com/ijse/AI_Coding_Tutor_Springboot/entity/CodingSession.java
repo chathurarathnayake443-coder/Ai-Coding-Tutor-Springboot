@@ -33,7 +33,7 @@ public class CodingSession {
     @JoinColumn(name = "student_id")
     private Student student;
 
-    @OneToOne(mappedBy = "codingSession")
+    @OneToOne(mappedBy = "codingSession", cascade = CascadeType.ALL)
     private Problem problem;
 
     @OneToMany(mappedBy = "codingSession")

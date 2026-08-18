@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student,Long> {
@@ -28,4 +29,7 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
     GROUP BY s.studentId, s.studentFullName, s.user.userName, s.studentContact, s.user.joinedDate, s.user.userStatus
     """)
     List<GetStudentDetailsDTO> getStudentDetails();
+
+    @Query("SELECT s FROM Student s WHERE s.user.userId = ?1")
+    Optional<Student> getStudentByUserId(long userId);
 }
