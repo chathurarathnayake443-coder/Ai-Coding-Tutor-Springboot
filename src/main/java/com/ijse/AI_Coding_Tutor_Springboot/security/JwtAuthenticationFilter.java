@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
@@ -66,6 +68,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (MalformedJwtException ex) {
             handleJwtException(response, 401, "Invalid token format");
         } catch (Exception ex) {
+            log.error("Exception: ", ex);
             handleJwtException(response, 500, "Authentication failed");
         }
     }

@@ -1,53 +1,16 @@
 services:
 
-  backend:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ai_coding_tutor_springboot
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: mysql
-      JUDGE0_API_URL: http://judge0-server:2358
-      JUDGE0_API_TOKEN: b272696a275a5a64a50798ff143974bad119578fec471a6e3442d7180c8f7f98
-    depends_on:
-      mysql:
-        condition: service_healthy
-      judge0-server:
-        condition: service_started
-    networks:
-      - public-net
-      - internal-net
-
-  mysql:
-    image: mysql:8
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: mysql
-      MYSQL_DATABASE: ai_coding_tutor_springboot
-    volumes:
-      - mysql-data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pmysql"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    networks:
-      - internal-net
-
   judge0-server:
     image: judge0/judge0:1.13.1
     ports:
       - "2358:2358"
-    env_file: ./judge0-v1.13.1/judge0.conf
+    env_file:
+      - ./judge0.conf
     environment:
       POSTGRES_HOST: judge0-db
       REDIS_HOST: judge0-redis
     privileged: true
     restart: unless-stopped
-    networks:
-      - internal-net
     depends_on:
       judge0-db:
         condition: service_healthy
@@ -56,17 +19,16 @@ services:
 
   judge0-workers:
     image: judge0/judge0:1.13.1
-    env_file: ./judge0-v1.13.1/judge0.conf
+    env_file:
+      - ./judge0.conf
     command: ["./scripts/workers"]
     volumes:
-      - ./judge0-v1.13.1/judge0.conf:/judge0.conf:ro
+      - ./judge0.conf:/judge0.conf:ro
     environment:
       POSTGRES_HOST: judge0-db
       REDIS_HOST: judge0-redis
     privileged: true
     restart: unless-stopped
-    networks:
-      - internal-net
     depends_on:
       judge0-db:
         condition: service_healthy
@@ -75,7 +37,8 @@ services:
 
   judge0-db:
     image: postgres:16
-    env_file: ./judge0-v1.13.1/judge0.conf
+    env_file:
+      - ./judge0.conf
     environment:
       POSTGRES_PASSWORD: judge0pass
     volumes:
@@ -85,22 +48,13 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-    networks:
-      - internal-net
 
   judge0-redis:
     image: redis:7
     command: ["redis-server", "--appendonly", "yes", "--requirepass", "somepassword"]
     volumes:
       - judge0-redis-data:/data
-    networks:
-      - internal-net
 
 volumes:
-  mysql-data:
   judge0-db-data:
   judge0-redis-data:
-
-networks:
-  public-net:
-  internal-net:

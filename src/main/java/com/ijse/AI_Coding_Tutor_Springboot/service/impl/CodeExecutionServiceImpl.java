@@ -41,7 +41,14 @@ public class CodeExecutionServiceImpl implements CodeExecutionService {
         body.put("source_code", code);
         body.put("language_id", languageId);
 
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
+        String jsonBody;
+        try {
+            jsonBody = new tools.jackson.databind.ObjectMapper().writeValueAsString(body);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to build request body", e);
+        }
+
+        HttpEntity<String> request = new HttpEntity<>(jsonBody, headers);
 
         ResponseEntity<Map> submitResponse = restTemplate.postForEntity(
                 apiUrl + "/submissions?base64_encoded=false&wait=false",
@@ -66,6 +73,7 @@ public class CodeExecutionServiceImpl implements CodeExecutionService {
             );
 
             Map<String, Object> result = pollResponse.getBody();
+            System.out.println("DEBUG - poll result: " + result);
             Map<String, Object> status = (Map<String, Object>) result.get("status");
             int statusId = (int) status.get("id");
 
