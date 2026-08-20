@@ -4,6 +4,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.constants.CommonResponse;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.CodingSessionDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.ResponseCodingSessionDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.service.CodingSessionService;
+import com.ijse.AI_Coding_Tutor_Springboot.service.GeminiService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
