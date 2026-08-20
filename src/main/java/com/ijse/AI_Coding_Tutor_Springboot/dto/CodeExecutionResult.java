@@ -11,6 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 
 public class CodeExecutionResult {
-    private boolean ok;
     private String output;
+    private String error;
 }

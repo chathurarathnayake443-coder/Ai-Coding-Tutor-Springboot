@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/login","/students/signUpStudent").permitAll()// by using this .requestMatches method, we can give another API to be called here.
-                        .requestMatchers(HttpMethod.GET, "/testing").permitAll()// by using this .requestMatches method, we can give another API to be called here.
+                        .requestMatchers(HttpMethod.GET, "/testing","/test").permitAll()// by using this .requestMatches method, we can give another API to be called here.
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
