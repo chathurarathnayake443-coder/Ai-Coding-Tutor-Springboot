@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.CodeExecutionResult;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.HintRequestDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.HintResponseDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.*;
 import com.ijse.AI_Coding_Tutor_Springboot.service.GeminiService;
 import org.springframework.stereotype.Service;
 
@@ -152,7 +150,52 @@ public class GeminiServiceImpl implements GeminiService {
         }
     }
 
-//    public RequestSolutionDTO generateActualSolution(){
-//
-//    }
+    public ResponseSolutionDTO generateActualSolution(RequestSolutionDTO requestSolutionDTO) throws JsonProcessingException {
+        try{
+            String prompt = """
+        You are an AI Coding Tutor.
+
+        The student has used all 5 available hints.
+        The student can now see the complete solution to the coding problem.
+
+        Generate the correct and complete solution for the coding problem
+        using the specified programming language.
+
+        IMPORTANT RULES:
+        1. Solve the coding problem completely and correctly.
+        2. Use ONLY the specified programming language.
+        3. The solution must be complete and executable.
+        4. Follow all requirements in the coding problem.
+        5. Return the response as a JSON object.
+        6. The JSON object must contain ONLY one field named "solutionCode".
+        7. The value of "solutionCode" must contain the complete source code.
+        8. Do NOT include any explanation.
+        9. Do NOT include Markdown code fences.
+        10. Do NOT include any additional fields.
+
+        Required response format:
+        {
+            "solutionCode": "complete solution code here"
+        }
+
+        Programming Language:
+        %s
+
+        Coding Problem:
+        %s
+
+        Generate the final solution now.
+        """.formatted(requestSolutionDTO.getLanguage(), requestSolutionDTO.getCodingProblem());
+
+            String response = generateResponse(prompt);
+            System.out.println(response);
+
+            ResponseSolutionDTO responseSolutionDTO = objectMapper.readValue(response, ResponseSolutionDTO.class);
+            System.out.println(responseSolutionDTO);
+            return responseSolutionDTO;
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
 }
