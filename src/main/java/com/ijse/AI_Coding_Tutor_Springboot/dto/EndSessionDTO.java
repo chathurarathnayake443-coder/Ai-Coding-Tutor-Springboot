@@ -10,8 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class RequestSolutionDTO {
+public class EndSessionDTO {
     private long sessionId;
-    private String language;
-    private String codingProblem;
+    private int ratingValue;
+    private String ratingFeedback;
 }

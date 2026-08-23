@@ -1,16 +1,11 @@
 package com.ijse.AI_Coding_Tutor_Springboot.service.impl;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.CodingSessionDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.EndSessionDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.ResponseCodingSessionDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.CodingSession;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.Problem;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.ProgrammingLanguage;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
+import com.ijse.AI_Coding_Tutor_Springboot.entity.*;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.CodingSessionStatus;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.CodingSessionRepository;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.ProblemRepository;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.ProgrammingLanguageRepository;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.StudentRepository;
+import com.ijse.AI_Coding_Tutor_Springboot.repository.*;
 import com.ijse.AI_Coding_Tutor_Springboot.service.CodingSessionService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +20,14 @@ public class CodingSessionServiceImpl implements CodingSessionService {
     private final ProblemRepository problemRepository;
     private final StudentRepository studentRepository;
     private final ProgrammingLanguageRepository programmingLanguageRepository;
+    private final RatingRepository ratingRepository;
 
-    public CodingSessionServiceImpl(CodingSessionRepository codingSessionRepository, ProblemRepository problemRepository, StudentRepository studentRepository, ProgrammingLanguageRepository programmingLanguageRepository) {
+    public CodingSessionServiceImpl(CodingSessionRepository codingSessionRepository, ProblemRepository problemRepository, StudentRepository studentRepository, ProgrammingLanguageRepository programmingLanguageRepository, RatingRepository ratingRepository) {
         this.codingSessionRepository = codingSessionRepository;
         this.problemRepository = problemRepository;
         this.studentRepository = studentRepository;
         this.programmingLanguageRepository = programmingLanguageRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     @Transactional
@@ -71,6 +68,29 @@ public class CodingSessionServiceImpl implements CodingSessionService {
         }
         catch(Exception e){
             throw e;
+        }
+    }
+
+    public void endSession(EndSessionDTO endSessionDTO){
+        try{
+            Optional<CodingSession> optionalCodingSession = codingSessionRepository.findById(endSessionDTO.getSessionId());
+            if(!optionalCodingSession.isPresent()){
+                throw new RuntimeException("Sorry, Session Not Found!");
+            }
+            CodingSession codingSession = optionalCodingSession.get();
+            codingSession.setEndTime(LocalDateTime.now());
+            codingSession.setSessionStatus(CodingSessionStatus.COMPLETED);
+            codingSessionRepository.save(codingSession);
+
+            Rating rating = new Rating();
+            rating.setSubmittedTime(LocalDateTime.now());
+            rating.setCodingSession(codingSession);
+            rating.setRatingValue(endSessionDTO.getRatingValue());
+            rating.setFeedbackText(endSessionDTO.getRatingFeedback());
+            ratingRepository.save(rating);
+        }
+        catch(Exception e){
+            e.printStackTrace();
         }
     }
 }

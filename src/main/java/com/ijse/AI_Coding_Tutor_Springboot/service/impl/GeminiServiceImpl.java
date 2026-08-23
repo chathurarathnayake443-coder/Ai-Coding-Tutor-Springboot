@@ -5,14 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.genai.Client;
 import com.google.genai.types.GenerateContentResponse;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.*;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.CodeAttempt;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.CodeExecution;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.CodingSession;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.Hint;
+import com.ijse.AI_Coding_Tutor_Springboot.entity.*;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.ExecutionStatus;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.CodeAttemptRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.CodingSessionRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.HintRepository;
+import com.ijse.AI_Coding_Tutor_Springboot.repository.SolutionRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.GeminiService;
 import org.springframework.stereotype.Service;
 
@@ -29,13 +27,15 @@ public class GeminiServiceImpl implements GeminiService {
     private final CodeAttemptRepository codeAttemptRepository;
     private final CodingSessionRepository codingSessionRepository;
     private final HintRepository hintRepository;
+    private final SolutionRepository solutionRepository;
 
-    public GeminiServiceImpl(Client geminiClient, ObjectMapper objectMapper, CodeAttemptRepository codeAttemptRepository, CodingSessionRepository codingSessionRepository, HintRepository hintRepository) {
+    public GeminiServiceImpl(Client geminiClient, ObjectMapper objectMapper, CodeAttemptRepository codeAttemptRepository, CodingSessionRepository codingSessionRepository, HintRepository hintRepository, SolutionRepository solutionRepository) {
         this.geminiClient = geminiClient;
         this.objectMapper = objectMapper;
         this.codeAttemptRepository = codeAttemptRepository;
         this.codingSessionRepository = codingSessionRepository;
         this.hintRepository = hintRepository;
+        this.solutionRepository = solutionRepository;
     }
 
     public String generateResponse(String prompt) {
@@ -257,6 +257,19 @@ public class GeminiServiceImpl implements GeminiService {
 
             ResponseSolutionDTO responseSolutionDTO = objectMapper.readValue(response, ResponseSolutionDTO.class);
             System.out.println(responseSolutionDTO);
+
+            Solution solution = new Solution();
+            solution.setGeneratedTime(LocalDateTime.now());
+            solution.setSolutionCode(responseSolutionDTO.getSolutionCode());
+
+            Optional<CodingSession> optionalCodingSession = codingSessionRepository.findById(requestSolutionDTO.getSessionId());
+            if (!optionalCodingSession.isPresent()) {
+                throw new RuntimeException("Sorry, session not found");
+            }
+            CodingSession codingSession = optionalCodingSession.get();
+            solution.setCodingSession(codingSession);
+            solutionRepository.save(solution);
+
             return responseSolutionDTO;
         }
         catch(Exception e){

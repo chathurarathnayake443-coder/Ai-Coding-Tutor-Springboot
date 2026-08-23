@@ -1,10 +1,7 @@
 package com.ijse.AI_Coding_Tutor_Springboot.controller;
 
 import com.ijse.AI_Coding_Tutor_Springboot.constants.CommonResponse;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.CodingSessionDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.RequestSolutionDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.ResponseCodingSessionDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.ResponseSolutionDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.*;
 import com.ijse.AI_Coding_Tutor_Springboot.service.CodingSessionService;
 import com.ijse.AI_Coding_Tutor_Springboot.service.GeminiService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,5 +38,11 @@ public class CodingSessionController {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @PostMapping("/endSession")
+    public CommonResponse endSession(@RequestBody EndSessionDTO endSessionDTO){
+        codingSessionService.endSession(endSessionDTO);
+        return new CommonResponse(OPERATION_SUCCESS,SUCCESS_MESSAGE);
     }
 }

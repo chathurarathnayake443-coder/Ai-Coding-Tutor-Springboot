@@ -12,4 +12,6 @@ public interface StudentService {
     public List<GetStudentDetailsDTO> getAllStudents();
 
     public String getStudentNameById(long userId);
+
+    public long getCompletedSessionCount(long userId);
 }

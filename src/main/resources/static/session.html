@@ -62,7 +62,7 @@
 
             <div class="run-bar">
                 <button class="btn btn-cyan" id="run-btn" disabled onclick="runCode()">▶ Run code</button>
-                <button class="btn btn-danger" id="end-btn" disabled style="margin-left:auto;" onclick="setEndedState()">End session</button>
+                <button class="btn btn-danger" id="end-btn" disabled style="margin-left:auto;" onclick="endSession()">End session</button>
             </div>
 
             <div class="output-pane">
@@ -415,10 +415,11 @@
     }
 
     function generateActualSolution(){
+        let sessionId = currentSession.id;
         let language = $('#language-select').val().trim().toLowerCase();
         let codingProblem = $('#question-input').val();
 
-        const obj = JSON.stringify({"language":language,"codingProblem":codingProblem})
+        const obj = JSON.stringify({"sessionId":sessionId,"language":language,"codingProblem":codingProblem})
 
         $.ajax({
             url: "http://localhost:8080/getSolution",
@@ -430,6 +431,66 @@
             },
             success: function (response) {
                 solution = response.body.solutionCode;
+            },
+            error: function (response){
+                if (response.status === 403){
+                    alert("Error 403 - Sorry, Forbidden!");
+                }
+                else if (response.status === 400){
+                    alert("Error 400 - Bad JSON");
+                }
+                else if (response.status === 401){
+                    alert("Error 401 - Unauthorized!");
+                }
+                else if (response.status === 500){
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    function calculateRating(){
+        if(currentSession.hintsUsed >= 5){
+            return 0;
+        }
+        if(currentSession.hintsUsed === 4){
+            return 1;
+        }
+        if(currentSession.hintsUsed === 3){
+            return 2;
+        }
+        if(currentSession.hintsUsed === 2){
+            return 3;
+        }
+        if(currentSession.hintsUsed === 1){
+            return 4;
+        }
+        if(currentSession.hintsUsed === 0){
+            return 5;
+        }
+    }
+
+    function endSession(){
+        let sessionId = currentSession.id;
+        let ratingValue = calculateRating();
+        let ratingFeedback = ratingBlurb(ratingValue);
+
+        currentSession.rating = ratingValue;
+
+        const obj = JSON.stringify({"sessionId":sessionId,"ratingValue":ratingValue,"ratingFeedback":ratingFeedback});
+
+        $.ajax({
+            url: "http://localhost:8080/endSession",
+            type: "POST",
+            contentType: "application/json",
+            data: obj,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                console.log(response);
+                alert("Session Ended");
+                setEndedState();
             },
             error: function (response){
                 if (response.status === 403){

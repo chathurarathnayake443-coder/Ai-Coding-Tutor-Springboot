@@ -34,15 +34,21 @@ public class StudentController {
         return new CommonResponse(OPERATION_SUCCESS, studentList, SUCCESS_MESSAGE);
     }
 
-    @PostMapping("students/signUpStudent")
+    @PostMapping("/students/signUpStudent")
     public CommonResponse signUpStudent(@RequestBody StudentDTO studentDTO){
         userService.signupUserStudent(studentDTO);
         return new CommonResponse(OPERATION_SUCCESS, SUCCESS_MESSAGE);
     }
 
-    @GetMapping("getStudentName/{userId}")
+    @GetMapping("/getStudentName/{userId}")
     public CommonResponse getStudentName(@PathVariable long userId){
         String studentName = studentService.getStudentNameById(userId);
         return new CommonResponse(OPERATION_SUCCESS, studentName, SUCCESS_MESSAGE);
+    }
+
+    @GetMapping("/getCompletedSessions/{userId}")
+    public CommonResponse getCompletedSessions(@PathVariable long userId){
+        long sessionCount = studentService.getCompletedSessionCount(userId);
+        return new CommonResponse(OPERATION_SUCCESS, sessionCount, SUCCESS_MESSAGE);
     }
 }

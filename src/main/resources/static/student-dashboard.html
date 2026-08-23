@@ -19,6 +19,9 @@
             <a class="nav-link" id="nav-analytics"><span class="dot"></span>Analytics</a>
         </nav>
 
+        <div style="font-size: 12px">Want to Increase Hint Your Hint Counts?</div>
+        <button class="btn btn-outline btn-block js-logout">⚡ Upgrade to Premium</button>
+
         <div class="sidebar-foot">
             <button class="btn btn-outline btn-block js-logout">Log out</button>
         </div>
@@ -122,6 +125,7 @@
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         loadStudentName();
+        loadSessionCount();
     });
 
     document.getElementById("nav-sessions").addEventListener("click", () => {
@@ -132,49 +136,6 @@
     });
 
     const LANG_LABEL = { java: "Java", python: "Python", javascript: "JavaScript" };
-
-    // async function loadSessions() {
-    //     // Real backend call: GET /api/sessions?userId=<id>  (already sorted newest first)
-    //     const sessions = await api.listSessions(user.id);
-    //     const timeline = document.getElementById("session-timeline");
-    //     document.getElementById("session-count-label").textContent = sessions.length + " total";
-    //
-    //     if (!sessions.length) {
-    //         timeline.innerHTML = `
-    //     <div class="empty-state">
-    //       <div class="empty-icon">🗂️</div>
-    //       <h4>No sessions yet</h4>
-    //       <p>Start your first session and it'll show up here, newest on top.</p>
-    //     </div>`;
-    //         return;
-    //     }
-    //
-    //     timeline.innerHTML = sessions.map((s, i) => `
-    //   <div class="timeline-item ${i === 0 ? "newest" : ""}">
-    //     <div class="session-card">
-    //       <div class="sc-top">
-    //         <div class="sc-question">${escapeHtml(truncate(s.question, 110))}</div>
-    //         <span class="pill ${s.status === "active" ? "pill-cyan" : "pill-mint"}">${s.status === "active" ? "In progress" : "Ended"}</span>
-    //       </div>
-    //       <div class="sc-meta">
-    //         <span>💻 ${LANG_LABEL[s.language] || s.language}</span>
-    //         <span>💡 ${s.hintsUsed}/5 hints used</span>
-    //         <span>🕒 ${formatDate(s.createdAt)}</span>
-    //       </div>
-    //       <div class="sc-foot">
-    //         ${s.status === "ended"
-    //         ? `<span class="rating-badge"><span class="stars">${starString(s.rating)}</span> ${s.rating}/5</span>`
-    //         : `<a href="session.html?id=${s.id}" class="btn btn-cyan btn-sm">Resume session</a>`}
-    //         <button class="btn btn-outline btn-sm" data-session-id="${s.id}" data-action="view-chat">View chat history</button>
-    //       </div>
-    //     </div>
-    //   </div>
-    // `).join("");
-    //
-    //     timeline.querySelectorAll('[data-action="view-chat"]').forEach((btn) => {
-    //         btn.addEventListener("click", () => openChatModal(btn.dataset.sessionId, sessions));
-    //     });
-
 
     function truncate(str, n) { return str.length > n ? str.slice(0, n - 1) + "…" : str; }
     function escapeHtml(str) { const d = document.createElement("div"); d.textContent = str || ""; return d.innerHTML; }
@@ -206,23 +167,6 @@
     document.getElementById("close-chat-modal-2").addEventListener("click", closeChatModal);
     chatOverlay.addEventListener("click", (e) => { if (e.target === chatOverlay) closeChatModal(); });
 
-    // async function loadAnalytics() {
-    //     // Real backend call: GET /api/students/:id/analytics
-    //     const a = await api.getAnalytics(user.id);
-    //     document.getElementById("an-total").textContent = a.totalSessions;
-    //     document.getElementById("an-rating").textContent = a.avgRating || "—";
-    //     document.getElementById("an-feedback").textContent = a.feedback;
-    //
-    //     const list = document.getElementById("topic-list");
-    //     list.innerHTML = a.focusTopics.map((t) => `
-    //   <div class="topic-row">
-    //     <span class="topic-name">${escapeHtml(t.topic)}</span>
-    //     <span class="topic-bar-track"><span class="topic-bar-fill" style="width:${Math.max(t.pct, 4)}%"></span></span>
-    //     <span class="topic-pct">${t.pct}%</span>
-    //   </div>
-    // `).join("");
-    // }
-
     // My Code
 
     function loadStudentName(){
@@ -238,6 +182,34 @@
             success: function(response){
                 console.log(response);
                 $('#student-name').text(response.body);
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    function loadSessionCount(){
+        let userId = localStorage.getItem("userId");
+        $.ajax({
+            url: "http://localhost:8080/getCompletedSessions/" + userId,
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function(response){
+                console.log(response);
+                let sessionCount = response.body;
+                $('#an-total').text(sessionCount);
             },
             error: function (response) {
                 if (response.status === 403) {
