@@ -27,6 +27,6 @@ public class CodeAttempt {
     @JoinColumn(name = "session_id")
     private CodingSession codingSession;
 
-    @OneToMany(mappedBy = "codeAttempt")
+    @OneToMany(mappedBy = "codeAttempt",cascade = CascadeType.ALL)
     private List<CodeExecution> codeExecutions;
 }

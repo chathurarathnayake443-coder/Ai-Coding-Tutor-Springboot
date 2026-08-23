@@ -11,6 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 
 public class CodeExecutionRequest {
+    private long sessionId;
     private String language;
     private String code;
 }

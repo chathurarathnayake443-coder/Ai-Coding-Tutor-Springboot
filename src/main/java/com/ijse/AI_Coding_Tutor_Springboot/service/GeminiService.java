@@ -8,7 +8,7 @@ public interface GeminiService {
 
     public String generateResponse(String prompt);
 
-    public CodeExecutionResult executeCode(String code, String language) throws JsonProcessingException;
+    public CodeExecutionResult executeCode(long sessionId,String code, String language) throws JsonProcessingException;
 
     public HintResponseDTO generateHint(HintRequestDTO hintRequestDTO) throws JsonProcessingException;
 

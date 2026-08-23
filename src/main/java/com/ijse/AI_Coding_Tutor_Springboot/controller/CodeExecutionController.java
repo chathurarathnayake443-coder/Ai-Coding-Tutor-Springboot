@@ -23,7 +23,7 @@ public class CodeExecutionController {
     @PostMapping("/runCode")
     public CommonResponse runCode(@RequestBody CodeExecutionRequest codeExecutionRequest){
         try{
-            CodeExecutionResult codeExecutionResult = geminiService.executeCode(codeExecutionRequest.getCode(), codeExecutionRequest.getLanguage());
+            CodeExecutionResult codeExecutionResult = geminiService.executeCode(codeExecutionRequest.getSessionId(),codeExecutionRequest.getCode(), codeExecutionRequest.getLanguage());
             return new CommonResponse(OPERATION_SUCCESS,codeExecutionResult,SUCCESS_MESSAGE);
         }
         catch (Exception e){

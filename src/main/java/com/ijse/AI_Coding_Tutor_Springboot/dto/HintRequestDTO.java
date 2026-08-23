@@ -11,7 +11,9 @@ import lombok.Setter;
 @NoArgsConstructor
 
 public class HintRequestDTO {
-    String language;
-    String codingProblem;
-    String studentCode;
+    private long sessionId;
+    private int hintNumber;
+    private String language;
+    private String codingProblem;
+    private String studentCode;
 }

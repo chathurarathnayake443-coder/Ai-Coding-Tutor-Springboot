@@ -19,7 +19,6 @@ public class Solution {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long solutionId;
     private String solutionCode;
-    private String explanation;
     private LocalDateTime generatedTime;
 
     @OneToOne
