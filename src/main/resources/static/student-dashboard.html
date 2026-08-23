@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard · AI Coding Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">AI</span><div><span>AI Coding Tutor</span><small>student workspace</small></div></div>
+
+        <nav class="nav-group">
+            <span class="nav-label">Workspace</span>
+            <a class="nav-link active"><span class="dot"></span>Dashboard</a>
+            <a class="nav-link" id="nav-sessions"><span class="dot"></span>Session history</a>
+            <a class="nav-link" id="nav-analytics"><span class="dot"></span>Analytics</a>
+        </nav>
+
+        <div class="sidebar-foot">
+            <button class="btn btn-outline btn-block js-logout">Log out</button>
+        </div>
+    </aside>
+
+    <div>
+        <header class="topbar">
+            <div>
+                <h1>Welcome back<span id="first-name-suffix"></span></h1>
+                <div class="topbar-sub">Pick up a question, or review how you're progressing</div>
+            </div>
+            <div class="user-chip">
+                <div class="who"><div class="name" id="student-name">—</div><div class="role">student</div></div>
+                <div class="avatar" id="student-avatar">S</div>
+            </div>
+        </header>
+
+        <main class="main">
+            <div class="create-session-card">
+                <div class="csc-copy">
+                    <h2>Stuck on a problem? Start a new session.</h2>
+                    <p>Paste any question, choose a language, and code it out in a real editor — with up to 5 hints if you need a nudge in the right direction.</p>
+                </div>
+                <a href="session.html" class="btn btn-primary" style="flex-shrink:0;">+ Create session</a>
+            </div>
+
+            <div class="two-col">
+                <!-- Chat / session history -->
+                <section class="panel" id="sessions-section">
+                    <div class="panel-head">
+                        <h3>Session history</h3>
+                        <span class="muted" style="font-size:12px;" id="session-count-label">—</span>
+                    </div>
+                    <div class="panel-body">
+                        <div class="timeline" id="session-timeline">
+                            <div class="empty-state"><div class="empty-icon">⏳</div><p>Loading your sessions…</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analytics -->
+                <section id="analytics-section">
+                    <div class="panel" style="margin-bottom:20px;">
+                        <div class="panel-head"><h3>Your progress</h3></div>
+                        <div class="panel-body">
+                            <div class="stat-grid" style="grid-template-columns:1fr 1fr;margin-bottom:0;">
+                                <div class="stat-card">
+                                    <div class="stat-label">Sessions completed</div>
+                                    <div class="stat-value" id="an-total">—</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-label">Avg. rating</div>
+                                    <div class="stat-value" id="an-rating">—</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel" style="margin-bottom:20px;">
+                        <div class="panel-head"><h3>Topics to focus on</h3></div>
+                        <div class="panel-body">
+                            <div class="topic-list" id="topic-list">
+                                <p class="muted" style="font-size:13px;">Loading…</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-head"><h3>Feedback</h3></div>
+                        <div class="panel-body">
+                            <p style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);" id="an-feedback">—</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Chat history modal -->
+<div class="modal-overlay" id="chat-overlay">
+    <div class="modal modal-wide">
+        <div class="modal-head">
+            <div>
+                <h3 id="chat-modal-title">Session chat history</h3>
+                <p class="muted" style="font-size:12px;margin-top:3px;" id="chat-modal-sub"></p>
+            </div>
+            <button class="modal-close" id="close-chat-modal">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="chat-log" id="chat-log"></div>
+        </div>
+        <div class="modal-foot">
+            <button class="btn btn-ghost" id="close-chat-modal-2">Close</button>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="js/mockApi.js"></script>
+<script src="js/ui.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadStudentName();
+    });
+
+    document.getElementById("nav-sessions").addEventListener("click", () => {
+        document.getElementById("sessions-section").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    document.getElementById("nav-analytics").addEventListener("click", () => {
+        document.getElementById("analytics-section").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    const LANG_LABEL = { java: "Java", python: "Python", javascript: "JavaScript" };
+
+    // async function loadSessions() {
+    //     // Real backend call: GET /api/sessions?userId=<id>  (already sorted newest first)
+    //     const sessions = await api.listSessions(user.id);
+    //     const timeline = document.getElementById("session-timeline");
+    //     document.getElementById("session-count-label").textContent = sessions.length + " total";
+    //
+    //     if (!sessions.length) {
+    //         timeline.innerHTML = `
+    //     <div class="empty-state">
+    //       <div class="empty-icon">🗂️</div>
+    //       <h4>No sessions yet</h4>
+    //       <p>Start your first session and it'll show up here, newest on top.</p>
+    //     </div>`;
+    //         return;
+    //     }
+    //
+    //     timeline.innerHTML = sessions.map((s, i) => `
+    //   <div class="timeline-item ${i === 0 ? "newest" : ""}">
+    //     <div class="session-card">
+    //       <div class="sc-top">
+    //         <div class="sc-question">${escapeHtml(truncate(s.question, 110))}</div>
+    //         <span class="pill ${s.status === "active" ? "pill-cyan" : "pill-mint"}">${s.status === "active" ? "In progress" : "Ended"}</span>
+    //       </div>
+    //       <div class="sc-meta">
+    //         <span>💻 ${LANG_LABEL[s.language] || s.language}</span>
+    //         <span>💡 ${s.hintsUsed}/5 hints used</span>
+    //         <span>🕒 ${formatDate(s.createdAt)}</span>
+    //       </div>
+    //       <div class="sc-foot">
+    //         ${s.status === "ended"
+    //         ? `<span class="rating-badge"><span class="stars">${starString(s.rating)}</span> ${s.rating}/5</span>`
+    //         : `<a href="session.html?id=${s.id}" class="btn btn-cyan btn-sm">Resume session</a>`}
+    //         <button class="btn btn-outline btn-sm" data-session-id="${s.id}" data-action="view-chat">View chat history</button>
+    //       </div>
+    //     </div>
+    //   </div>
+    // `).join("");
+    //
+    //     timeline.querySelectorAll('[data-action="view-chat"]').forEach((btn) => {
+    //         btn.addEventListener("click", () => openChatModal(btn.dataset.sessionId, sessions));
+    //     });
+
+
+    function truncate(str, n) { return str.length > n ? str.slice(0, n - 1) + "…" : str; }
+    function escapeHtml(str) { const d = document.createElement("div"); d.textContent = str || ""; return d.innerHTML; }
+
+    const chatOverlay = document.getElementById("chat-overlay");
+    function openChatModal(sessionId, sessions) {
+        const s = sessions.find((x) => x.id === sessionId);
+        if (!s) return;
+        document.getElementById("chat-modal-title").textContent = truncate(s.question, 80);
+        document.getElementById("chat-modal-sub").textContent = `${LANG_LABEL[s.language]} · ${formatDate(s.createdAt)} · ${s.hintsUsed}/5 hints`;
+        const log = document.getElementById("chat-log");
+        if (!s.chat || !s.chat.length) {
+            log.innerHTML = '<p class="muted" style="font-size:13px;">No hints were requested during this session.</p>';
+        } else {
+            log.innerHTML = s.chat.map((m) => `
+        <div class="chat-msg from-${m.from}">
+          <div class="bubble">
+            <span class="tag">${m.from === "ai" ? "AI tutor" : "You"}</span>
+            ${escapeHtml(m.text)}
+            ${m.options && m.options.length ? `<div class="option-chips">${m.options.map((o) => `<span class="option-chip" style="cursor:default;">${escapeHtml(o)}</span>`).join("")}</div>` : ""}
+          </div>
+        </div>
+      `).join("");
+        }
+        chatOverlay.classList.add("open");
+    }
+    function closeChatModal() { chatOverlay.classList.remove("open"); }
+    document.getElementById("close-chat-modal").addEventListener("click", closeChatModal);
+    document.getElementById("close-chat-modal-2").addEventListener("click", closeChatModal);
+    chatOverlay.addEventListener("click", (e) => { if (e.target === chatOverlay) closeChatModal(); });
+
+    // async function loadAnalytics() {
+    //     // Real backend call: GET /api/students/:id/analytics
+    //     const a = await api.getAnalytics(user.id);
+    //     document.getElementById("an-total").textContent = a.totalSessions;
+    //     document.getElementById("an-rating").textContent = a.avgRating || "—";
+    //     document.getElementById("an-feedback").textContent = a.feedback;
+    //
+    //     const list = document.getElementById("topic-list");
+    //     list.innerHTML = a.focusTopics.map((t) => `
+    //   <div class="topic-row">
+    //     <span class="topic-name">${escapeHtml(t.topic)}</span>
+    //     <span class="topic-bar-track"><span class="topic-bar-fill" style="width:${Math.max(t.pct, 4)}%"></span></span>
+    //     <span class="topic-pct">${t.pct}%</span>
+    //   </div>
+    // `).join("");
+    // }
+
+    // My Code
+
+    function loadStudentName(){
+        let userId = localStorage.getItem("userId");
+
+        $.ajax({
+            url: "http://localhost:8080/getStudentName/" + userId,
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function(response){
+                console.log(response);
+                $('#student-name').text(response.body);
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+
+</script>
+</body>
+</html>

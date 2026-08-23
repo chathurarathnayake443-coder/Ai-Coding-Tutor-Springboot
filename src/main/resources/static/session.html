@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session · AI Coding Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="session-shell">
+    <!-- Top bar -->
+    <div class="session-top">
+        <div class="st-left">
+            <a href="student-dashboard.html" class="brand" style="text-decoration:none;">
+                <span class="brand-mark">AI</span>
+                <div><span>AI Coding Tutor</span><small>session workspace</small></div>
+            </a>
+            <span class="session-status" id="session-status">
+        <span class="blip"></span><span id="session-status-text">Not started</span>
+      </span>
+        </div>
+        <div class="user-chip">
+            <a href="student-dashboard.html" class="btn btn-ghost btn-sm">← Back to dashboard</a>
+        </div>
+    </div>
+
+    <!-- Question + language + start -->
+    <div class="setup-bar">
+        <div class="setup-grid">
+            <div class="field">
+                <label for="question-input">Your question</label>
+                <textarea id="question-input" class="input question-input" placeholder="Paste the exact question or problem statement you're working on…" rows="2"></textarea>
+            </div>
+            <div class="field">
+                <label for="language-select">Language</label>
+                <select id="language-select" class="input">
+                    <option value="java">Java</option>
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" id="start-btn" onclick="startNewSession()">Start session</button>
+        </div>
+        <div class="lock-note" id="lock-note">🔒 The editor, hints, and run button unlock once you start the session. You can only end a session manually or after your 5th hint reveals the full solution.</div>
+    </div>
+
+    <!-- Main body: editor + aside -->
+    <div class="session-body">
+        <div class="editor-pane">
+            <div class="editor-toolbar">
+                <div class="et-left">
+                    <span class="traffic-dots"><span></span><span></span><span></span></span>
+                    <span id="editor-lang-label">Java</span>
+                </div>
+                <span class="muted" id="editor-hint-note" style="font-size:12px;">Editor locked</span>
+            </div>
+
+            <div class="code-editor-wrap">
+                <textarea class="code-editor" id="code-editor" placeholder="Start the session to begin coding…" disabled spellcheck="false"></textarea>
+            </div>
+
+            <div class="run-bar">
+                <button class="btn btn-cyan" id="run-btn" disabled onclick="runCode()">▶ Run code</button>
+                <button class="btn btn-danger" id="end-btn" disabled style="margin-left:auto;" onclick="setEndedState()">End session</button>
+            </div>
+
+            <div class="output-pane">
+                <div class="output-head"><span>Output</span><span id="output-status" class="muted" style="font-size:11px;"></span></div>
+                <div class="output-body" id="output-body"><span class="placeholder">Run your code to see output here.</span></div>
+            </div>
+        </div>
+
+        <aside class="aside">
+            <div class="aside-section">
+                <h4>Hints</h4>
+                <div class="hint-panel-top">
+                    <div class="hint-dial" id="hint-dial">
+                        <svg viewBox="0 0 120 120" id="hint-dial-svg"></svg>
+                        <div class="dial-center"><span class="count" id="hint-count">5/5</span><span class="label">left</span></div>
+                    </div>
+                    <div class="hp-copy">Stuck on what to do next? Take a hint — the tutor reads your current code and suggests <strong>one</strong> next step, never the full answer (until hint 5).</div>
+                </div>
+                <button class="btn btn-primary btn-block" id="hint-btn" style="margin-top:16px;" disabled onclick="generateHint()">Take a hint (5 left)</button>
+                <button class="btn btn-success btn-block" id="solution-btn" style="margin-top:16px;" disabled onclick="setSolutionToEditor()">Get the Solution Code</button>
+
+                <div class="hint-feed" id="hint-feed"></div>
+                <div class="hint-empty" id="hint-empty">No hints taken yet. Hints you request will appear here as guidance cards.</div>
+            </div>
+
+            <div class="aside-section" id="rating-section" style="display:none;">
+                <div class="rating-banner show">
+                    <h4 style="margin-bottom:2px;">Session rated</h4>
+                    <div class="stars-big" id="final-stars">★★★★☆</div>
+                    <p class="muted" style="font-size:13px;" id="final-rating-text">4/5 — nice work.</p>
+                    <a href="student-dashboard.html" class="btn btn-outline btn-block" style="margin-top:14px;">Back to dashboard</a>
+                </div>
+            </div>
+        </aside>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="js/mockApi.js"></script>
+<script src="js/ui.js"></script>
+<script>
+
+    const params = new URLSearchParams(window.location.search);
+    const existingId = params.get("id");
+
+    const questionInput = document.getElementById("question-input");
+    const languageSelect = document.getElementById("language-select");
+    const startBtn = document.getElementById("start-btn");
+    const codeEditor = document.getElementById("code-editor");
+    const runBtn = document.getElementById("run-btn");
+    const endBtn = document.getElementById("end-btn");
+    const hintBtn = document.getElementById("hint-btn");
+    const hintFeed = document.getElementById("hint-feed");
+    const hintEmpty = document.getElementById("hint-empty");
+    const hintCountEl = document.getElementById("hint-count");
+    const statusEl = document.getElementById("session-status");
+    const statusText = document.getElementById("session-status-text");
+    const editorLangLabel = document.getElementById("editor-lang-label");
+    const editorHintNote = document.getElementById("editor-hint-note");
+    const outputBody = document.getElementById("output-body");
+    const outputStatus = document.getElementById("output-status");
+    const lockNote = document.getElementById("lock-note");
+    const ratingSection = document.getElementById("rating-section");
+    const solutionBtn = document.getElementById("solution-btn");
+
+    const LANG_LABEL = { java: "Java", python: "Python", javascript: "JavaScript" };
+    let currentSession = null;
+
+    /* ---------------------------------------------------------- hint dial */
+    function renderDial(hintsUsed) {
+        const svg = document.getElementById("hint-dial-svg");
+        const total = 5, r = 50, circumference = 2 * Math.PI * r;
+        const gap = 6; // degrees-equivalent visual gap between segments, in path units
+        const segLen = circumference / total - gap;
+        let circles = "";
+        for (let i = 0; i < total; i++) {
+            const filled = i >= hintsUsed; // remaining hints lit up in amber
+            const offset = -(i * (circumference / total));
+            circles += `<circle class="segment ${filled ? "filled" : "spent"}" cx="60" cy="60" r="${r}" stroke-dasharray="${segLen} ${circumference - segLen}" stroke-dashoffset="${offset}"></circle>`;
+        }
+        svg.innerHTML = circles;
+        hintCountEl.textContent = `${5 - hintsUsed}/5`;
+    }
+
+    /* ---------------------------------------------------------- line numbers */
+    function syncLineNumbers() {
+        const lines = codeEditor.value.split("\n").length;
+        let out = "";
+        for (let i = 1; i <= lines; i++) out += i + "\n";
+        lineNumbers.textContent = out;
+        lineNumbers.scrollTop = codeEditor.scrollTop;
+    }
+    codeEditor.addEventListener("input", syncLineNumbers);
+    codeEditor.addEventListener("scroll", () => { lineNumbers.scrollTop = codeEditor.scrollTop; });
+    codeEditor.addEventListener("keydown", (e) => {
+        if (e.key === "Tab") { e.preventDefault(); const s = codeEditor.selectionStart, en = codeEditor.selectionEnd; codeEditor.value = codeEditor.value.slice(0, s) + "  " + codeEditor.value.slice(en); codeEditor.selectionStart = codeEditor.selectionEnd = s + 2; syncLineNumbers(); }
+    });
+
+    /* ---------------------------------------------------------- rendering hints */
+    function renderHintCard(msg) {
+        hintEmpty.style.display = "none";
+        const bubble = document.createElement("div");
+        bubble.className = "hint-bubble" + (msg.isFinal ? " is-final" : "");
+        bubble.innerHTML = `
+        <div class="bubble-inner">
+            <span class="bubble-tag">${msg.isFinal ? "Full solution" : "Hint"}</span>
+            <p>${escapeHtml(msg.text)}</p>
+            ${msg.options && msg.options.length ? `<div class="option-chips">${msg.options.map((o) => `<span class="option-chip">${escapeHtml(o)}</span>`).join("")}</div>` : ""}
+        </div>
+    `;
+        hintFeed.appendChild(bubble);
+        bubble.querySelectorAll(".option-chip").forEach((chip) => {
+            chip.addEventListener("click", () => {
+                showToast(`Noted — try applying "${chip.textContent}" in your code.`, null);
+            });
+        });
+    }
+    function escapeHtml(str) { const d = document.createElement("div"); d.textContent = str || ""; return d.innerHTML; }
+
+    /* ---------------------------------------------------------- lock / unlock UI states */
+    function setLockedState() {
+        questionInput.disabled = false;
+        languageSelect.disabled = false;
+        startBtn.disabled = false;
+        codeEditor.disabled = true;
+        runBtn.disabled = true;
+        endBtn.disabled = true;
+        hintBtn.disabled = true;
+        statusEl.className = "session-status";
+        statusText.textContent = "Not started";
+        editorHintNote.textContent = "Editor locked";
+    }
+
+    function setActiveState() {
+        questionInput.disabled = true;
+        languageSelect.disabled = true;
+        startBtn.disabled = true;
+        startBtn.textContent = "Session in progress";
+        codeEditor.disabled = false;
+        runBtn.disabled = false;
+        endBtn.disabled = false;
+        hintBtn.disabled = currentSession.hintsUsed >= 5;
+        statusEl.className = "session-status live";
+        statusText.textContent = "Live session";
+        editorHintNote.textContent = "Autosaves as you type";
+        lockNote.style.display = "none";
+        editorLangLabel.textContent = LANG_LABEL[currentSession.language];
+        hintBtn.textContent = `Take a hint (${5 - currentSession.hintsUsed} left)`;
+        solutionBtn.disabled = true;
+    }
+
+    function setEndedState() {
+        questionInput.disabled = true;
+        languageSelect.disabled = true;
+        startBtn.disabled = true;
+        startBtn.textContent = "Session ended";
+        codeEditor.disabled = true;
+        runBtn.disabled = true;
+        endBtn.disabled = true;
+        hintBtn.disabled = true;
+        statusEl.className = "session-status ended";
+        statusText.textContent = "Session ended";
+        editorHintNote.textContent = "Read-only";
+        lockNote.style.display = "none";
+
+        ratingSection.style.display = "block";
+        document.getElementById("final-stars").textContent = starString(currentSession.rating);
+        document.getElementById("final-rating-text").textContent = `${currentSession.rating}/5 — ${ratingBlurb(currentSession.rating)}`;
+    }
+
+    function ratingBlurb(r) {
+        if (r >= 5) return "excellent independent problem-solving.";
+        if (r >= 4) return "strong work, minimal guidance needed.";
+        if (r >= 3) return "solid effort — review the hints you used.";
+        return "keep practicing this topic, you'll get faster.";
+    }
+
+    // My Code
+
+    function startNewSession(){
+        let programmingLanguage = $('#language-select').val().trim().toLowerCase();
+        let codingProblem = $('#question-input').val();
+        let studentId = localStorage.getItem("userId");
+
+        if(programmingLanguage === ""){
+            alert("Please enter a programming language!");
+            return;
+        }
+
+        if(codingProblem === ""){
+            alert("Please input a Coding Problem!");
+            return;
+        }
+
+        const obj = JSON.stringify({"codingProblem": codingProblem, "programmingLanguage": programmingLanguage, "studentId": studentId});
+
+        $.ajax({
+            url: 'http://localhost:8080/createSession',
+            type: "POST",
+            contentType: "application/json",
+            data: obj,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function(response){
+                console.log(response);
+
+                currentSession = {
+                    id: response.body.sessionId,
+                    language: programmingLanguage,
+                    hintsUsed: 0
+                };
+
+                setActiveState();
+                codeEditor.focus();
+                alert("New Session Started !");
+                generateActualSolution();
+            },
+            error: function (response){
+                if (response.status === 403){
+                    alert("Error 403 - Sorry, Forbidden!");
+                }
+                else if (response.status === 400){
+                    alert("Error 400 - Bad JSON");
+                }
+                else if (response.status === 401){
+                    alert("Error 401 - Unauthorized!");
+                }
+                else if (response.status === 500){
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    function runCode(){
+        let sessionId = currentSession.id;
+        let studentCode = $('#code-editor').val();
+        let programmingLanguage = $('#language-select').val().trim().toLowerCase();
+
+        const obj = JSON.stringify({"sessionId": sessionId,"language": programmingLanguage, "code": studentCode});
+        $.ajax({
+            url: "http://localhost:8080/runCode",
+            type: "POST",
+            contentType: "application/json",
+            data: obj,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                if (!response || !response.body) {
+                    alert("Something went wrong on the server — no response body.");
+                    outputBody.textContent = "Server returned an empty response.";
+                    return;
+                }
+                if (response.body.output == null) {
+                    alert("Something Wrong in your code!");
+                    outputBody.textContent = response.body.error;
+                    return;
+                }
+                alert("Success!");
+                outputBody.textContent = response.body.output;
+            },
+            error: function (response){
+                outputBody.textContent = "Execution failed. Please try again.";
+                outputBody.classList.add("is-error");
+                outputStatus.textContent = "error";
+                if (response.status === 403){
+                    alert("Error 403 - Sorry, Forbidden!");
+                }
+                else if (response.status === 400){
+                    alert("Error 400 - Bad JSON");
+                }
+                else if (response.status === 401){
+                    alert("Error 401 - Unauthorized!");
+                }
+                else if (response.status === 500){
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    function generateHint(){
+        let sessionId = currentSession.id;
+        let hintNumber = currentSession.hintsUsed + 1;
+        let language = $('#language-select').val().trim().toLowerCase();
+        let codingProblem = $('#question-input').val();
+        let studentCode = $('#code-editor').val();
+
+        const obj = JSON.stringify({"sessionId":sessionId,"hintNumber": hintNumber,"language":language, "codingProblem":codingProblem, "studentCode":studentCode});
+        $.ajax({
+            url: "http://localhost:8080/generateHint",
+            type: "POST",
+            contentType: "application/json",
+            data: obj,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                console.log("BEFORE UPDATE — currentSession:", JSON.stringify(currentSession));
+                console.log("HINT OBJ" + response);
+                alert("Hint Success!");
+                hintEmpty.style.display = "none";
+
+                const hint = {
+                    text: response.body.hint,
+                    isFinal: false
+                };
+
+                renderHintCard(hint);
+
+                currentSession.hintsUsed++;
+
+                renderDial(currentSession.hintsUsed);
+
+                hintBtn.textContent =
+                    `Take a hint (${5 - currentSession.hintsUsed} left)`;
+
+                if (currentSession.hintsUsed >= 5) {
+                    hintBtn.disabled = true;
+                    alert("You used all the 5 Hints ! You will receive the Actual Solution now!");
+                    solutionBtn.disabled = false;
+                }
+            },
+            error: function (response){
+                outputBody.textContent = "Execution failed. Please try again.";
+                outputBody.classList.add("is-error");
+                outputStatus.textContent = "error";
+                if (response.status === 403){
+                    alert("Error 403 - Sorry, Forbidden!");
+                }
+                else if (response.status === 400){
+                    alert("Error 400 - Bad JSON");
+                }
+                else if (response.status === 401){
+                    alert("Error 401 - Unauthorized!");
+                }
+                else if (response.status === 500){
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    // variable for solution code
+    let solution = "";
+
+    function setSolutionToEditor(){
+        $('#code-editor').val(solution);
+    }
+
+    function generateActualSolution(){
+        let language = $('#language-select').val().trim().toLowerCase();
+        let codingProblem = $('#question-input').val();
+
+        const obj = JSON.stringify({"language":language,"codingProblem":codingProblem})
+
+        $.ajax({
+            url: "http://localhost:8080/getSolution",
+            type: "POST",
+            contentType: "application/json",
+            data: obj,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                solution = response.body.solutionCode;
+            },
+            error: function (response){
+                if (response.status === 403){
+                    alert("Error 403 - Sorry, Forbidden!");
+                }
+                else if (response.status === 400){
+                    alert("Error 400 - Bad JSON");
+                }
+                else if (response.status === 401){
+                    alert("Error 401 - Unauthorized!");
+                }
+                else if (response.status === 500){
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard · AI Coding Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">AI</span><div><span>AI Coding Tutor</span><small>admin console</small></div></div>
+
+        <nav class="nav-group">
+            <span class="nav-label">Overview</span>
+            <a class="nav-link active"><span class="dot"></span>Students</a>
+            <a class="nav-link" id="open-add-admin"><span class="dot"></span>Add admin</a>
+        </nav>
+
+        <div class="sidebar-foot">
+            <button class="btn btn-outline btn-block js-logout">Log out</button>
+        </div>
+    </aside>
+
+    <div>
+        <header class="topbar">
+            <div>
+                <h1>Enrolled students</h1>
+                <div class="topbar-sub">Everyone currently registered on AI Coding Tutor</div>
+            </div>
+            <div class="user-chip">
+                <div class="who">
+                    <div class="name" id="admin-name">—</div>
+                    <div class="role">admin</div>
+                </div>
+                <div class="avatar role-admin" id="admin-avatar">A</div>
+            </div>
+        </header>
+
+        <main class="main">
+            <section class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-top"><span class="stat-label">Total students</span><span class="stat-icon pill-cyan">🧑‍🎓</span></div>
+                    <div class="stat-value" id="stat-total">—</div>
+                    <div class="stat-delta">registered accounts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top"><span class="stat-label">Active this week</span><span class="stat-icon pill-mint">⚡</span></div>
+                    <div class="stat-value" id="stat-active">—</div>
+                    <div class="stat-delta up">had a session in 7 days</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top"><span class="stat-label">Sessions run</span><span class="stat-icon pill-amber">💬</span></div>
+                    <div class="stat-value" id="stat-sessions">—</div>
+                    <div class="stat-delta">across all students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-top"><span class="stat-label">Avg. rating</span><span class="stat-icon pill-violet">★</span></div>
+                    <div class="stat-value" id="stat-rating">—</div>
+                    <div class="stat-delta">out of 5</div>
+                </div>
+            </section>
+
+            <div class="panel">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <span class="sb-icon">🔍</span>
+                        <input type="text" class="input" id="search-input" placeholder="Search by name or email…">
+                    </div>
+                    <button class="btn btn-outline btn-sm" id="open-add-admin-2">+ Add admin account</button>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Phone</th>
+                        <th>Sessions</th>
+                        <th>Avg. rating</th>
+                        <th>Joined</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody id="students-tbody">
+                    <tr><td colspan="7" class="table-empty">Loading students…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- Add admin modal -->
+<div class="modal-overlay" id="add-admin-overlay">
+    <div class="modal">
+        <div class="modal-head">
+            <h3>Add a new admin</h3>
+            <button class="modal-close" id="close-add-admin">✕</button>
+        </div>
+        <form id="add-admin-form">
+            <div class="modal-body">
+                <div class="field">
+                    <label for="aa-name">Full name</label>
+                    <input type="text" id="aa-name" class="input" placeholder="e.g. Nayana Wickrama" required>
+                </div>
+                <div class="field">
+                    <label for="aa-email">Email</label>
+                    <input type="email" id="aa-email" class="input" placeholder="admin@aitutor.dev" required>
+                </div>
+                <div class="field" style="margin-bottom:0;">
+                    <label for="aa-password">Temporary password</label>
+                    <input type="password" id="aa-password" class="input" placeholder="At least 8 characters" required>
+                </div>
+            </div>
+            <div class="modal-foot">
+                <button type="button" class="btn btn-ghost" id="cancel-add-admin">Cancel</button>
+                <button type="submit" class="btn btn-primary">Create admin account</button>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="js/ui.js"></script>
+<script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadStudentTable();
+    });
+
+    function escapeHtml(str) {
+        const div = document.createElement("div");
+        div.textContent = str || "";
+        return div.innerHTML;
+    }
+
+    // Add admin modal wiring
+    const overlay = document.getElementById("add-admin-overlay");
+    function openModal() { overlay.classList.add("open"); }
+    function closeModal() { overlay.classList.remove("open"); document.getElementById("add-admin-form").reset(); }
+    document.getElementById("open-add-admin").addEventListener("click", openModal);
+    document.getElementById("open-add-admin-2").addEventListener("click", openModal);
+    document.getElementById("close-add-admin").addEventListener("click", closeModal);
+    document.getElementById("cancel-add-admin").addEventListener("click", closeModal);
+    overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
+
+    // My Code
+
+    let studentRecords = [];
+
+    // function loadStudentTable(){
+    //     $.ajax({
+    //         url: "http://localhost:8080/students",
+    //         type: "GET",
+    //         contentType: "application/json",
+    //         headers: {
+    //             'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+    //         },
+    //         success: function (response) {
+    //             studentRecords = response.body;
+    //             console.log(response.body);
+    //             let html = "";
+    //             for(const responseElement of response.body) {
+    //                 html += `<tr><td id="studentName">${responseElement.studentName}<br>${responseElement.studentEmail}</td>
+    //                     <td id="studentPhone">${responseElement.studentPhone}</td>
+    //                     <td id="sessionCount">${responseElement.sessionCount}</td>
+    //                     <td id="averageRating">${(responseElement.ratings/responseElement.sessionCount)}</td>
+    //                     <td id="joinedDate">${responseElement.joinedDate}</td>
+    //                     <td id="status">${responseElement.studentStatus}</td>
+    //                     </tr>`
+    //             }
+    //             $('#students-tbody').html(html);
+    //         },
+    //         error: function (response) {
+    //             if (response.status === 403) {
+    //                 alert("Error 403 - Sorry, Forbidden!");
+    //             } else if (response.status === 400) {
+    //                 alert("Error 400 - Bad JSON");
+    //             } else if (response.status === 401) {
+    //                 alert("Error 401 - Unauthorized!");
+    //             } else if (response.status === 500) {
+    //                 alert("Error 500 - Internal Server Error");
+    //             }
+    //         }
+    //     })
+    // }
+
+    function loadStudentTable(){
+        $.ajax({
+            url: "http://localhost:8080/students",
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                studentRecords = response.body; // confirm this matches your backend's actual shape
+                renderStudentTable(studentRecords);
+                renderStats(studentRecords);
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        });
+    }
+
+    function renderStudentTable(students) {
+        if (!students || !students.length) {
+            $('#students-tbody').html(`<tr><td colspan="7" class="table-empty">No students found</td></tr>`);
+            return;
+        }
+
+        let html = "";
+        for (const s of students) {
+            const avgRating = s.sessionCount > 0 ? (s.ratings / s.sessionCount) : 0;
+            const isActive = s.studentStatus === "ACTIVE"; // adjust to whatever value your backend sends
+
+            html += `<tr>
+    <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div class="avatar role-student">${initials(s.studentName)}</div>
+            <div>
+                <div>${escapeHtml(s.studentName)}</div>
+                <small>${escapeHtml(s.studentEmail)}</small>
+            </div>
+        </div>
+    </td>
+    <td>${escapeHtml(s.studentPhone)}</td>
+    <td>${s.sessionCount}</td>
+    <td title="${avgRating.toFixed(1)} / 5">${starString(avgRating)}</td>
+    <td>${formatDate(s.joinedDate)}</td>
+    <td><span class="status-dot ${isActive ? 'active' : 'inactive'}">${escapeHtml(s.studentStatus)}</span></td>
+</tr>`;
+        }
+        $('#students-tbody').html(html);
+    }
+
+    function renderStats(students) {
+        const total = students.length;
+        const sessionsTotal = students.reduce((sum, s) => sum + s.sessionCount, 0);
+        const ratedStudents = students.filter(s => s.sessionCount > 0);
+        const avgRating = ratedStudents.length
+            ? ratedStudents.reduce((sum, s) => sum + (s.ratings / s.sessionCount), 0) / ratedStudents.length
+            : 0;
+        const activeThisWeek = students.filter(s => {
+            if (!s.lastActiveDate) return false;
+            const diffDays = (Date.now() - new Date(s.lastActiveDate).getTime()) / 86400000;
+            return diffDays <= 7;
+        }).length;
+
+        $('#stat-total').text(total);
+        $('#stat-active').text(activeThisWeek);
+        $('#stat-sessions').text(sessionsTotal);
+        $('#stat-rating').text(avgRating.toFixed(1));
+    }
+</script>
+</body>
+</html>
+

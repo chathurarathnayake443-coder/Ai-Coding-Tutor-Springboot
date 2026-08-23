@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign up · AI Coding Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="auth-shell">
+    <aside class="auth-visual">
+        <div class="brand">
+            <span class="brand-mark">AI</span>
+            <div><span>AI Coding Tutor</span><small>guided practice, not answers</small></div>
+        </div>
+
+        <div class="visual-copy">
+            <h1>Learn to think in code, not copy it.</h1>
+            <p>Paste in any question, start a session, and code in a real editor. When you're stuck, take a hint — the tutor explains the next concept and lets you choose how to apply it.</p>
+
+            <div class="visual-mock-card">
+                <div class="mono" style="font-size:11px;color:var(--text-muted);margin-bottom:12px;">YOUR PROGRESS</div>
+                <div style="display:flex;gap:18px;">
+                    <div class="hint-dial" style="--dial-size:88px;">
+                        <svg viewBox="0 0 120 120">
+                            <circle class="segment spent" cx="60" cy="60" r="50" stroke-dasharray="55 245" stroke-dashoffset="0"></circle>
+                            <circle class="segment filled" cx="60" cy="60" r="50" stroke-dasharray="55 245" stroke-dashoffset="-63"></circle>
+                            <circle class="segment filled" cx="60" cy="60" r="50" stroke-dasharray="55 245" stroke-dashoffset="-126"></circle>
+                            <circle class="segment filled" cx="60" cy="60" r="50" stroke-dasharray="55 245" stroke-dashoffset="-189"></circle>
+                            <circle class="segment filled" cx="60" cy="60" r="50" stroke-dasharray="55 245" stroke-dashoffset="-252"></circle>
+                        </svg>
+                        <div class="dial-center"><span class="count">4/5</span><span class="label">hints left</span></div>
+                    </div>
+                    <div style="flex:1;">
+                        <div class="mock-line w80"></div>
+                        <div class="mock-line w60"></div>
+                        <div class="mock-line w40"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="visual-foot">
+            <div><strong>Java</strong>&nbsp;·&nbsp;<strong>Python</strong>&nbsp;·&nbsp;<strong>JS</strong></div>
+            <div><strong>Free</strong>for students</div>
+        </div>
+    </aside>
+
+    <div class="auth-form-wrap">
+        <form class="auth-form" id="signup-form" novalidate>
+            <h2>Create your student account</h2>
+            <p class="subhead">Admin accounts are set up separately by the tutoring team.</p>
+
+            <div class="field" id="name-field">
+                <label for="name">Full name</label>
+                <input type="text" id="name" class="input" placeholder="e.g. Dinuka Perera" autocomplete="name" required>
+                <div class="field-error">Enter your full name.</div>
+            </div>
+
+            <div class="field" id="email-field">
+                <label for="email">Email (this becomes your username)</label>
+                <input type="email" id="email" class="input" placeholder="you@example.com" autocomplete="username" required>
+                <div class="field-error">Enter a valid email address.</div>
+            </div>
+
+            <div class="field" id="phone-field">
+                <label for="phone-number">Telephone number</label>
+                <div class="input-row">
+                    <select id="phone-code" class="input input-tel-code">
+                        <option value="+94">🇱🇰 +94</option>
+                        <option value="+91">🇮🇳 +91</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+61">🇦🇺 +61</option>
+                        <option value="+65">🇸🇬 +65</option>
+                        <option value="+971">🇦🇪 +971</option>
+                        <option value="+880">🇧🇩 +880</option>
+                    </select>
+                    <input type="tel" id="phone-number" class="input input-tel-num" placeholder="71 234 5678" autocomplete="tel-national" required>
+                </div>
+                <div class="field-error">Enter a valid phone number.</div>
+            </div>
+
+            <div class="field" id="password-field">
+                <label for="password">Password</label>
+                <div class="password-field">
+                    <input type="password" id="password" class="input" placeholder="At least 8 characters" autocomplete="new-password" required>
+                    <button type="button" class="password-toggle" data-target="password">Show</button>
+                </div>
+                <div class="field-error">Password must be at least 8 characters.</div>
+            </div>
+
+            <div class="field" id="confirm-field">
+                <label for="confirm-password">Confirm password</label>
+                <div class="password-field">
+                    <input type="password" id="confirm-password" class="input" placeholder="Re-enter your password" autocomplete="new-password" required>
+                    <button type="button" class="password-toggle" data-target="confirm-password">Show</button>
+                </div>
+                <div class="field-error">Passwords don't match.</div>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block" id="signup-btn" onclick="signUpStudent()">Create account</button>
+
+            <p class="subhead" style="margin-top:20px;text-align:center;">
+                Already have an account? <a href="index.html">Log in</a>
+            </p>
+        </form>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="js/mockApi.js"></script>
+<script src="js/ui.js"></script>
+<script>
+    (function () {
+        const user = api.currentUser();
+        if (user) window.location.href = user.role === "admin" ? "admin-dashboard.html" : "student-dashboard.html";
+    })();
+
+    document.querySelectorAll(".password-toggle").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const input = document.getElementById(btn.dataset.target);
+            const isPw = input.type === "password";
+            input.type = isPw ? "text" : "password";
+            btn.textContent = isPw ? "Hide" : "Show";
+        });
+    });
+
+    const form = document.getElementById("signup-form");
+    const signupBtn = document.getElementById("signup-btn");
+
+    function setError(id, hasError) { document.getElementById(id).classList.toggle("has-error", hasError); }
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const phoneCode = document.getElementById("phone-code").value;
+        const phoneNumber = document.getElementById("phone-number").value.trim();
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirm-password").value;
+
+        let valid = true;
+        if (!name) { setError("name-field", true); valid = false; } else setError("name-field", false);
+
+        const emailValid = /^\S+@\S+\.\S+$/.test(email);
+        setError("email-field", !emailValid); if (!emailValid) valid = false;
+
+        const phoneValid = phoneNumber.replace(/\D/g, "").length >= 7;
+        setError("phone-field", !phoneValid); if (!phoneValid) valid = false;
+
+        const pwValid = password.length >= 8;
+        setError("password-field", !pwValid); if (!pwValid) valid = false;
+
+        const matchValid = password === confirmPassword && confirmPassword.length > 0;
+        setError("confirm-field", !matchValid); if (!matchValid) valid = false;
+
+        if (!valid) return;
+
+        signupBtn.disabled = true;
+        signupBtn.textContent = "Creating account…";
+        try {
+            // Real backend call: POST /api/auth/signup { name, email, password, phone }
+            await api.signup({ name, email, password, phone: phoneCode + " " + phoneNumber });
+            showToast("Account created — log in to continue.", "success");
+            setTimeout(() => { window.location.href = "login.html"; }, 700);
+        } catch (err) {
+            showToast(err.message, "error");
+            setError("email-field", true);
+        } finally {
+            signupBtn.disabled = false;
+            signupBtn.textContent = "Create account";
+        }
+    });
+
+    // My Code
+
+    function signUpStudent(){
+        let studentId = 0;
+        let fullName = $('#name').val().trim();
+        let email = $('#email').val().trim();
+        let studentContact = $('#phone-code').val().trim() + $('#phone-number').val().trim();
+        let password = $('#password').val().trim();
+        let confirmPassword = $('#confirm-password').val().trim();
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match. Please re-enter.");
+            return;
+        }
+
+        const obj = JSON.stringify({"studentId": studentId, "studentFullName" : fullName, "studentEmail": email, "studentContact": studentContact, "password" : password});
+
+        $.ajax({
+            url:"http://localhost:8080/students/signUpStudent",
+            type:"POST",
+            contentType:"application/json",
+            data : obj,
+            success:function(response){
+                console.log(response);
+                alert("Signed up successfully.");
+            },
+            error: function (response){
+                if (response.status === 403){
+                    alert("Error 403 - Sorry, Forbidden!");
+                }
+                else if (response.status === 400){
+                    alert("Error 400 - Bad JSON");
+                }
+                else if (response.status === 401){
+                    alert("Error 401 - Unauthorized!");
+                }
+                else if (response.status === 500){
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+</script>
+</body>
+</html>
