@@ -2,6 +2,7 @@ package com.ijse.AI_Coding_Tutor_Springboot.service.impl;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.CodingSessionDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.EndSessionDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.GetSessionHistoryViewDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.ResponseCodingSessionDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.*;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.CodingSessionStatus;
@@ -21,13 +22,15 @@ public class CodingSessionServiceImpl implements CodingSessionService {
     private final StudentRepository studentRepository;
     private final ProgrammingLanguageRepository programmingLanguageRepository;
     private final RatingRepository ratingRepository;
+    private final CodeAttemptRepository codeAttemptRepository;
 
-    public CodingSessionServiceImpl(CodingSessionRepository codingSessionRepository, ProblemRepository problemRepository, StudentRepository studentRepository, ProgrammingLanguageRepository programmingLanguageRepository, RatingRepository ratingRepository) {
+    public CodingSessionServiceImpl(CodingSessionRepository codingSessionRepository, ProblemRepository problemRepository, StudentRepository studentRepository, ProgrammingLanguageRepository programmingLanguageRepository, RatingRepository ratingRepository, CodeAttemptRepository codeAttemptRepository) {
         this.codingSessionRepository = codingSessionRepository;
         this.problemRepository = problemRepository;
         this.studentRepository = studentRepository;
         this.programmingLanguageRepository = programmingLanguageRepository;
         this.ratingRepository = ratingRepository;
+        this.codeAttemptRepository = codeAttemptRepository;
     }
 
     @Transactional
@@ -92,5 +95,30 @@ public class CodingSessionServiceImpl implements CodingSessionService {
         catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public GetSessionHistoryViewDTO getSessionHistoryView(long sessionId){
+        try{
+            Object[] summary = codingSessionRepository.getSessionHistoryView(sessionId);
+
+            long sessionHistoryId = (long)summary[0];
+            String codingProblem = (String)summary[1];
+            String programmingLanguage = (String)summary[2];
+            int usedHintCount = (Integer)summary[3];
+
+            Optional<CodeAttempt> lastExecutedCode = codeAttemptRepository.findTopByCodingSession_SessionIdOrderByAttemptNumberDesc(sessionId);
+            if(!lastExecutedCode.isPresent()){
+                throw new RuntimeException("Sorry, Code Attempt Not Found!");
+            }
+            CodeAttempt codeAttempt = lastExecutedCode.get();
+            String lastCode = codeAttempt.getCode();
+
+            return new GetSessionHistoryViewDTO(sessionHistoryId,codingProblem,programmingLanguage,lastCode,usedHintCount);
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 }

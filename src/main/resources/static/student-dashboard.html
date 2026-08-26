@@ -240,12 +240,13 @@
                 console.log(response);
                 let html = "";
                 for(const responseElement of response.body){
+                    console.log(responseElement.sessionStatus);
                     html += `
       <div class="timeline-item ${responseElement === 0 ? "newest" : ""}">
         <div class="session-card">
           <div class="sc-top">
             <div class="sc-question">${escapeHtml(truncate(responseElement.codingProblem, 110))}</div>
-            <span class="pill ${responseElement.sessionStatus === "COMPLETED" ? "pill-cyan" : "pill-mint"}">${responseElement.sessionStatus === "COMPLETED" ? "In progress" : "Ended"}</span>
+            <span class="pill ${responseElement.sessionStatus === "IN_PROGRESS" ? "pill-cyan" : "pill-mint"}">${responseElement.sessionStatus === "IN_PROGRESS" ? "In progress" : "Ended"}</span>
           </div>
           <div class="sc-meta">
             <span>💻 ${LANG_LABEL[responseElement.programmingLanguage] || responseElement.programmingLanguage}</span>
