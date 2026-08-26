@@ -1,6 +1,7 @@
 package com.ijse.AI_Coding_Tutor_Springboot.service;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
 
@@ -14,4 +15,6 @@ public interface StudentService {
     public String getStudentNameById(long userId);
 
     public long getCompletedSessionCount(long userId);
+
+    public List<SessionHistoryDTO> getSessionHistory(long userId);
 }

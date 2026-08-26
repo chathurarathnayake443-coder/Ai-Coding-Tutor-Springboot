@@ -126,6 +126,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         loadStudentName();
         loadSessionCount();
+        getSessionHistory();
     });
 
     document.getElementById("nav-sessions").addEventListener("click", () => {
@@ -210,6 +211,58 @@
                 console.log(response);
                 let sessionCount = response.body;
                 $('#an-total').text(sessionCount);
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    function getSessionHistory(){
+        let userId = localStorage.getItem("userId");
+        $.ajax({
+            url: "http://localhost:8080/getSessionHistory/" + userId,
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function(response){
+                console.log("Session History Fetched");
+                console.log(response);
+                let html = "";
+                for(const responseElement of response.body){
+                    html += `
+      <div class="timeline-item ${responseElement === 0 ? "newest" : ""}">
+        <div class="session-card">
+          <div class="sc-top">
+            <div class="sc-question">${escapeHtml(truncate(responseElement.codingProblem, 110))}</div>
+            <span class="pill ${responseElement.sessionStatus === "COMPLETED" ? "pill-cyan" : "pill-mint"}">${responseElement.sessionStatus === "COMPLETED" ? "In progress" : "Ended"}</span>
+          </div>
+          <div class="sc-meta">
+            <span>💻 ${LANG_LABEL[responseElement.programmingLanguage] || responseElement.programmingLanguage}</span>
+            <span>💡 ${responseElement.usedHintCount}/5 hints used</span>
+            <span>🕒 ${formatDate(responseElement.startDate)}</span>
+          </div>
+          <div class="sc-foot">
+            ${responseElement.sessionStatus === "COMPLETED"
+                        ? `<span class="rating-badge"><span class="stars">${starString(responseElement.ratingValue)}</span> ${responseElement.ratingValue}/5</span>`
+                        : `<a href="session.html?id=${responseElement.sessionId}" class="btn btn-cyan btn-sm">Resume session</a>`}
+            <button class="btn btn-outline btn-sm" data-session-id="${responseElement.sessionId}" data-action="view-chat">View chat history</button>
+          </div>
+        </div>
+      </div>
+    `
+                }
+                $('#session-timeline').html(html);
             },
             error: function (response) {
                 if (response.status === 403) {

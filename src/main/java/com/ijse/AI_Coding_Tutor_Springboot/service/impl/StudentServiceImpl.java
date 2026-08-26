@@ -1,6 +1,7 @@
 package com.ijse.AI_Coding_Tutor_Springboot.service.impl;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.CodingSessionRepository;
@@ -60,5 +61,26 @@ public class StudentServiceImpl implements StudentService {
         return 0;
     }
 
+
+    public List<SessionHistoryDTO> getSessionHistory(long userId){
+        try{
+            Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
+            if(!studentOptional.isPresent()){
+                throw new RuntimeException("Sorry Student not found");
+            }
+            Student student = studentOptional.get();
+
+            List<SessionHistoryDTO> sessionHistoryDTOList = codingSessionRepository.getSessionHistory(student.getStudentId());
+            for(SessionHistoryDTO sessionHistoryDTO : sessionHistoryDTOList){
+                System.out.println(sessionHistoryDTO.getSessionId());
+            }
+            return sessionHistoryDTOList;
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }

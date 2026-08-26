@@ -2,6 +2,7 @@ package com.ijse.AI_Coding_Tutor_Springboot.controller;
 
 import com.ijse.AI_Coding_Tutor_Springboot.constants.CommonResponse;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
 import com.ijse.AI_Coding_Tutor_Springboot.service.StudentService;
@@ -50,5 +51,11 @@ public class StudentController {
     public CommonResponse getCompletedSessions(@PathVariable long userId){
         long sessionCount = studentService.getCompletedSessionCount(userId);
         return new CommonResponse(OPERATION_SUCCESS, sessionCount, SUCCESS_MESSAGE);
+    }
+
+    @GetMapping("/getSessionHistory/{userId}")
+    public CommonResponse getSessionHistory(@PathVariable long userId){
+        List<SessionHistoryDTO> sessionHistoryDTO = studentService.getSessionHistory(userId);
+        return new CommonResponse(OPERATION_SUCCESS, sessionHistoryDTO, SUCCESS_MESSAGE);
     }
 }
