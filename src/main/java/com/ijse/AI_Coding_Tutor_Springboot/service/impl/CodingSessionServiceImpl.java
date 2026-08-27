@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,14 +24,16 @@ public class CodingSessionServiceImpl implements CodingSessionService {
     private final ProgrammingLanguageRepository programmingLanguageRepository;
     private final RatingRepository ratingRepository;
     private final CodeAttemptRepository codeAttemptRepository;
+    private final HintRepository hintRepository;
 
-    public CodingSessionServiceImpl(CodingSessionRepository codingSessionRepository, ProblemRepository problemRepository, StudentRepository studentRepository, ProgrammingLanguageRepository programmingLanguageRepository, RatingRepository ratingRepository, CodeAttemptRepository codeAttemptRepository) {
+    public CodingSessionServiceImpl(CodingSessionRepository codingSessionRepository, ProblemRepository problemRepository, StudentRepository studentRepository, ProgrammingLanguageRepository programmingLanguageRepository, RatingRepository ratingRepository, CodeAttemptRepository codeAttemptRepository, HintRepository hintRepository) {
         this.codingSessionRepository = codingSessionRepository;
         this.problemRepository = problemRepository;
         this.studentRepository = studentRepository;
         this.programmingLanguageRepository = programmingLanguageRepository;
         this.ratingRepository = ratingRepository;
         this.codeAttemptRepository = codeAttemptRepository;
+        this.hintRepository = hintRepository;
     }
 
     @Transactional
@@ -99,26 +102,32 @@ public class CodingSessionServiceImpl implements CodingSessionService {
 
     public GetSessionHistoryViewDTO getSessionHistoryView(long sessionId){
         try{
-            Object[] summary = codingSessionRepository.getSessionHistoryView(sessionId);
-
-            long sessionHistoryId = (long)summary[0];
-            String codingProblem = (String)summary[1];
-            String programmingLanguage = (String)summary[2];
-            int usedHintCount = (Integer)summary[3];
+            Optional<GetSessionHistoryViewDTO> optionalSessionView = codingSessionRepository.getSessionHistoryView(sessionId);
+            if(!optionalSessionView.isPresent()){
+                throw new RuntimeException("Sorry, Session Not Found!");
+            }
+            GetSessionHistoryViewDTO sessionView = optionalSessionView.get();
 
             Optional<CodeAttempt> lastExecutedCode = codeAttemptRepository.findTopByCodingSession_SessionIdOrderByAttemptNumberDesc(sessionId);
+            String lastCode = "";
             if(!lastExecutedCode.isPresent()){
-                throw new RuntimeException("Sorry, Code Attempt Not Found!");
+                lastCode = "";
             }
-            CodeAttempt codeAttempt = lastExecutedCode.get();
-            String lastCode = codeAttempt.getCode();
+            else{
+                CodeAttempt codeAttempt = lastExecutedCode.get();
+                lastCode = codeAttempt.getCode();
+            }
 
-            return new GetSessionHistoryViewDTO(sessionHistoryId,codingProblem,programmingLanguage,lastCode,usedHintCount);
+            List<String> hintList = hintRepository.getHintListForSession(sessionId);
+            sessionView.setHintTextList(hintList);
+
+            sessionView.setLastExecutedCode(lastCode);
+
+            return sessionView;
 
         }
         catch(Exception e){
-            e.printStackTrace();
+            throw e;
         }
-        return null;
     }
 }

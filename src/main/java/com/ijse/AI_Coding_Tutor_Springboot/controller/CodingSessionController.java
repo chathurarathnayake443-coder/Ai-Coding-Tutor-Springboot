@@ -5,10 +5,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.dto.*;
 import com.ijse.AI_Coding_Tutor_Springboot.service.CodingSessionService;
 import com.ijse.AI_Coding_Tutor_Springboot.service.GeminiService;
 import io.jsonwebtoken.security.Jwks;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.ijse.AI_Coding_Tutor_Springboot.constants.ResponseCode.OPERATION_SUCCESS;
 import static com.ijse.AI_Coding_Tutor_Springboot.constants.ResponseMessage.SUCCESS_MESSAGE;
@@ -48,9 +45,10 @@ public class CodingSessionController {
         return new CommonResponse(OPERATION_SUCCESS,SUCCESS_MESSAGE);
     }
 
-    @GetMapping("/getSessionHistoryView")
-    public CommonResponse getSessionHistoryView(long sessionId){
+    @GetMapping("/getSessionHistoryView/{sessionId}")
+    public CommonResponse getSessionHistoryView(@PathVariable long sessionId){
         GetSessionHistoryViewDTO sessionView =  codingSessionService.getSessionHistoryView(sessionId);
+        System.out.println(sessionView.getCodingProblem());
         return new CommonResponse(OPERATION_SUCCESS,sessionView,SUCCESS_MESSAGE);
     }
 }

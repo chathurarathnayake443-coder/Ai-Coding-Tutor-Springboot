@@ -279,6 +279,11 @@
         })
     }
 
+    $(document).on("click", '[data-action="view-chat"]', function() {
+        let sessionId = $(this).data("session-id");
+        window.location.href = "session.html?id=" + sessionId;
+    });
+
 
 </script>
 </body>

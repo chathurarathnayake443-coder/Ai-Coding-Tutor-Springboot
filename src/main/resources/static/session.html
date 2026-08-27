@@ -104,6 +104,14 @@
 <script src="js/ui.js"></script>
 <script>
 
+    document.addEventListener("DOMContentLoaded", () => {
+        if (existingId) {
+            loadExistingSession(existingId);
+        } else {
+            setLockedState();
+        }
+    });
+
     const params = new URLSearchParams(window.location.search);
     const existingId = params.get("id");
 
@@ -507,6 +515,45 @@
                 }
             }
         })
+    }
+
+    function loadExistingSession(sessionId) {
+        $.ajax({
+            url: "http://localhost:8080/getSessionHistoryView/" + sessionId,
+            type: "GET",
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('JWT') },
+            success: function (response) {
+                if (!response || !response.body) {
+                    alert("Could not load this session.");
+                    return;
+                }
+
+                let detail = response.body;
+
+                currentSession = {
+                    id: detail.sessionId,
+                    language: detail.programmingLanguage,
+                    hintsUsed: detail.usedHintCount
+                };
+
+                questionInput.value = detail.codingProblem;
+                languageSelect.value = detail.programmingLanguage;
+                codeEditor.value = detail.lastExecutedCode || "";
+
+                if (detail.hintTextList && detail.hintTextList.length > 0) {
+                    for (let i = 0; i < detail.hintTextList.length; i++) {
+                        renderHintCard({ text: detail.hintTextList[i], isFinal: false });
+                    }
+                }
+
+                setEndedState();
+                renderDial(detail.usedHintCount);
+                syncLineNumbers();
+            },
+            error: function () {
+                alert("Could not load this session.");
+            }
+        });
     }
 </script>
 </body>
