@@ -4,15 +4,17 @@ import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.CodingSessionRepository;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.HintRepository;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.RatingRepository;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.StudentRepository;
+import com.ijse.AI_Coding_Tutor_Springboot.entity.User;
+import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserStatus;
+import com.ijse.AI_Coding_Tutor_Springboot.repository.*;
 import com.ijse.AI_Coding_Tutor_Springboot.service.StudentService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class StudentServiceImpl implements StudentService {
@@ -21,12 +23,14 @@ public class StudentServiceImpl implements StudentService {
     private StudentRepository studentRepository;
     private CodingSessionRepository codingSessionRepository;
     private final RatingRepository ratingRepository;
+    private final UserRepository userRepository;
 
-    public StudentServiceImpl(StudentRepository studentRepository, CodingSessionRepository codingSessionRepository, HintRepository hintRepository, RatingRepository ratingRepository) {
+    public StudentServiceImpl(StudentRepository studentRepository, CodingSessionRepository codingSessionRepository, HintRepository hintRepository, RatingRepository ratingRepository, UserRepository userRepository) {
         this.studentRepository = studentRepository;
         this.codingSessionRepository = codingSessionRepository;
         this.hintRepository = hintRepository;
         this.ratingRepository = ratingRepository;
+        this.userRepository = userRepository;
     }
 
     public List<GetStudentDetailsDTO> getAllStudents(){
@@ -103,5 +107,4 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
-
 }

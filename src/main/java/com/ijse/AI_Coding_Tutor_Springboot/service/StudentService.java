@@ -4,9 +4,13 @@ import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
+import com.ijse.AI_Coding_Tutor_Springboot.entity.User;
+import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface StudentService {
 

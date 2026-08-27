@@ -12,22 +12,26 @@ import com.ijse.AI_Coding_Tutor_Springboot.repository.SubscriptionPlanRepository
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserSubscriptionRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.UserService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-    private SubscriptionPlanRepository subscriptionPlanRepository;
-    private UserSubscriptionRepository userSubscriptionRepository;
+    private final UserRepository userRepository;
+    private final SubscriptionPlanRepository subscriptionPlanRepository;
+    private final UserSubscriptionRepository userSubscriptionRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, SubscriptionPlanRepository subscriptionPlanRepository, UserSubscriptionRepository userSubscriptionRepository) {
+    public UserServiceImpl(UserRepository userRepository, SubscriptionPlanRepository subscriptionPlanRepository, UserSubscriptionRepository userSubscriptionRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.subscriptionPlanRepository = subscriptionPlanRepository;
         this.userSubscriptionRepository = userSubscriptionRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserDTO getUserDetails(String userName, String password, String userRole) {
@@ -88,5 +92,38 @@ public class UserServiceImpl implements UserService {
         catch(Exception e){
             throw e;
         }
+    }
+
+    public UserDTO findOrCreateByGoogleEmail(String email, String name) {
+        try{
+            Optional<User> existing = userRepository.findByUserName(email);
+            if (existing.isPresent()) {
+                User user = existing.get();
+                UserDTO userDTO = new UserDTO();
+                userDTO.setUserId(user.getUserId());
+                userDTO.setUserName(user.getUserName());
+                userDTO.setPassword(user.getPassword());
+                userDTO.setUserStatus(user.getUserStatus());
+                userDTO.setJoinedDate(user.getJoinedDate());
+                return userDTO;
+            }
+
+            User user = new User();
+            user.setUserName(email);
+            user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+            user.setUserRole("STUDENT");
+            user.setUserStatus(UserStatus.ACTIVE);
+            user.setJoinedDate(LocalDateTime.now());
+
+            Student student = new Student();
+            student.setStudentFullName(name);
+            student.setUser(user);
+            user.setStudent(student);
+            userRepository.save(user);
+        }
+        catch(Exception e){
+            throw e;
+        }
+        return null;
     }
 }
