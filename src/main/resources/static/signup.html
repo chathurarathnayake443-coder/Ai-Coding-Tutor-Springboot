@@ -225,7 +225,6 @@
     }
 
     function handleGoogleSignIn(response) {
-        // response.credential is the Google ID token (a JWT from Google)
         $.ajax({
             url: "http://localhost:8080/auth/google",
             type: "POST",

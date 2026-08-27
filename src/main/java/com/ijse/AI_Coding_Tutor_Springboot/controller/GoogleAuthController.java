@@ -31,7 +31,7 @@ import static com.ijse.AI_Coding_Tutor_Springboot.constants.ResponseMessage.SUCC
 public class GoogleAuthController {
 
     private final UserService userService;
-    private final JwtUtil jwtUtil; // whatever generates your existing JWTs
+    private final JwtUtil jwtUtil;
 
     @Value("${google.client.id}")
     private String googleClientId;
@@ -59,7 +59,6 @@ public class GoogleAuthController {
             String email = payload.getEmail();
             String name = (String) payload.get("name");
 
-            // find existing student by email, or create a new one on first login
             UserDTO userDetails = userService.findOrCreateByGoogleEmail(email, name);
 
             String token = jwtUtil.generateToken(userDetails);
