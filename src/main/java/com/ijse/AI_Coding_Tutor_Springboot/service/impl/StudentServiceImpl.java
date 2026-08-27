@@ -5,6 +5,8 @@ import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.CodingSessionRepository;
+import com.ijse.AI_Coding_Tutor_Springboot.repository.HintRepository;
+import com.ijse.AI_Coding_Tutor_Springboot.repository.RatingRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.StudentRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.StudentService;
 import org.springframework.stereotype.Service;
@@ -15,12 +17,16 @@ import java.util.Optional;
 @Service
 public class StudentServiceImpl implements StudentService {
 
+    private final HintRepository hintRepository;
     private StudentRepository studentRepository;
     private CodingSessionRepository codingSessionRepository;
+    private final RatingRepository ratingRepository;
 
-    public StudentServiceImpl(StudentRepository studentRepository, CodingSessionRepository codingSessionRepository) {
+    public StudentServiceImpl(StudentRepository studentRepository, CodingSessionRepository codingSessionRepository, HintRepository hintRepository, RatingRepository ratingRepository) {
         this.studentRepository = studentRepository;
         this.codingSessionRepository = codingSessionRepository;
+        this.hintRepository = hintRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     public List<GetStudentDetailsDTO> getAllStudents(){
@@ -81,6 +87,21 @@ public class StudentServiceImpl implements StudentService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public double getAverageRating(long userId){
+        try{
+            Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
+            if(!studentOptional.isPresent()){
+                throw new RuntimeException("Sorry Student not found");
+            }
+            Student student = studentOptional.get();
+            double avgRating = ratingRepository.findAvgRatingByStudentId(student.getStudentId());
+            return avgRating;
+        }
+        catch(Exception e){
+            throw e;
+        }
     }
 
 }

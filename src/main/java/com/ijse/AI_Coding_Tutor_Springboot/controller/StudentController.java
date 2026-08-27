@@ -58,4 +58,10 @@ public class StudentController {
         List<SessionHistoryDTO> sessionHistoryDTO = studentService.getSessionHistory(userId);
         return new CommonResponse(OPERATION_SUCCESS, sessionHistoryDTO, SUCCESS_MESSAGE);
     }
+
+    @GetMapping("/getAvgRating/{userId}")
+    public CommonResponse getAvgRating(@PathVariable long userId){
+        double avgRating = studentService.getAverageRating(userId);
+        return new CommonResponse(OPERATION_SUCCESS, avgRating, SUCCESS_MESSAGE);
+    }
 }

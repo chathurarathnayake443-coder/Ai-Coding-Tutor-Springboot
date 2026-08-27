@@ -127,6 +127,7 @@
         loadStudentName();
         loadSessionCount();
         getSessionHistory();
+        getAvgRating();
     });
 
     document.getElementById("nav-sessions").addEventListener("click", () => {
@@ -283,6 +284,50 @@
         let sessionId = $(this).data("session-id");
         window.location.href = "session.html?id=" + sessionId;
     });
+
+    function getAvgRating(){
+        let userId = localStorage.getItem("userId");
+        $.ajax({
+            url: "http://localhost:8080/getAvgRating/" + userId,
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function(response){
+                console.log(response.body);
+                $('#an-rating').text(response.body + " / 5");
+                let ratingFeedback = generateRatingFeedback(response.body);
+                $('#an-feedback').text(ratingFeedback);
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    function generateRatingFeedback(ratingValue){
+        if(ratingValue >= 4.5){
+            return "Excellent Performance Rating! Keep it Up! Strong independent problem-solving — you're leaning on hints less each session.";
+        }
+        else if(ratingValue >= 3.5){
+            return "Good Performance Rating! You are doing Well!";
+        }
+        else if(ratingValue >= 2.5){
+            return "Normal Performance Rating. Keep Trying!";
+        }
+        else{
+            return "Poor Performance. Dont Give up and Try Harder!";
+        }
+    }
 
 
 </script>

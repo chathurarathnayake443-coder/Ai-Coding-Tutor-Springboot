@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign up · AI Coding Tutor</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
@@ -99,7 +100,13 @@
                 </div>
                 <div class="field-error">Passwords don't match.</div>
             </div>
-
+            <br>
+            <div id="g_id_onload"
+                 data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+                 data-callback="handleGoogleSignIn">
+            </div>
+            <div class="g_id_signin" data-type="standard" data-theme="outline" data-size="large"></div>
+            <br>
             <button type="button" class="btn btn-primary btn-block" id="signup-btn" onclick="signUpStudent()">Create account</button>
 
             <p class="subhead" style="margin-top:20px;text-align:center;">
@@ -215,6 +222,24 @@
                 }
             }
         })
+    }
+
+    function handleGoogleSignIn(response) {
+        // response.credential is the Google ID token (a JWT from Google)
+        $.ajax({
+            url: "http://localhost:8080/auth/google",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ idToken: response.credential }),
+            success: function (res) {
+                localStorage.setItem("JWT", res.body.token);
+                localStorage.setItem("userId", res.body.userId);
+                window.location.href = "student-dashboard.html";
+            },
+            error: function () {
+                alert("Google sign-in failed.");
+            }
+        });
     }
 </script>
 </body>

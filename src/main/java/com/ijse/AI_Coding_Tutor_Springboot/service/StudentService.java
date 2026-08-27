@@ -17,4 +17,6 @@ public interface StudentService {
     public long getCompletedSessionCount(long userId);
 
     public List<SessionHistoryDTO> getSessionHistory(long userId);
+
+    public double getAverageRating(long userId);
 }
