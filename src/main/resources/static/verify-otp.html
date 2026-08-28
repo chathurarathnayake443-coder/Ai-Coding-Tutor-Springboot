@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP · AI Coding Tutor</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0b0b0b;
+            color: #f5f5f5;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 500px;
+            padding: 24px;
+        }
+
+        .card {
+            background: #151515;
+            border: 1px solid goldenrod;
+            border-radius: 18px;
+            padding: 38px;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, .08);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: goldenrod;
+            color: #151515;
+            font-size: 13px;
+            letter-spacing: .5px;
+        }
+
+        .eyebrow {
+            margin: 0 0 8px;
+            color: #9a9a9a;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 30px;
+            line-height: 1.15;
+        }
+
+        .description {
+            margin: 12px 0 26px;
+            color: #a7a7a7;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .phone {
+            font-weight: 700;
+            color: #eeeeee;
+        }
+
+        .otp-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 26px 0;
+        }
+
+        .otp-box {
+            width: 54px;
+            height: 62px;
+            border: 1px solid #cfcfcf;
+            border-radius: 12px;
+            background: #1d1d1d;
+            color: #f5f5f5;
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            outline: none;
+            transition:
+                    border-color .2s ease,
+                    box-shadow .25s ease,
+                    transform .2s ease,
+                    background .2s ease;
+        }
+
+        .otp-box:focus {
+            background: #151515;
+            border-color: #f5f5f5;
+            transform: translateY(-2px);
+            box-shadow:
+                    0 12px 28px rgba(0, 0, 0, .55),
+                    0 0 0 3px rgba(255, 255, 255, .08);
+        }
+
+        /* Shadow remains beautifully visible after a digit is entered. */
+        .otp-box.filled {
+            background: #151515;
+            border-color: #bdbdbd;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .45);
+        }
+
+        .otp-box.error {
+            border-color: #f5f5f5;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, .10);
+        }
+
+        .btn {
+            width: 100%;
+            height: 48px;
+            border: 0;
+            border-radius: 10px;
+            background: lightseagreen;
+            color: #151515;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .btn:hover {
+            background: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, .14);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .resend {
+            margin-top: 20px;
+            text-align: center;
+            color: #a7a7a7;
+            font-size: 13px;
+        }
+
+        .resend button {
+            border: 0;
+            background: none;
+            padding: 0;
+            color: #f5f5f5;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .resend button:disabled {
+            color: #999;
+            cursor: not-allowed;
+            text-decoration: none;
+        }
+
+        .message {
+            display: none;
+            margin-top: 18px;
+            padding: 12px 14px;
+            border-radius: 9px;
+            background: #242424;
+            color: #333;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 22px;
+            text-align: center;
+            color: #bdbdbd;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: #f5f5f5;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 500px) {
+            .card {
+                padding: 28px 20px;
+            }
+
+            .otp-container {
+                gap: 7px;
+            }
+
+            .otp-box {
+                width: 45px;
+                height: 56px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+    <div class="card">
+
+        <div class="brand">
+            <span class="brand-mark">AI</span>
+            <span>AI Coding Tutor</span>
+        </div>
+
+        <p class="eyebrow">Security verification</p>
+        <h1 style="color: goldenrod">Verify your OTP</h1>
+
+        <p class="description">
+            A 6-digit OTP code has been sent to your registered mobile number.
+            Enter that code below to continue.
+        </p>
+
+        <div class="otp-container">
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code" aria-label="OTP digit 1">
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" aria-label="OTP digit 2">
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" aria-label="OTP digit 3">
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" aria-label="OTP digit 4">
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" aria-label="OTP digit 5">
+            <input class="otp-box" type="text" maxlength="1" inputmode="numeric" aria-label="OTP digit 6">
+        </div>
+
+        <button class="btn" id="verify-btn">Verify OTP</button>
+
+        <div class="message" id="message"></div>
+
+        <div class="resend">
+            Didn't receive the code?
+            <button id="resend-btn" disabled>Resend OTP (<span id="timer">30</span>s)</button>
+        </div>
+
+        <a href="index.html" class="back-link">← Back to login</a>
+
+    </div>
+</div>
+
+<script>
+    const otpBoxes = document.querySelectorAll(".otp-box");
+    const verifyBtn = document.getElementById("verify-btn");
+    const message = document.getElementById("message");
+    const resendBtn = document.getElementById("resend-btn");
+    const timerEl = document.getElementById("timer");
+
+    /*
+     * Temporary frontend demo OTP.
+     * IMPORTANT:
+     * In your real application, the OTP must be generated and
+     * verified by the Spring Boot backend, not JavaScript.
+     */
+    const demoOtp = "123456";
+
+    otpBoxes.forEach((box, index) => {
+
+        box.addEventListener("input", function () {
+            this.value = this.value.replace(/\D/g, "").slice(0, 1);
+
+            if (this.value) {
+                this.classList.add("filled");
+
+                if (index < otpBoxes.length - 1) {
+                    otpBoxes[index + 1].focus();
+                }
+            } else {
+                this.classList.remove("filled");
+            }
+        });
+
+        box.addEventListener("keydown", function (event) {
+            if (event.key === "Backspace" && !this.value && index > 0) {
+                otpBoxes[index - 1].value = "";
+                otpBoxes[index - 1].classList.remove("filled");
+                otpBoxes[index - 1].focus();
+            }
+
+            if (event.key === "ArrowLeft" && index > 0) {
+                otpBoxes[index - 1].focus();
+            }
+
+            if (event.key === "ArrowRight" && index < otpBoxes.length - 1) {
+                otpBoxes[index + 1].focus();
+            }
+        });
+
+        box.addEventListener("paste", function (event) {
+            event.preventDefault();
+
+            const pasted = (event.clipboardData || window.clipboardData)
+                .getData("text")
+                .replace(/\D/g, "")
+                .slice(0, 6);
+
+            pasted.split("").forEach((digit, i) => {
+                if (otpBoxes[i]) {
+                    otpBoxes[i].value = digit;
+                    otpBoxes[i].classList.add("filled");
+                }
+            });
+
+            const nextIndex = Math.min(pasted.length, otpBoxes.length - 1);
+            otpBoxes[nextIndex].focus();
+        });
+    });
+
+    verifyBtn.addEventListener("click", function () {
+
+        const otp = Array.from(otpBoxes)
+            .map(box => box.value)
+            .join("");
+
+        if (otp.length !== 6) {
+            message.textContent = "Please enter all 6 digits of the OTP.";
+            message.classList.add("show");
+            return;
+        }
+
+        /*
+         * Replace this demo verification with your Spring Boot API.
+         *
+         * Example request:
+         *
+         * POST /verifyOtp
+         * {
+         *     "mobile": "...",
+         *     "otp": "123456"
+         * }
+         */
+
+        if (otp === demoOtp) {
+            message.textContent = "OTP verified successfully. You can now create a new password.";
+            message.classList.add("show");
+
+            sessionStorage.setItem("otpVerified", "true");
+
+            setTimeout(function () {
+                window.location.href = "reset-password.html";
+            }, 700);
+        } else {
+            message.textContent = "Invalid OTP. Please check the code and try again.";
+            message.classList.add("show");
+
+            otpBoxes.forEach(box => box.classList.add("error"));
+
+            setTimeout(function () {
+                otpBoxes.forEach(box => box.classList.remove("error"));
+            }, 700);
+        }
+    });
+
+    /* Resend countdown */
+    let seconds = 30;
+
+    const countdown = setInterval(function () {
+        seconds--;
+        timerEl.textContent = seconds;
+
+        if (seconds <= 0) {
+            clearInterval(countdown);
+            resendBtn.disabled = false;
+            resendBtn.innerHTML = "Resend OTP";
+        }
+    }, 1000);
+
+    resendBtn.addEventListener("click", function () {
+        if (resendBtn.disabled) return;
+
+        /*
+         * Call your Spring Boot resend-OTP endpoint here.
+         */
+
+        message.textContent = "A new OTP has been sent to your mobile number.";
+        message.classList.add("show");
+
+        resendBtn.disabled = true;
+
+        seconds = 30;
+        resendBtn.innerHTML = `Resend OTP (<span id="timer">30</span>s)`;
+
+        const newTimer = setInterval(function () {
+            seconds--;
+
+            const currentTimer = document.getElementById("timer");
+            if (currentTimer) {
+                currentTimer.textContent = seconds;
+            }
+
+            if (seconds <= 0) {
+                clearInterval(newTimer);
+                resendBtn.disabled = false;
+                resendBtn.innerHTML = "Resend OTP";
+            }
+        }, 1000);
+    });
+</script>
+
+</body>
+</html>
