@@ -19,7 +19,7 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
         s.user.userName,
         s.studentContact,
         COUNT(DISTINCT cs.sessionId),
-        AVG(r.ratingValue),
+        COALESCE(AVG(r.ratingValue), 0.0),
         s.user.joinedDate,
         s.user.userStatus
     )

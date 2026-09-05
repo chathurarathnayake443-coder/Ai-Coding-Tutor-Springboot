@@ -194,7 +194,18 @@
                 'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
             },
             success: function (response) {
-                studentRecords = response.body; // confirm this matches your backend's actual shape
+                studentRecords = response.body;
+                // let totalRating = 0;
+                // let ratedCount = 0;
+                // studentRecords.forEach(student => {
+                //     if (student.avgRating != null && student.avgRating > 0) {
+                //         totalRating += student.avgRating;
+                //         ratedCount++;
+                //     }
+                // });
+                // const overallAverage = ratedCount > 0 ? (totalRating / ratedCount) : 0;
+                // console.log("Average rating - " + overallAverage);
+                // $('#stat-rating').text(overallAverage);
                 renderStudentTable(studentRecords);
                 renderStats(studentRecords);
             },
@@ -220,24 +231,24 @@
 
         let html = "";
         for (const s of students) {
-            const avgRating = s.sessionCount > 0 ? (s.ratings / s.sessionCount) : 0;
-            const isActive = s.studentStatus === "ACTIVE"; // adjust to whatever value your backend sends
+            const avgRating = s.avgRating || 0;
+            const isActive = s.studentStatus === "ACTIVE";
 
             html += `<tr>
-    <td>
-        <div style="display:flex;align-items:center;gap:10px;">
-            <div class="avatar role-student">${initials(s.studentName)}</div>
-            <div>
-                <div>${escapeHtml(s.studentName)}</div>
-                <small>${escapeHtml(s.studentEmail)}</small>
-            </div>
+<td>
+    <div style="display:flex;align-items:center;gap:10px;">
+        <div class="avatar role-student">${initials(s.studentName)}</div>
+        <div>
+            <div>${escapeHtml(s.studentName)}</div>
+            <small>${escapeHtml(s.studentEmail)}</small>
         </div>
-    </td>
-    <td>${escapeHtml(s.studentPhone)}</td>
-    <td>${s.sessionCount}</td>
-    <td title="${avgRating.toFixed(1)} / 5">${starString(avgRating)}</td>
-    <td>${formatDate(s.joinedDate)}</td>
-    <td><span class="status-dot ${isActive ? 'active' : 'inactive'}">${escapeHtml(s.studentStatus)}</span></td>
+    </div>
+</td>
+<td>${escapeHtml(s.studentPhone)}</td>
+<td>${s.sessionCount}</td>
+<td title="${avgRating.toFixed(1)} / 5">${starString(avgRating)}</td>
+<td>${formatDate(s.joinedDate)}</td>
+<td><span class="status-dot ${isActive ? 'active' : 'inactive'}">${escapeHtml(s.studentStatus)}</span></td>
 </tr>`;
         }
         $('#students-tbody').html(html);
@@ -246,9 +257,9 @@
     function renderStats(students) {
         const total = students.length;
         const sessionsTotal = students.reduce((sum, s) => sum + s.sessionCount, 0);
-        const ratedStudents = students.filter(s => s.sessionCount > 0);
+        const ratedStudents = students.filter(s => s.avgRating != null && s.avgRating > 0);
         const avgRating = ratedStudents.length
-            ? ratedStudents.reduce((sum, s) => sum + (s.ratings / s.sessionCount), 0) / ratedStudents.length
+            ? ratedStudents.reduce((sum, s) => sum + s.avgRating, 0) / ratedStudents.length
             : 0;
         const activeThisWeek = students.filter(s => {
             if (!s.lastActiveDate) return false;

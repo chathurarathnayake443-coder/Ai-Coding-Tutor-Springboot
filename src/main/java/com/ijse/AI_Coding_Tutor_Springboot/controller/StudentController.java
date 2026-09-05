@@ -31,6 +31,8 @@ public class StudentController {
         for(int i = 0; i < studentList.size(); i++){
             System.out.println(studentList.get(i).getStudentName());
             System.out.println("Hello");
+            System.out.println("session count - " + studentList.get(i).getSessionCount());
+            System.out.println("Average of students - " + studentList.get(i).getAvgRating());
         }
         return new CommonResponse(OPERATION_SUCCESS, studentList, SUCCESS_MESSAGE);
     }
