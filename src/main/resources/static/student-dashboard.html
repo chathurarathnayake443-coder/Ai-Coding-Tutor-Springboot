@@ -184,6 +184,7 @@
             success: function(response){
                 console.log(response);
                 $('#student-name').text(response.body);
+                $('#first-name-suffix').text(", " + response.body);
             },
             error: function (response) {
                 if (response.status === 403) {
