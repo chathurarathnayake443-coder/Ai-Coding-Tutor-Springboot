@@ -185,6 +185,8 @@
                 console.log(response);
                 $('#student-name').text(response.body);
                 $('#first-name-suffix').text(", " + response.body);
+                let letters = initials($('#student-name').text());
+                $('#student-avatar').text(letters);
             },
             error: function (response) {
                 if (response.status === 403) {
@@ -328,6 +330,19 @@
         else{
             return "Poor Performance. Dont Give up and Try Harder!";
         }
+    }
+
+    function initials(fullName) {
+        if (!fullName) return "?";
+
+        const parts = fullName.trim().split(/\s+/);
+        if (parts.length === 1) {
+            return parts[0].slice(0, 2).toUpperCase();
+        }
+
+        const first = parts[0].charAt(0);
+        const last = parts[parts.length - 1].charAt(0);
+        return (first + last).toUpperCase();
     }
 
 

@@ -126,6 +126,7 @@
 
     document.addEventListener("DOMContentLoaded", () => {
         loadStudentTable();
+        loadAdminName();
     });
 
     function escapeHtml(str) {
@@ -271,6 +272,49 @@
         $('#stat-active').text(activeThisWeek);
         $('#stat-sessions').text(sessionsTotal);
         $('#stat-rating').text(avgRating.toFixed(1));
+    }
+
+    function loadAdminName(){
+        let userId = localStorage.getItem('userId');
+
+        $.ajax({
+            url: "http://localhost:8080/getAdminName/" + userId,
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                console.log(response.body);
+                $('#admin-name').text(response.body);
+                let letters = initials(response.body);
+                $('#admin-avatar').text(letters);
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    function initials(fullName) {
+        if (!fullName) return "?";
+
+        const parts = fullName.trim().split(/\s+/);
+        if (parts.length === 1) {
+            return parts[0].slice(0, 2).toUpperCase();
+        }
+
+        const first = parts[0].charAt(0);
+        const last = parts[parts.length - 1].charAt(0);
+        return (first + last).toUpperCase();
     }
 </script>
 </body>
