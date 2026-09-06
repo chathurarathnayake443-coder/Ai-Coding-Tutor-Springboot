@@ -131,8 +131,13 @@
         </main>
     </div>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        getStudentDetails();
+    });
+
     let originalProfile={fullName:"",email:"",phone:"",address:""};
     const userId=localStorage.getItem("userId");
     const token=localStorage.getItem("JWT");
@@ -210,6 +215,37 @@
     function resetForm(){setUI(originalProfile);message("Your changes have been discarded.","success");}
     function logout(){localStorage.removeItem("JWT");localStorage.removeItem("userId");window.location.href="index.html";}
     document.addEventListener("DOMContentLoaded",loadProfile);
+
+    // My Code
+
+    function getStudentDetails(){
+        let userId = localStorage.getItem("userId");
+
+        $.ajax({
+            url:"http://localhost:8080/getStudentDetails/"+userId,
+            type:"GET",
+            contentType:"application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success:function(response){
+                console.log(response.body.studentId);
+                $('#profile-name').text(response.body.studentFullName);
+                $('#profile-email').text(response.body.studentEmail);
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
 </script>
 </body>
 </html>

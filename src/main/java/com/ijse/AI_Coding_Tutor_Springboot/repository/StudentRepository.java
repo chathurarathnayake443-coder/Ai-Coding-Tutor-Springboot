@@ -1,6 +1,7 @@
 package com.ijse.AI_Coding_Tutor_Springboot.repository;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.GetUserPasswordAndEmailDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -32,4 +33,7 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
 
     @Query("SELECT s FROM Student s WHERE s.user.userId = ?1")
     Optional<Student> getStudentByUserId(long userId);
+
+    @Query("SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.GetUserPasswordAndEmailDTO(s.user.userName,s.user.password) FROM Student s WHERE s.studentId = ?1")
+    Optional<GetUserPasswordAndEmailDTO> getUserPasswordAndEmail(long userId);
 }

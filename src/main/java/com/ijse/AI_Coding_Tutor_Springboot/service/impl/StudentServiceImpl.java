@@ -1,6 +1,7 @@
 package com.ijse.AI_Coding_Tutor_Springboot.service.impl;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.GetUserPasswordAndEmailDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
@@ -102,6 +103,25 @@ public class StudentServiceImpl implements StudentService {
             Student student = studentOptional.get();
             double avgRating = ratingRepository.findAvgRatingByStudentId(student.getStudentId());
             return avgRating;
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
+
+    public StudentDTO getStudentById(long userId){
+        try{
+            Optional<Student> optionalStudent = studentRepository.getStudentByUserId(userId);
+            if(!optionalStudent.isPresent()){
+                throw new RuntimeException("Sorry Student not found");
+            }
+            Student student = optionalStudent.get();
+            Optional<GetUserPasswordAndEmailDTO> optionalDTO = studentRepository.getUserPasswordAndEmail(student.getStudentId());
+            if(!optionalDTO.isPresent()){
+                throw new RuntimeException("Sorry Email and Password not found");
+            }
+            GetUserPasswordAndEmailDTO getUserPasswordAndEmailDTO = optionalDTO.get();
+            return new StudentDTO(student.getStudentId(),student.getStudentFullName(),getUserPasswordAndEmailDTO.getEmail(),student.getStudentContact(),getUserPasswordAndEmailDTO.getPassword());
         }
         catch(Exception e){
             throw e;

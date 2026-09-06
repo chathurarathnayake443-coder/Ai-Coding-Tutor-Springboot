@@ -66,4 +66,13 @@ public class StudentController {
         double avgRating = studentService.getAverageRating(userId);
         return new CommonResponse(OPERATION_SUCCESS, avgRating, SUCCESS_MESSAGE);
     }
+
+    @GetMapping("/getStudentDetails/{userId}")
+    public CommonResponse getStudentDetails(@PathVariable long userId){
+        StudentDTO studentDTO =  studentService.getStudentById(userId);
+        System.out.println(studentDTO.getStudentId());
+        System.out.println(studentDTO.getStudentFullName());
+        System.out.println(studentDTO.getStudentEmail());
+        return new CommonResponse(OPERATION_SUCCESS, studentDTO, SUCCESS_MESSAGE);
+    }
 }
