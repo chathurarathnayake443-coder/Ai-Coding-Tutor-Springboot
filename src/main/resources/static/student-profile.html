@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile · AI Coding Tutor</title>
+    <style>
+        :root{
+            --bg:#0B0E14;--bg-alt:#0E1219;--surface:#141A23;--surface-2:#1B222D;
+            --surface-3:#222B38;--border:#262F3D;--border-soft:#1D2530;
+            --text-primary:#E8ECF1;--text-secondary:#92A0B3;--text-muted:#5B6472;
+            --amber:#E8A33D;--amber-dim:#4A3A1E;--cyan:#4FD1C5;--cyan-dim:#16342F;
+            --mint:#6EE7B7;--mint-dim:#16332A;--coral:#F2685C;
+            --display:"Space Grotesk","Inter",system-ui,sans-serif;
+            --body:"Inter",system-ui,sans-serif;
+        }
+        *{box-sizing:border-box}
+        html{color-scheme:dark}
+        body{margin:0;min-height:100vh;background:
+                radial-gradient(1200px 600px at 12% -10%,rgba(139,127,232,.06),transparent 55%),
+                radial-gradient(1000px 500px at 100% 0%,rgba(79,209,197,.05),transparent 50%),var(--bg);
+            color:var(--text-primary);font-family:var(--body);-webkit-font-smoothing:antialiased}
+        h1,h2,h3,p{margin:0}a{color:inherit;text-decoration:none}button,input,textarea{font:inherit}
+        .app-shell{display:grid;grid-template-columns:1fr;min-height:100vh}
+        .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:6px;border:1px solid transparent;
+            font-weight:600;font-size:14px;padding:11px 18px;white-space:nowrap;transition:.15s;cursor:pointer}
+        .btn:disabled{opacity:.45;cursor:not-allowed}.btn-primary{background:var(--amber);color:#1A1305;border-color:var(--amber)}
+        .btn-primary:hover:not(:disabled){background:#F3AE4C;box-shadow:0 0 0 1px rgba(232,163,61,.35),0 0 24px rgba(232,163,61,.12)}
+        .btn-outline{background:transparent;color:var(--text-primary);border-color:var(--border)}
+        .btn-outline:hover{background:var(--surface-2);border-color:var(--text-secondary)}.btn-block{width:100%}.btn-sm{padding:7px 12px;font-size:13px}
+        .content{min-width:0}.topbar{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:18px 32px;
+                                 border-bottom:1px solid var(--border-soft);background:rgba(11,14,20,.78);backdrop-filter:blur(8px);position:sticky;top:0;z-index:5}
+        .topbar h1{font-family:var(--display);font-size:20px}.topbar-sub{color:var(--text-secondary);font-size:13px;margin-top:3px}
+        .user-chip{display:flex;align-items:center;gap:10px}.who{text-align:right;line-height:1.25}.who .name{font-size:13px;font-weight:600}
+        .who .role{font-size:11px;color:var(--text-muted);text-transform:capitalize}.avatar,.profile-avatar{
+                                                                                        display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700}
+        .avatar{width:36px;height:36px;border-radius:50%;font-size:13px;color:#0B0E14;background:linear-gradient(145deg,var(--cyan),var(--mint))}
+        .main{padding:28px 32px 64px;max-width:1100px;margin:0 auto}.breadcrumb{display:flex;gap:8px;color:var(--text-muted);font-size:12px;margin-bottom:18px}
+        .breadcrumb a:hover{color:var(--cyan)}
+        .profile-hero{background:linear-gradient(135deg,rgba(232,163,61,.1),rgba(79,209,197,.055)),var(--surface);
+            border:1px solid var(--border);border-radius:16px;padding:24px;display:flex;align-items:center;justify-content:space-between;
+            gap:20px;margin-bottom:20px;box-shadow:0 1px 2px rgba(0,0,0,.4)}
+        .profile-identity{display:flex;align-items:center;gap:16px}.profile-avatar{width:68px;height:68px;border-radius:18px;
+                                                                       background:linear-gradient(145deg,var(--amber),var(--cyan));color:#0B0E14;font-size:22px;
+                                                                       box-shadow:0 0 0 1px rgba(232,163,61,.35),0 0 24px rgba(232,163,61,.12)}
+        .profile-identity h2{font-family:var(--display);font-size:22px;margin-bottom:4px}.profile-identity p{color:var(--text-secondary);font-size:13px}
+        .profile-badge{display:inline-flex;align-items:center;gap:7px;margin-top:9px;padding:5px 10px;border-radius:100px;
+            background:var(--mint-dim);border:1px solid rgba(110,231,183,.22);color:var(--mint);font-size:11px;font-weight:700}
+        .profile-badge:before{content:"";width:6px;height:6px;border-radius:50%;background:var(--mint)}
+        .profile-grid{display:grid;grid-template-columns:1.55fr .9fr;gap:20px;align-items:start}
+        .panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+        .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--border-soft)}
+        .panel-head h3{font-family:var(--display);font-size:15px}.panel-head p{color:var(--text-muted);font-size:11px;margin-top:3px}.panel-body{padding:20px}
+        .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field.full{grid-column:1/-1}.field label{display:block;font-size:12px;
+                                                                                                        font-weight:600;color:var(--text-secondary);margin-bottom:7px}.input{width:100%;background:var(--surface-2);border:1px solid var(--border);
+                                                                                                                                                                          color:var(--text-primary);padding:11px 13px;border-radius:6px;font-size:14px;outline:none;transition:.15s}
+        .input::placeholder{color:var(--text-muted)}.input:focus{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(79,209,197,.35),0 0 24px rgba(79,209,197,.12);background:var(--surface-3)}
+        textarea.input{resize:vertical;min-height:92px;line-height:1.5}.field-note{margin-top:6px;color:var(--text-muted);font-size:11px;line-height:1.4}
+        .form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;padding-top:18px;border-top:1px solid var(--border-soft)}
+        .info-row{display:flex;justify-content:space-between;gap:18px;padding:13px 0;border-bottom:1px solid var(--border-soft)}
+        .info-row:first-child{padding-top:0}.info-row:last-child{border-bottom:0;padding-bottom:0}.info-label{color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+        .info-value{color:var(--text-primary);font-size:13px;text-align:right;word-break:break-word}
+        .tip{margin-top:18px;padding:13px;background:var(--amber-dim);border:1px solid rgba(232,163,61,.24);border-radius:6px}
+        .tip-title{color:var(--amber);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+        .tip p{color:#D7C39F;font-size:12px;line-height:1.5}
+        .message{display:none;margin-bottom:16px;padding:11px 13px;border-radius:6px;font-size:12.5px}
+        .message.show{display:block}.message.success{background:var(--mint-dim);border:1px solid rgba(110,231,183,.25);color:var(--mint)}
+        .message.error{background:rgba(58,33,30,.8);border:1px solid rgba(242,104,92,.3);color:#F3A79E}
+        @media(max-width:900px){.profile-grid{grid-template-columns:1fr}}
+        @media(max-width:650px){.topbar{padding:16px 18px}.topbar-sub{display:none}.main{padding:20px 16px 40px}
+            .profile-hero{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}
+            .form-actions{flex-direction:column-reverse}.form-actions .btn{width:100%}.who{display:none}}
+    </style>
+</head>
+<body>
+<div class="app-shell">
+
+    <div class="content">
+        <header class="topbar">
+            <div><h1>My Profile</h1><div class="topbar-sub">View and update your personal information</div></div>
+            <div class="user-chip"><div class="who"><div class="name" id="topbar-name">Student</div><div class="role">student</div></div><div class="avatar" id="topbar-avatar">ST</div></div>
+        </header>
+
+        <main class="main">
+            <div class="breadcrumb"><a href="student-dashboard.html">Dashboard</a><span>›</span><span>My profile</span></div>
+
+            <section class="profile-hero">
+                <div class="profile-identity"><div class="profile-avatar" id="profile-avatar">ST</div>
+                    <div><h2 id="profile-name">Student Name</h2><p id="profile-email">student@example.com</p>
+                        <span class="profile-badge">Active student</span></div></div>
+                <a href="student-dashboard.html" class="btn btn-outline btn-sm">← Back to dashboard</a>
+            </section>
+
+            <div id="message" class="message"></div>
+
+            <div class="profile-grid">
+                <section class="panel">
+                    <div class="panel-head"><div><h3>Personal details</h3><p>Update your information whenever something changes.</p></div></div>
+                    <div class="panel-body">
+                        <form id="profile-form">
+                            <div class="form-grid">
+                                <div class="field full"><label for="full-name">Full name</label>
+                                    <input class="input" type="text" id="full-name" placeholder="Enter your full name" autocomplete="name" required></div>
+                                <div class="field"><label for="email">Email address</label>
+                                    <input class="input" type="email" id="email" placeholder="student@example.com" autocomplete="email" required>
+                                    <div class="field-note">Your login email may be managed separately by the system.</div></div>
+                                <div class="field"><label for="phone">Phone number</label>
+                                    <input class="input" type="tel" id="phone" placeholder="+94 7X XXX XXXX" autocomplete="tel"></div>
+                                <div class="field full"><label for="address">Address</label>
+                                    <textarea class="input" id="address" placeholder="Enter your current address" autocomplete="street-address"></textarea></div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-outline" onclick="resetForm()">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="save-btn">Save changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <aside class="panel">
+                    <div class="panel-head"><div><h3>Account information</h3><p>Your current account details</p></div></div>
+                    <div class="panel-body">
+                        <div class="info-row"><span class="info-label">Student ID</span><span class="info-value" id="student-id">—</span></div>
+                        <div class="info-row"><span class="info-label">Username</span><span class="info-value" id="username">—</span></div>
+                        <div class="info-row"><span class="info-label">Status</span><span class="info-value" style="color:var(--mint)">Active</span></div>
+                        <div class="info-row"><span class="info-label">Role</span><span class="info-value">Student</span></div>
+                        <div class="tip"><div class="tip-title">Profile tip</div><p>Keep your phone number and address up to date so your account information remains accurate.</p></div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    let originalProfile={fullName:"",email:"",phone:"",address:""};
+    const userId=localStorage.getItem("userId");
+    const token=localStorage.getItem("JWT");
+
+    function initials(name){
+        if(!name||!name.trim())return "?";
+        const p=name.trim().split(/\s+/);
+        return (p.length===1?p[0].slice(0,2):p[0][0]+p[p.length-1][0]).toUpperCase();
+    }
+    function setUI(p){
+        document.getElementById("full-name").value=p.fullName||"";
+        document.getElementById("email").value=p.email||"";
+        document.getElementById("phone").value=p.phone||"";
+        document.getElementById("address").value=p.address||"";
+        const n=p.fullName||"Student", i=initials(n);
+        document.getElementById("profile-name").textContent=n;
+        document.getElementById("profile-email").textContent=p.email||"student@example.com";
+        document.getElementById("profile-avatar").textContent=i;
+        document.getElementById("topbar-name").textContent=n;
+        document.getElementById("topbar-avatar").textContent=i;
+    }
+    function message(text,type){
+        const el=document.getElementById("message");
+        el.className="message show "+type;
+        el.textContent=(type==="success"?"✓ ":"⚠ ")+text;
+        setTimeout(()=>el.classList.remove("show"),4000);
+    }
+
+    /* Connect these two URLs to your Spring Boot endpoints. */
+    async function loadProfile(){
+        if(!userId||!token){ loadDemo(); return; }
+        try{
+            const r=await fetch("http://localhost:8080/getStudentProfile/"+userId,{
+                headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"}
+            });
+            if(!r.ok)throw new Error();
+            const result=await r.json(), d=result.body||result;
+            const p={fullName:d.studentFullName||d.fullName||"",email:d.email||"",
+                phone:d.studentContact||d.phone||"",address:d.address||""};
+            originalProfile={...p}; setUI(p);
+            document.getElementById("student-id").textContent=d.studentId??"—";
+            document.getElementById("username").textContent=d.username||"—";
+        }catch(e){console.error(e);loadDemo();}
+    }
+    function loadDemo(){
+        const p={fullName:"Student Name",email:"student@example.com",phone:"",address:""};
+        originalProfile={...p};setUI(p);
+        document.getElementById("student-id").textContent=userId||"Not available";
+        document.getElementById("username").textContent=localStorage.getItem("username")||"Not available";
+    }
+    async function saveProfile(p){
+        if(!userId||!token){originalProfile={...p};setUI(p);message("Profile updated successfully.","success");return;}
+        try{
+            const r=await fetch("http://localhost:8080/updateStudentProfile/"+userId,{
+                method:"PUT",headers:{"Authorization":"Bearer "+token,"Content-Type":"application/json"},
+                body:JSON.stringify({studentFullName:p.fullName,studentContact:p.phone,email:p.email,address:p.address})
+            });
+            if(!r.ok)throw new Error();
+            originalProfile={...p};setUI(p);message("Your profile has been updated successfully.","success");
+        }catch(e){console.error(e);message("Unable to update your profile. Please try again.","error");}
+    }
+    document.getElementById("profile-form").addEventListener("submit",async e=>{
+        e.preventDefault();
+        const p={
+            fullName:document.getElementById("full-name").value.trim(),
+            email:document.getElementById("email").value.trim(),
+            phone:document.getElementById("phone").value.trim(),
+            address:document.getElementById("address").value.trim()
+        };
+        if(!p.fullName)return message("Please enter your full name.","error");
+        if(!p.email)return message("Please enter your email address.","error");
+        const b=document.getElementById("save-btn");b.disabled=true;b.textContent="Saving...";
+        await saveProfile(p);b.disabled=false;b.textContent="Save changes";
+    });
+    function resetForm(){setUI(originalProfile);message("Your changes have been discarded.","success");}
+    function logout(){localStorage.removeItem("JWT");localStorage.removeItem("userId");window.location.href="index.html";}
+    document.addEventListener("DOMContentLoaded",loadProfile);
+</script>
+</body>
+</html>
