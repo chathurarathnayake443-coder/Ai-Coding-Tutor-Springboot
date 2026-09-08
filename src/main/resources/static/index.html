@@ -3,156 +3,919 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Log in · AI Coding Tutor</title>
-    <link rel="stylesheet" href="css/style.css">
+    <title>AI Coding Tutor — Learn to Think, Not Just Code</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root{
+            --bg:#0B0E14;
+            --bg-alt:#0E1219;
+            --surface:#141A23;
+            --surface-2:#1B222D;
+            --surface-3:#222B38;
+            --border:#262F3D;
+            --border-soft:#1D2530;
+            --text-primary:#E8ECF1;
+            --text-secondary:#92A0B3;
+            --text-muted:#5B6472;
+            --accent-amber:#E8A33D;
+            --accent-amber-dim:#4A3A1E;
+            --accent-cyan:#4FD1C5;
+            --accent-cyan-dim:#16342F;
+            --accent-mint:#6EE7B7;
+            --accent-mint-dim:#16332A;
+            --accent-coral:#F2685C;
+            --accent-coral-dim:#3A211E;
+            --accent-violet:#8B7FE8;
+            --accent-violet-dim:#241F3D;
+            --radius-sm:6px;
+            --radius-md:10px;
+            --radius-lg:16px;
+            --shadow-1:0 1px 2px rgba(0,0,0,.4);
+            --shadow-2:0 18px 50px rgba(0,0,0,.38);
+            --font-display:'Space Grotesk','Inter',sans-serif;
+            --font-body:'Inter',sans-serif;
+            --font-mono:'JetBrains Mono',monospace;
+        }
+
+        *{box-sizing:border-box}
+        html{scroll-behavior:smooth;color-scheme:dark}
+        body{
+            margin:0;
+            background:var(--bg);
+            color:var(--text-primary);
+            font-family:var(--font-body);
+            -webkit-font-smoothing:antialiased;
+            overflow-x:hidden;
+        }
+        body:before{
+            content:"";
+            position:fixed;
+            inset:0;
+            pointer-events:none;
+            z-index:-2;
+            background:
+                    radial-gradient(900px 500px at 8% -5%,rgba(139,127,232,.09),transparent 60%),
+                    radial-gradient(800px 450px at 92% 5%,rgba(79,209,197,.08),transparent 60%),
+                    radial-gradient(700px 500px at 50% 100%,rgba(232,163,61,.045),transparent 60%);
+        }
+        canvas#particles{
+            position:fixed;
+            inset:0;
+            width:100%;
+            height:100%;
+            z-index:-1;
+            pointer-events:none;
+            opacity:.7;
+        }
+        a{text-decoration:none;color:inherit}
+        button{font-family:inherit}
+        .container{width:min(1160px,calc(100% - 40px));margin:auto}
+
+        /* NAV */
+        .navbar{
+            position:fixed;
+            top:0;left:0;right:0;
+            z-index:100;
+            height:72px;
+            border-bottom:1px solid transparent;
+            transition:.25s ease;
+        }
+        .navbar.scrolled{
+            background:rgba(11,14,20,.78);
+            backdrop-filter:blur(16px);
+            border-color:var(--border-soft);
+        }
+        .nav-inner{
+            height:100%;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+        .brand{
+            display:flex;align-items:center;gap:10px;
+            font-family:var(--font-display);
+            font-weight:700;font-size:17px;
+        }
+        .brand-mark{
+            width:31px;height:31px;border-radius:8px;
+            display:grid;place-items:center;
+            background:linear-gradient(145deg,var(--accent-amber),var(--accent-cyan));
+            color:#0B0E14;
+            font-family:var(--font-mono);
+            font-weight:600;font-size:14px;
+        }
+        .brand small{
+            display:block;color:var(--text-muted);
+            font-family:var(--font-body);
+            font-size:10px;font-weight:500;
+        }
+        .nav-links{display:flex;align-items:center;gap:26px}
+        .nav-links a{
+            color:var(--text-secondary);
+            font-size:13px;font-weight:500;
+            transition:.2s;
+        }
+        .nav-links a:hover{color:var(--text-primary)}
+        .nav-actions{display:flex;align-items:center;gap:10px}
+        .btn{
+            display:inline-flex;align-items:center;justify-content:center;gap:8px;
+            border-radius:var(--radius-sm);
+            border:1px solid transparent;
+            font-weight:600;font-size:13px;
+            cursor:pointer;padding:10px 16px;
+            transition:transform .15s,background .2s,border-color .2s,box-shadow .2s;
+        }
+        .btn:hover{transform:translateY(-1px)}
+        .btn-primary{
+            background:var(--accent-amber);
+            color:#1A1305;
+            border-color:var(--accent-amber);
+            box-shadow:0 8px 24px rgba(232,163,61,.12);
+        }
+        .btn-primary:hover{background:#f3ae4c;box-shadow:0 10px 28px rgba(232,163,61,.2)}
+        .btn-outline{
+            background:transparent;
+            color:var(--text-primary);
+            border-color:var(--border);
+        }
+        .btn-outline:hover{background:var(--surface-2);border-color:var(--text-secondary)}
+        .btn-cyan{background:var(--accent-cyan);color:#052221;border-color:var(--accent-cyan)}
+        .btn-cyan:hover{background:#63dcd1}
+        .btn-large{padding:13px 20px;font-size:14px}
+
+        /* HERO */
+        .hero{
+            min-height:820px;
+            padding-top:145px;
+            position:relative;
+            display:flex;
+            align-items:center;
+        }
+        .hero-grid{
+            display:grid;
+            grid-template-columns:1.02fr .98fr;
+            gap:60px;
+            align-items:center;
+        }
+        .eyebrow{
+            display:inline-flex;align-items:center;gap:8px;
+            padding:6px 10px;
+            border:1px solid rgba(79,209,197,.2);
+            background:rgba(22,52,47,.45);
+            border-radius:100px;
+            color:var(--accent-cyan);
+            font-family:var(--font-mono);
+            font-size:10.5px;
+            letter-spacing:.04em;
+            margin-bottom:20px;
+        }
+        .eyebrow .pulse{
+            width:6px;height:6px;border-radius:50%;
+            background:var(--accent-mint);
+            box-shadow:0 0 0 5px rgba(110,231,183,.1);
+        }
+        .hero h1{
+            font-family:var(--font-display);
+            font-size:clamp(43px,5.4vw,72px);
+            line-height:1.02;
+            letter-spacing:-.045em;
+            margin:0 0 20px;
+            max-width:720px;
+        }
+        .hero h1 .gradient{
+            background:linear-gradient(100deg,var(--text-primary) 15%,var(--accent-cyan) 54%,var(--accent-violet));
+            -webkit-background-clip:text;
+            background-clip:text;
+            color:transparent;
+        }
+        .hero-copy{
+            color:var(--text-secondary);
+            font-size:16px;
+            line-height:1.7;
+            max-width:590px;
+        }
+        .hero-actions{display:flex;gap:10px;margin-top:30px;flex-wrap:wrap}
+        .hero-note{
+            display:flex;align-items:center;gap:9px;
+            color:var(--text-muted);
+            font-size:11.5px;
+            margin-top:17px;
+        }
+        .hero-note span{color:var(--accent-mint)}
+        .hero-visual{
+            position:relative;
+            perspective:1000px;
+        }
+        .glow{
+            position:absolute;
+            width:300px;height:300px;
+            border-radius:50%;
+            filter:blur(70px);
+            background:rgba(79,209,197,.11);
+            right:5%;top:15%;
+            pointer-events:none;
+        }
+        .app-window{
+            position:relative;
+            border:1px solid var(--border);
+            border-radius:18px;
+            background:rgba(14,18,25,.9);
+            box-shadow:var(--shadow-2),0 0 0 1px rgba(139,127,232,.035);
+            overflow:hidden;
+            transform:rotateY(-4deg) rotateX(2deg);
+            transition:transform .5s ease;
+        }
+        .app-window:hover{transform:rotateY(0) rotateX(0) translateY(-4px)}
+        .window-top{
+            height:48px;
+            border-bottom:1px solid var(--border-soft);
+            display:flex;align-items:center;
+            padding:0 15px;gap:7px;
+        }
+        .traffic span{width:8px;height:8px;border-radius:50%;background:var(--surface-3);display:inline-block;margin-right:4px}
+        .window-title{margin-left:8px;color:var(--text-muted);font-size:11px;font-family:var(--font-mono)}
+        .window-body{
+            display:grid;
+            grid-template-columns:1fr 180px;
+            min-height:390px;
+        }
+        .editor{
+            background:#0D1117;
+            border-right:1px solid var(--border-soft);
+        }
+        .editor-head{
+            height:38px;border-bottom:1px solid var(--border-soft);
+            display:flex;align-items:center;justify-content:space-between;
+            padding:0 14px;color:var(--text-muted);font-size:10px;
+        }
+        .code{padding:18px;font:12px/1.8 var(--font-mono);color:#B9C2D0}
+        .code .kw{color:#8B7FE8}.code .fn{color:#4FD1C5}.code .str{color:#E8A33D}.code .cm{color:#5B6472}
+        .code-line{white-space:pre}
+        .hints{background:var(--bg-alt);padding:17px}
+        .hints-title{font:600 10px var(--font-display);color:var(--text-muted);letter-spacing:.08em}
+        .hint-count{
+            display:flex;align-items:end;gap:8px;margin:20px 0 17px;
+        }
+        .hint-count strong{font:700 29px var(--font-display)}
+        .hint-count small{color:var(--text-muted);font-size:9px;margin-bottom:4px}
+        .mini-hint{
+            padding:11px;border-radius:7px;
+            background:var(--accent-amber-dim);
+            border:1px solid rgba(232,163,61,.25);
+            color:#F0C687;font-size:10.5px;line-height:1.5;
+        }
+        .mini-button{
+            width:100%;margin-top:12px;padding:9px;
+            border:1px solid rgba(79,209,197,.25);
+            background:var(--accent-cyan-dim);
+            color:var(--accent-cyan);
+            border-radius:6px;font-size:10px;font-weight:600;
+        }
+
+        /* TRUST */
+        .trust{padding:18px 0 70px}
+        .trust-line{
+            display:flex;justify-content:center;align-items:center;gap:25px;
+            color:var(--text-muted);font-size:11px;
+            text-transform:uppercase;letter-spacing:.09em;
+        }
+        .trust-line:before,.trust-line:after{content:"";height:1px;background:var(--border-soft);flex:1}
+
+        /* SECTIONS */
+        .section{padding:105px 0}
+        .section-head{text-align:center;max-width:720px;margin:0 auto 48px}
+        .section-kicker{
+            color:var(--accent-violet);
+            font:600 11px var(--font-mono);
+            text-transform:uppercase;letter-spacing:.1em;
+            margin-bottom:12px;
+        }
+        .section-head h2{
+            font:700 clamp(30px,4vw,45px) var(--font-display);
+            letter-spacing:-.035em;
+            margin:0 0 14px;
+        }
+        .section-head p{color:var(--text-secondary);font-size:14px;line-height:1.7}
+
+        /* FEATURES */
+        .features{
+            display:grid;grid-template-columns:repeat(3,1fr);gap:15px;
+        }
+        .feature{
+            background:linear-gradient(145deg,rgba(27,34,45,.8),rgba(20,26,35,.85));
+            border:1px solid var(--border);
+            border-radius:var(--radius-md);
+            padding:25px;
+            min-height:220px;
+            transition:transform .25s,border-color .25s,box-shadow .25s;
+        }
+        .feature:hover{
+            transform:translateY(-5px);
+            border-color:#354154;
+            box-shadow:var(--shadow-2);
+        }
+        .feature-icon{
+            width:38px;height:38px;border-radius:9px;
+            display:grid;place-items:center;
+            margin-bottom:24px;
+            font-size:17px;
+        }
+        .icon-cyan{background:var(--accent-cyan-dim);color:var(--accent-cyan)}
+        .icon-amber{background:var(--accent-amber-dim);color:var(--accent-amber)}
+        .icon-violet{background:var(--accent-violet-dim);color:var(--accent-violet)}
+        .feature h3{font:600 17px var(--font-display);margin:0 0 8px}
+        .feature p{color:var(--text-secondary);font-size:13px;line-height:1.65}
+
+        /* DEMO */
+        .demo-wrap{
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:var(--radius-lg);
+            overflow:hidden;
+            box-shadow:var(--shadow-2);
+        }
+        .demo-top{
+            display:flex;justify-content:space-between;align-items:center;
+            padding:17px 20px;border-bottom:1px solid var(--border-soft);
+        }
+        .demo-title{font:600 14px var(--font-display)}
+        .demo-meta{color:var(--text-muted);font-size:11px}
+        .video-shell{background:#080B10;padding:14px}
+        video{
+            display:block;width:100%;
+            max-height:620px;
+            border-radius:10px;
+            background:#080B10;
+            outline:none;
+        }
+        .demo-caption{
+            display:grid;grid-template-columns:1fr 1fr 1fr;
+            border-top:1px solid var(--border-soft);
+        }
+        .demo-point{padding:18px 20px;border-right:1px solid var(--border-soft)}
+        .demo-point:last-child{border-right:0}
+        .demo-point strong{display:block;font:600 13px var(--font-display);margin-bottom:5px}
+        .demo-point span{font-size:11.5px;color:var(--text-muted);line-height:1.5}
+
+        /* HOW IT WORKS */
+        .steps{
+            display:grid;grid-template-columns:repeat(3,1fr);
+            border:1px solid var(--border);
+            border-radius:var(--radius-lg);
+            overflow:hidden;
+        }
+        .step{
+            padding:30px;
+            background:var(--surface);
+            border-right:1px solid var(--border);
+            position:relative;
+        }
+        .step:last-child{border-right:0}
+        .step-num{
+            font:600 11px var(--font-mono);
+            color:var(--accent-amber);
+            margin-bottom:45px;
+        }
+        .step h3{font:600 18px var(--font-display);margin-bottom:8px}
+        .step p{color:var(--text-secondary);font-size:13px;line-height:1.65}
+
+        /* INTERACTIVE */
+        .playground{
+            display:grid;grid-template-columns:1fr 1fr;
+            background:var(--surface);
+            border:1px solid var(--border);
+            border-radius:var(--radius-lg);
+            overflow:hidden;
+        }
+        .play-left{padding:28px;border-right:1px solid var(--border)}
+        .play-right{padding:28px;background:var(--bg-alt)}
+        .play-label{
+            color:var(--text-muted);
+            font:600 10px var(--font-mono);
+            text-transform:uppercase;letter-spacing:.08em;
+            margin-bottom:10px;
+        }
+        textarea.demo-input{
+            width:100%;min-height:115px;resize:vertical;
+            background:#0D1117;color:var(--text-primary);
+            border:1px solid var(--border);
+            border-radius:var(--radius-sm);
+            padding:13px;
+            font:12.5px/1.6 var(--font-mono);
+            outline:none;
+        }
+        textarea.demo-input:focus{border-color:var(--accent-cyan);box-shadow:0 0 0 3px rgba(79,209,197,.1)}
+        .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+        .lang-btn{
+            background:var(--surface-2);border:1px solid var(--border);
+            color:var(--text-secondary);padding:7px 10px;border-radius:100px;
+            font-size:11px;cursor:pointer;
+        }
+        .lang-btn.active{color:var(--accent-cyan);border-color:rgba(79,209,197,.35);background:var(--accent-cyan-dim)}
+        .tutor-response{
+            min-height:180px;
+            border:1px dashed var(--border);
+            border-radius:var(--radius-sm);
+            padding:17px;
+        }
+        .response-tag{color:var(--accent-cyan);font:600 10px var(--font-mono);margin-bottom:10px}
+        .response-text{font-size:13px;line-height:1.65;color:var(--text-secondary)}
+        .response-text strong{color:var(--text-primary)}
+        .cursor{display:inline-block;width:6px;height:13px;background:var(--accent-cyan);vertical-align:-2px;margin-left:2px;animation:blink 1s infinite}
+        @keyframes blink{50%{opacity:0}}
+
+        /* CTA */
+        .cta{
+            padding:75px 0;
+            margin-bottom:80px;
+        }
+        .cta-card{
+            position:relative;overflow:hidden;
+            border:1px solid var(--border);
+            border-radius:20px;
+            background:
+                    linear-gradient(135deg,rgba(139,127,232,.10),rgba(79,209,197,.06) 48%,rgba(232,163,61,.06)),
+                    var(--surface);
+            padding:60px 50px;
+            text-align:center;
+        }
+        .cta-card:before{
+            content:"";
+            position:absolute;width:320px;height:320px;
+            border-radius:50%;filter:blur(90px);
+            background:rgba(79,209,197,.08);
+            top:-180px;left:50%;transform:translateX(-50%);
+        }
+        .cta-card > *{position:relative}
+        .cta-card h2{font:700 38px var(--font-display);letter-spacing:-.035em;margin:0 0 12px}
+        .cta-card p{color:var(--text-secondary);font-size:14px;margin-bottom:25px}
+
+        /* FOOTER */
+        footer{
+            border-top:1px solid var(--border-soft);
+            padding:28px 0;
+        }
+        .footer-inner{display:flex;justify-content:space-between;gap:20px;align-items:center}
+        .footer-copy{color:var(--text-muted);font-size:11px}
+        .footer-links{display:flex;gap:18px}
+        .footer-links a{font-size:11px;color:var(--text-muted)}
+        .footer-links a:hover{color:var(--text-primary)}
+
+        /* REVEAL */
+        .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+        .reveal.visible{opacity:1;transform:none}
+        .delay-1{transition-delay:.1s}.delay-2{transition-delay:.2s}.delay-3{transition-delay:.3s}
+
+        /* RESPONSIVE */
+        @media(max-width:900px){
+            .nav-links{display:none}
+            .hero{min-height:auto;padding:125px 0 70px}
+            .hero-grid{grid-template-columns:1fr;gap:45px}
+            .features,.steps{grid-template-columns:1fr}
+            .step{border-right:0;border-bottom:1px solid var(--border)}
+            .step:last-child{border-bottom:0}
+            .playground{grid-template-columns:1fr}
+            .play-left{border-right:0;border-bottom:1px solid var(--border)}
+        }
+        @media(max-width:620px){
+            .container{width:min(100% - 28px,1160px)}
+            .nav-actions .btn-outline{display:none}
+            .hero h1{font-size:43px}
+            .hero-copy{font-size:14px}
+            .window-body{grid-template-columns:1fr}
+            .hints{display:none}
+            .demo-caption{grid-template-columns:1fr}
+            .demo-point{border-right:0;border-bottom:1px solid var(--border-soft)}
+            .demo-point:last-child{border-bottom:0}
+            .cta-card{padding:42px 22px}
+            .cta-card h2{font-size:29px}
+            .footer-inner{align-items:flex-start;flex-direction:column}
+        }
+    </style>
 </head>
+
 <body>
+<canvas id="particles"></canvas>
 
-<div class="auth-shell">
-    <!-- Visual side -->
-    <aside class="auth-visual">
-        <div class="brand">
+<header class="navbar" id="navbar">
+    <div class="container nav-inner">
+        <a class="brand" href="#">
             <span class="brand-mark">AI</span>
-            <div><span>AI Coding Tutor</span><small>guided practice, not answers</small></div>
+            <span>AI Coding Tutor<small>learn by thinking</small></span>
+        </a>
+
+        <nav class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#demo">Demo</a>
+            <a href="#how">How it works</a>
+            <a href="#playground">Try it</a>
+        </nav>
+
+        <div class="nav-actions">
+            <a class="btn btn-outline" href="login.html">Sign in</a>
+            <a class="btn btn-primary" href="signup.html">Get started</a>
         </div>
-
-        <div class="visual-copy">
-            <h1>Five hints. Zero shortcuts.</h1>
-            <p>Every question is a session. Every session gives you at most five nudges toward the next step — never the finished code, until you've truly earned a look at it.</p>
-
-            <div class="visual-mock-card">
-                <div class="mono" style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">SESSION · reverseString.js</div>
-                <div class="mock-line w80"></div>
-                <div class="mock-line w60"></div>
-                <div class="mock-line w40"></div>
-                <div class="mock-hint">Hint 2/5 — check the direction your loop counter moves.</div>
-            </div>
-        </div>
-
-        <div class="visual-foot">
-            <div><strong>5</strong>hints per session</div>
-            <div><strong>3</strong>languages supported</div>
-            <div><strong>∞</strong>sessions to practice</div>
-        </div>
-    </aside>
-
-    <!-- Form side -->
-    <div class="auth-form-wrap">
-        <form class="auth-form" id="login-form" novalidate>
-
-            <h2>Welcome back</h2>
-            <p class="subhead">Log in to keep working through your sessions.</p>
-
-            <div class="form-note" id="demo-note">
-                Demo accounts — Student: <span class="mono">dinuka@student.dev</span> / <span class="mono">student123</span> · Admin: <span class="mono">admin@aitutor.dev</span> / <span class="mono">admin123</span>
-            </div>
-
-            <div class="field">
-                <label for="role">Log in as</label>
-                <select id="role" class="input" required>
-                    <option value="STUDENT">STUDENT</option>
-                    <option value="ADMIN">ADMIN</option>
-                </select>
-            </div>
-
-            <div class="field" id="email-field">
-                <label for="email">Email (username)</label>
-                <input type="email" id="email" class="input" placeholder="you@example.com" autocomplete="username" required>
-                <div class="field-error">Enter a valid email address.</div>
-            </div>
-
-            <div class="field" id="password-field">
-                <label for="password">Password</label>
-                <div class="password-field">
-                    <input type="password" id="password" class="input" placeholder="Enter your password" autocomplete="current-password" required>
-                    <button type="button" class="password-toggle" id="toggle-password">Show</button>
-                </div>
-                <div class="field-error">Password is required.</div>
-            </div>
-
-            <button type="button" class="btn btn-primary btn-block" id="login-btn" onclick="login()">Log in</button>
-
-            <p class="subhead" style="margin-top:20px;text-align:center;">
-                New student? <a href="signup.html">Create an account</a>
-            </p>
-
-            <hr>
-            <br>
-            <p style="font-size: 11px; transform: translateX(120px)"><a href="forgot-password.html">Forgot Your Password? Go here</a></p>
-        </form>
     </div>
-</div>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="js/mockApi.js"></script>
-<script src="js/ui.js"></script>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="container hero-grid">
+            <div class="hero-copy-wrap reveal">
+                <div class="eyebrow"><span class="pulse"></span> AI-guided programming practice</div>
+                <h1>Don't just get the answer.<br><span class="gradient">Learn how to solve it.</span></h1>
+                <p class="hero-copy">
+                    AI Coding Tutor helps students become better programmers through guided,
+                    Socratic-style assistance. Write code, run it, think through the problem,
+                    and receive the next useful hint instead of having the solution handed to you.
+                </p>
+
+                <div class="hero-actions">
+                    <a class="btn btn-primary btn-large" href="signup.html">Start learning free →</a>
+                    <a class="btn btn-outline btn-large" href="#demo">Watch the demo</a>
+                </div>
+
+                <div class="hero-note">
+                    <span>✓</span> Practice • Hints • Code execution • Progress tracking
+                </div>
+            </div>
+
+            <div class="hero-visual reveal delay-2">
+                <div class="glow"></div>
+                <div class="app-window">
+                    <div class="window-top">
+                        <div class="traffic"><span></span><span></span><span></span></div>
+                        <div class="window-title">AI Coding Tutor / session workspace</div>
+                    </div>
+
+                    <div class="window-body">
+                        <div class="editor">
+                            <div class="editor-head">
+                                <span>● ● ● &nbsp; Java</span>
+                                <span>ACTIVE SESSION</span>
+                            </div>
+                            <div class="code">
+                                <div class="code-line"><span class="kw">public class</span> <span class="fn">Main</span> {</div>
+                                <div class="code-line">  <span class="kw">public static void</span> main(String[] args) {</div>
+                                <div class="code-line">    <span class="cm">// Your thinking happens here...</span></div>
+                                <div class="code-line">    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="str">1</span>; i &lt;= <span class="str">10</span>; i++) {</div>
+                                <div class="code-line">      System.out.println(i);</div>
+                                <div class="code-line">    }</div>
+                                <div class="code-line">  }</div>
+                                <div class="code-line">}</div>
+                            </div>
+                        </div>
+
+                        <aside class="hints">
+                            <div class="hints-title">HINTS</div>
+                            <div class="hint-count"><strong>4/5</strong><small>LEFT</small></div>
+                            <div class="mini-hint">Think about which part of the loop controls how many times it repeats.</div>
+                            <button class="mini-button">Take a hint</button>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="trust">
+        <div class="container">
+            <div class="trust-line">Built for students who want to understand the code</div>
+        </div>
+    </section>
+
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-head reveal">
+                <div class="section-kicker">The learning loop</div>
+                <h2>A tutor that guides your thinking.</h2>
+                <p>
+                    Every part of the workspace is designed around practice and understanding,
+                    not simply copying an AI-generated answer.
+                </p>
+            </div>
+
+            <div class="features">
+                <article class="feature reveal delay-1">
+                    <div class="feature-icon icon-amber">✦</div>
+                    <h3>Socratic hints</h3>
+                    <p>Get one useful next step at a time. The tutor nudges your reasoning instead of immediately revealing the solution.</p>
+                </article>
+
+                <article class="feature reveal delay-2">
+                    <div class="feature-icon icon-cyan">▶</div>
+                    <h3>Run your code</h3>
+                    <p>Write and execute your code inside the session so you can test ideas, inspect output, and learn from mistakes.</p>
+                </article>
+
+                <article class="feature reveal delay-3">
+                    <div class="feature-icon icon-violet">↗</div>
+                    <h3>Track your progress</h3>
+                    <p>Build a history of your practice sessions and use feedback and ratings to understand where you can improve.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="demo">
+        <div class="container">
+            <div class="section-head reveal">
+                <div class="section-kicker">See it in action</div>
+                <h2>A real AI Coding Tutor session.</h2>
+                <p>Watch how a student starts a problem, works inside the coding workspace, and uses hints to move forward.</p>
+            </div>
+
+            <div class="demo-wrap reveal">
+                <div class="demo-top">
+                    <div class="demo-title">Session workspace — demo</div>
+                    <div class="demo-meta">Java • Guided practice</div>
+                </div>
+
+                <div class="video-shell">
+                    <video autoplay loop muted playsinline preload="metadata">
+                        <source src="assets/ai-coding-tutor-demo.mp4" type="video/mp4">
+                        Your browser does not support HTML5 video.
+                    </video>
+                </div>
+
+                <div class="demo-caption">
+                    <div class="demo-point">
+                        <strong>01 — Define the problem</strong>
+                        <span>Start with the exact programming question you are trying to solve.</span>
+                    </div>
+                    <div class="demo-point">
+                        <strong>02 — Think and code</strong>
+                        <span>Use the editor and run your code while the tutor stays beside you.</span>
+                    </div>
+                    <div class="demo-point">
+                        <strong>03 — Ask for a hint</strong>
+                        <span>Receive guidance that helps you discover the next step yourself.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="how">
+        <div class="container">
+            <div class="section-head reveal">
+                <div class="section-kicker">Simple workflow</div>
+                <h2>From question to understanding.</h2>
+            </div>
+
+            <div class="steps reveal">
+                <div class="step">
+                    <div class="step-num">01 / QUESTION</div>
+                    <h3>Bring your problem</h3>
+                    <p>Enter the programming problem you are working on and choose your programming language.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">02 / PRACTICE</div>
+                    <h3>Write & run</h3>
+                    <p>Experiment inside the editor. Run your program and use the output to guide your next decision.</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">03 / GUIDANCE</div>
+                    <h3>Get unstuck</h3>
+                    <p>When you need help, request a hint. The tutor gives you a focused nudge rather than doing the work for you.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="playground">
+        <div class="container">
+            <div class="section-head reveal">
+                <div class="section-kicker">Interactive preview</div>
+                <h2>Try the tutor's thinking style.</h2>
+                <p>This lightweight demo is interactive and runs entirely in your browser.</p>
+            </div>
+
+            <div class="playground reveal">
+                <div class="play-left">
+                    <div class="play-label">Your programming problem</div>
+                    <textarea id="problemInput" class="demo-input">How can I find the largest number in a list?</textarea>
+
+                    <div class="controls">
+                        <button class="lang-btn active" data-lang="Python">Python</button>
+                        <button class="lang-btn" data-lang="Java">Java</button>
+                        <button class="lang-btn" data-lang="JavaScript">JavaScript</button>
+                        <button class="btn btn-cyan" id="hintBtn">Ask for a hint →</button>
+                    </div>
+                </div>
+
+                <div class="play-right">
+                    <div class="play-label">Tutor guidance</div>
+                    <div class="tutor-response">
+                        <div class="response-tag" id="responseTag">AI TUTOR / PYTHON</div>
+                        <div class="response-text" id="responseText">
+                            Tell me what you have tried so far. I won't give you the full answer immediately — we'll work through the next step together.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <div class="cta-card reveal">
+                <div class="section-kicker">Start your learning loop</div>
+                <h2>Ready to become a better programmer?</h2>
+                <p>Create your account and start your first guided coding session.</p>
+                <a class="btn btn-primary btn-large" href="signup.html">Create your free account →</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="container footer-inner">
+        <div class="footer-copy">© 2026 AI Coding Tutor. Learn to think. Learn to code.</div>
+        <div class="footer-links">
+            <a href="#features">Features</a>
+            <a href="#demo">Demo</a>
+            <a href="index.html">Sign in</a>
+        </div>
+    </div>
+</footer>
+
 <script>
-    // If already logged in, skip straight to the right dashboard.
-    (function () {
-        const user = api.currentUser();
-        if (user) window.location.href = user.role === "admin" ? "admin-dashboard.html" : "student-dashboard.html";
-    })();
-
-    const form = document.getElementById("login-form");
-    const emailField = document.getElementById("email-field");
-    const passwordField = document.getElementById("password-field");
-    const toggleBtn = document.getElementById("toggle-password");
-    const passwordInput = document.getElementById("password");
-    const loginBtn = document.getElementById("login-btn");
-
-    toggleBtn.addEventListener("click", () => {
-        const isPw = passwordInput.type === "password";
-        passwordInput.type = isPw ? "text" : "password";
-        toggleBtn.textContent = isPw ? "Hide" : "Show";
+    /* NAVBAR */
+    const navbar = document.getElementById("navbar");
+    window.addEventListener("scroll", () => {
+        navbar.classList.toggle("scrolled", window.scrollY > 20);
     });
 
-    function setError(fieldEl, hasError) {
-        fieldEl.classList.toggle("has-error", hasError);
+    /* SCROLL REVEAL */
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll(".reveal").forEach(el => revealObserver.observe(el));
+
+    /* INTERACTIVE TUTOR */
+    const responses = {
+        Python: [
+            "Start by thinking about what value you need to keep track of while you inspect each item.",
+            "What should your program compare the current number against?",
+            "Now think about how you could update that value whenever you find something larger."
+        ],
+        Java: [
+            "Think about a variable that can remember the largest value seen so far.",
+            "How could a loop compare each element with that remembered value?",
+            "If the current element is larger, what should happen to your tracking variable?"
+        ],
+        JavaScript: [
+            "Before choosing a method, think about the state you need while traversing the array.",
+            "What value should you compare each array element against?",
+            "When you discover a larger value, what should your program update?"
+        ]
+    };
+
+    let selectedLanguage = "Python";
+    let hintIndex = 0;
+
+    document.querySelectorAll(".lang-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            selectedLanguage = btn.dataset.lang;
+            hintIndex = 0;
+            document.getElementById("responseTag").textContent = "AI TUTOR / " + selectedLanguage.toUpperCase();
+            document.getElementById("responseText").innerHTML =
+                "Tell me what you have tried so far. I won't give you the full answer immediately — we'll work through the next step together.";
+        });
+    });
+
+    document.getElementById("hintBtn").addEventListener("click", () => {
+        const problem = document.getElementById("problemInput").value.trim();
+        const response = responses[selectedLanguage][hintIndex % responses[selectedLanguage].length];
+
+        if (!problem) {
+            document.getElementById("responseText").innerHTML =
+                "Enter a programming problem first, then ask the tutor for a focused next step.";
+            return;
+        }
+
+        hintIndex++;
+
+        const target = document.getElementById("responseText");
+        target.innerHTML = "";
+        let i = 0;
+
+        const timer = setInterval(() => {
+            target.innerHTML = response.slice(0, i++) + '<span class="cursor"></span>';
+            if (i > response.length) {
+                clearInterval(timer);
+                target.innerHTML = "<strong>Hint:</strong> " + response;
+            }
+        }, 15);
+    });
+
+    /* FLOATING PARTICLES */
+    const canvas = document.getElementById("particles");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    let mouse = {x:-1000,y:-1000};
+
+    function resizeCanvas(){
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = innerWidth * dpr;
+        canvas.height = innerHeight * dpr;
+        canvas.style.width = innerWidth + "px";
+        canvas.style.height = innerHeight + "px";
+        ctx.setTransform(dpr,0,0,dpr,0,0);
+
+        const count = Math.min(75, Math.floor(innerWidth / 18));
+        particles = Array.from({length:count}, () => ({
+            x:Math.random()*innerWidth,
+            y:Math.random()*innerHeight,
+            vx:(Math.random()-.5)*.22,
+            vy:(Math.random()-.5)*.18,
+            r:Math.random()*5+.8,
+            phase:Math.random()*Math.PI*2
+        }));
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    window.addEventListener("mousemove", e => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+
+    function particleColor(p){
+        const pulse = (Math.sin(Date.now()/1300 + p.phase)+1)/2;
+        if(pulse > .72) return "rgba(79,209,197,.42)";
+        if(pulse < .22) return "rgba(139,127,232,.35)";
+        return "rgba(232,163,61,.25)";
     }
 
-    // My Code
+    function animateParticles(){
+        ctx.clearRect(0,0,innerWidth,innerHeight);
 
-    function login(){
-        let userName = $('#email').val().trim();
-        let userPassword = $('#password').val().trim();
-        let userRole = $('#role').val().trim();
+        for(let i=0;i<particles.length;i++){
+            const p = particles[i];
 
-        const obj = JSON.stringify({"userName": userName, "password": userPassword, "userRoles": userRole.toUpperCase()});
+            p.x += p.vx;
+            p.y += p.vy;
 
-        $.ajax({
-            url: "http://localhost:8080/login",
-            type: "POST",
-            data: obj,
-            contentType: "application/json",
-            success: function (response) {
-                console.log(response.body.token);
-                localStorage.setItem("JWT", response.body.token);
-                localStorage.setItem("userId", response.body.userId);
+            if(p.x < -10) p.x = innerWidth+10;
+            if(p.x > innerWidth+10) p.x = -10;
+            if(p.y < -10) p.y = innerHeight+10;
+            if(p.y > innerHeight+10) p.y = -10;
 
-                if(userRole === "ADMIN"){
-                    window.location.href = "admin-dashboard.html";
-                }
-                if(userRole === "STUDENT"){
-                    window.location.href = "student-dashboard.html";
-                }
-                alert("Logged in successfully!");
-            },
-            error: function (response) {
-                if (response.status === 403) {
-                    alert("Error 403 - Forbidden!");
-                }
-                else if (response.status === 400){
-                    alert("Error 400 - Bad JSON");
-                }
-                else if (response.status === 401){
-                    alert("Error 401 - Unauthorized!");
-                }
-                else if (response.status === 500){
-                    alert("Error 500 - Internal Server Error");
+            const dx = mouse.x-p.x;
+            const dy = mouse.y-p.y;
+            const distance = Math.sqrt(dx*dx+dy*dy);
+
+            if(distance < 120){
+                p.x -= dx/distance * .18;
+                p.y -= dy/distance * .18;
+            }
+
+            ctx.beginPath();
+            ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+            ctx.fillStyle = particleColor(p);
+            ctx.fill();
+
+            for(let j=i+1;j<particles.length;j++){
+                const q = particles[j];
+                const ax=p.x-q.x, ay=p.y-q.y;
+                const d=Math.sqrt(ax*ax+ay*ay);
+
+                if(d < 105){
+                    ctx.beginPath();
+                    ctx.moveTo(p.x,p.y);
+                    ctx.lineTo(q.x,q.y);
+                    ctx.strokeStyle=`rgba(139,127,232,${(1-d/105)*.06})`;
+                    ctx.lineWidth=.6;
+                    ctx.stroke();
                 }
             }
-        })
-    }
+        }
 
+        requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    /* SUBTLE HERO PARALLAX */
+    const visual = document.querySelector(".app-window");
+    window.addEventListener("mousemove", e => {
+        if(window.innerWidth < 900) return;
+        const x = (e.clientX / innerWidth - .5);
+        const y = (e.clientY / innerHeight - .5);
+        visual.style.transform =
+            `rotateY(${x * -5}deg) rotateX(${y * 3}deg) translateY(-2px)`;
+    });
 </script>
 </body>
 </html>

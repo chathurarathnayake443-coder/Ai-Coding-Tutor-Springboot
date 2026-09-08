@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in · AI Coding Tutor</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="auth-shell">
+    <!-- Visual side -->
+    <aside class="auth-visual">
+        <div class="brand">
+            <span class="brand-mark">AI</span>
+            <div><span>AI Coding Tutor</span><small>guided practice, not answers</small></div>
+        </div>
+
+        <div class="visual-copy">
+            <h1>Five hints. Zero shortcuts.</h1>
+            <p>Every question is a session. Every session gives you at most five nudges toward the next step — never the finished code, until you've truly earned a look at it.</p>
+
+            <div class="visual-mock-card">
+                <div class="mono" style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">SESSION · reverseString.js</div>
+                <div class="mock-line w80"></div>
+                <div class="mock-line w60"></div>
+                <div class="mock-line w40"></div>
+                <div class="mock-hint">Hint 2/5 — check the direction your loop counter moves.</div>
+            </div>
+        </div>
+
+        <div class="visual-foot">
+            <div><strong>5</strong>hints per session</div>
+            <div><strong>3</strong>languages supported</div>
+            <div><strong>∞</strong>sessions to practice</div>
+        </div>
+    </aside>
+
+    <!-- Form side -->
+    <div class="auth-form-wrap">
+        <form class="auth-form" id="login-form" novalidate>
+
+            <h2>Welcome back</h2>
+            <p class="subhead">Log in to keep working through your sessions.</p>
+
+            <div class="form-note" id="demo-note">
+                Demo accounts — Student: <span class="mono">dinuka@student.dev</span> / <span class="mono">student123</span> · Admin: <span class="mono">admin@aitutor.dev</span> / <span class="mono">admin123</span>
+            </div>
+
+            <div class="field">
+                <label for="role">Log in as</label>
+                <select id="role" class="input" required>
+                    <option value="STUDENT">STUDENT</option>
+                    <option value="ADMIN">ADMIN</option>
+                </select>
+            </div>
+
+            <div class="field" id="email-field">
+                <label for="email">Email (username)</label>
+                <input type="email" id="email" class="input" placeholder="you@example.com" autocomplete="username" required>
+                <div class="field-error">Enter a valid email address.</div>
+            </div>
+
+            <div class="field" id="password-field">
+                <label for="password">Password</label>
+                <div class="password-field">
+                    <input type="password" id="password" class="input" placeholder="Enter your password" autocomplete="current-password" required>
+                    <button type="button" class="password-toggle" id="toggle-password">Show</button>
+                </div>
+                <div class="field-error">Password is required.</div>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block" id="login-btn" onclick="login()">Log in</button>
+
+            <p class="subhead" style="margin-top:20px;text-align:center;">
+                New student? <a href="signup.html">Create an account</a>
+            </p>
+
+            <hr>
+            <br>
+            <p style="font-size: 11px; transform: translateX(120px)"><a href="forgot-password.html">Forgot Your Password? Go here</a></p>
+        </form>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="js/mockApi.js"></script>
+<script src="js/ui.js"></script>
+<script>
+    // If already logged in, skip straight to the right dashboard.
+    (function () {
+        const user = api.currentUser();
+        if (user) window.location.href = user.role === "admin" ? "admin-dashboard.html" : "student-dashboard.html";
+    })();
+
+    const form = document.getElementById("login-form");
+    const emailField = document.getElementById("email-field");
+    const passwordField = document.getElementById("password-field");
+    const toggleBtn = document.getElementById("toggle-password");
+    const passwordInput = document.getElementById("password");
+    const loginBtn = document.getElementById("login-btn");
+
+    toggleBtn.addEventListener("click", () => {
+        const isPw = passwordInput.type === "password";
+        passwordInput.type = isPw ? "text" : "password";
+        toggleBtn.textContent = isPw ? "Hide" : "Show";
+    });
+
+    function setError(fieldEl, hasError) {
+        fieldEl.classList.toggle("has-error", hasError);
+    }
+
+    // My Code
+
+    function login(){
+        let userName = $('#email').val().trim();
+        let userPassword = $('#password').val().trim();
+        let userRole = $('#role').val().trim();
+
+        const obj = JSON.stringify({"userName": userName, "password": userPassword, "userRoles": userRole.toUpperCase()});
+
+        $.ajax({
+            url: "http://localhost:8080/login",
+            type: "POST",
+            data: obj,
+            contentType: "application/json",
+            success: function (response) {
+                console.log(response.body.token);
+                localStorage.setItem("JWT", response.body.token);
+                localStorage.setItem("userId", response.body.userId);
+
+                if(userRole === "ADMIN"){
+                    window.location.href = "admin-dashboard.html";
+                }
+                if(userRole === "STUDENT"){
+                    window.location.href = "student-dashboard.html";
+                }
+                alert("Logged in successfully!");
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Forbidden!");
+                }
+                else if (response.status === 400){
+                    alert("Error 400 - Bad JSON");
+                }
+                else if (response.status === 401){
+                    alert("Error 401 - Unauthorized!");
+                }
+                else if (response.status === 500){
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+</script>
+</body>
+</html>

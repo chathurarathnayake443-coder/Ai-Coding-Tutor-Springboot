@@ -44,6 +44,6 @@ function starString(n) {
 
 function wireLogout(selector) {
     document.querySelectorAll(selector).forEach((btn) => {
-        btn.addEventListener("click", () => { api.logout(); window.location.href = "index.html"; });
+        btn.addEventListener("click", () => { api.logout(); window.location.href = "login.html"; });
     });
 }
