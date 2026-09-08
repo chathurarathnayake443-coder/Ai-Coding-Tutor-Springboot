@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upgrade Your Plan — AI Coding Tutor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root{
+            --bg:#0B0E14; --bg-alt:#0E1219; --surface:#141A23; --surface-2:#1B222D;
+            --surface-3:#222B38; --border:#262F3D; --border-soft:#1D2530;
+            --text-primary:#E8ECF1; --text-secondary:#92A0B3; --text-muted:#5B6472;
+            --amber:#E8A33D; --amber-dim:#4A3A1E; --cyan:#4FD1C5; --cyan-dim:#16342F;
+            --mint:#6EE7B7; --mint-dim:#16332A; --coral:#F2685C; --violet:#8B7FE8;
+            --violet-dim:#241F3D;
+            --font-display:'Space Grotesk','Inter',sans-serif;
+            --font-body:'Inter',sans-serif; --font-mono:'JetBrains Mono',monospace;
+        }
+        *{box-sizing:border-box}
+        html{scroll-behavior:smooth;color-scheme:dark}
+        body{
+            margin:0; min-height:100vh; color:var(--text-primary); font-family:var(--font-body);
+            background:var(--bg);
+            background-image:
+                    radial-gradient(1000px 500px at 10% -10%,rgba(139,127,232,.08),transparent 55%),
+                    radial-gradient(900px 500px at 100% 0%,rgba(79,209,197,.07),transparent 52%);
+        }
+        button{font-family:inherit}
+        .container{max-width:1180px;margin:auto;padding:0 28px}
+        .topbar{
+            height:72px; display:flex;align-items:center;justify-content:space-between;
+            border-bottom:1px solid var(--border-soft); background:rgba(11,14,20,.78);
+            backdrop-filter:blur(10px); position:sticky;top:0;z-index:10;
+        }
+        .brand{display:flex;align-items:center;gap:10px;color:var(--text-primary);text-decoration:none}
+        .brand-mark{
+            width:32px;height:32px;border-radius:8px;display:grid;place-items:center;
+            background:linear-gradient(145deg,var(--amber),var(--cyan));
+            color:#0B0E14;font:600 14px var(--font-mono)
+        }
+        .brand-name{font:700 18px var(--font-display)}
+        .brand small{display:block;color:var(--text-muted);font:500 10px var(--font-body);letter-spacing:.03em}
+        .back-btn{
+            border:1px solid var(--border);background:transparent;color:var(--text-secondary);
+            padding:9px 13px;border-radius:6px;cursor:pointer;font-size:13px
+        }
+        .back-btn:hover{background:var(--surface-2);color:var(--text-primary)}
+
+        .hero{text-align:center;padding:62px 0 34px}
+        .eyebrow{
+            display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:999px;
+            background:var(--cyan-dim);color:var(--cyan);font-size:11px;font-weight:700;
+            text-transform:uppercase;letter-spacing:.08em;border:1px solid rgba(79,209,197,.2)
+        }
+        .eyebrow span{width:6px;height:6px;border-radius:50%;background:var(--cyan)}
+        .hero h1{font:700 clamp(32px,5vw,50px)/1.08 var(--font-display);margin:18px 0 12px;letter-spacing:-.035em}
+        .hero p{max-width:650px;margin:auto;color:var(--text-secondary);font-size:15px;line-height:1.7}
+        .hero .mono{font:500 12px var(--font-mono);color:var(--text-muted);margin-top:15px}
+
+        .billing-toggle{
+            display:flex;justify-content:center;gap:4px;margin:22px auto 34px;padding:4px;
+            width:max-content;background:var(--surface);border:1px solid var(--border);border-radius:8px
+        }
+        .billing-toggle button{
+            border:0;background:transparent;color:var(--text-secondary);padding:8px 14px;
+            border-radius:5px;cursor:pointer;font-size:12px;font-weight:600
+        }
+        .billing-toggle button.active{background:var(--surface-3);color:var(--text-primary)}
+        .save{color:var(--mint);font-size:10px;margin-left:4px}
+
+        .pricing-grid{
+            display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch;
+            padding-bottom:46px
+        }
+        .plan{
+            position:relative;background:var(--surface);border:1px solid var(--border);
+            border-radius:16px;padding:26px;display:flex;flex-direction:column;
+            box-shadow:0 8px 24px rgba(0,0,0,.28);transition:transform .2s,border-color .2s,box-shadow .2s
+        }
+        .plan:hover{transform:translateY(-4px)}
+        .plan.plus{border-color:rgba(79,209,197,.35);box-shadow:0 8px 32px rgba(79,209,197,.08)}
+        .plan.pro{border-color:rgba(139,127,232,.45);box-shadow:0 8px 36px rgba(139,127,232,.1)}
+        .popular{
+            position:absolute;top:15px;right:15px;padding:5px 8px;border-radius:999px;
+            background:var(--cyan-dim);color:var(--cyan);font-size:10px;font-weight:700;
+            text-transform:uppercase;letter-spacing:.06em
+        }
+        .plan-icon{
+            width:38px;height:38px;border-radius:9px;display:grid;place-items:center;
+            background:var(--surface-2);border:1px solid var(--border);font-size:18px;margin-bottom:17px
+        }
+        .plan.plus .plan-icon{background:var(--cyan-dim);color:var(--cyan);border-color:rgba(79,209,197,.22)}
+        .plan.pro .plan-icon{background:var(--violet-dim);color:#B6AEF2;border-color:rgba(139,127,232,.25)}
+        .plan h2{font:700 24px var(--font-display);margin:0 0 6px}
+        .plan-desc{color:var(--text-secondary);font-size:13px;line-height:1.55;min-height:42px}
+        .price{display:flex;align-items:flex-end;gap:5px;margin:22px 0 7px}
+        .amount{font:700 42px/1 var(--font-display);letter-spacing:-.04em}
+        .period{color:var(--text-muted);font-size:12px;margin-bottom:5px}
+        .price-note{height:18px;color:var(--text-muted);font-size:11px}
+        .divider{height:1px;background:var(--border-soft);margin:18px 0}
+        .feature-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;font-weight:700;margin-bottom:11px}
+        .features{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:11px}
+        .features li{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.45;color:var(--text-secondary)}
+        .check{flex:0 0 18px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;
+            background:var(--mint-dim);color:var(--mint);font-size:10px;font-weight:800;margin-top:1px}
+        .plan.plus .check{background:var(--cyan-dim);color:var(--cyan)}
+        .plan.pro .check{background:var(--violet-dim);color:#B6AEF2}
+        .feature-highlight{
+            margin:13px 0;padding:12px;border-radius:8px;background:var(--surface-2);
+            border:1px solid var(--border);font-size:12.5px;line-height:1.55;color:var(--text-primary)
+        }
+        .feature-highlight strong{display:block;color:var(--cyan);font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+        .plan.pro .feature-highlight strong{color:#B6AEF2}
+        .plan-footer{margin-top:auto;padding-top:24px}
+        .btn{
+            width:100%;padding:12px 16px;border-radius:7px;font-size:13px;font-weight:700;
+            cursor:pointer;border:1px solid transparent;transition:.15s
+        }
+        .btn-free{background:var(--surface-3);border-color:var(--border);color:var(--text-secondary);cursor:default}
+        .btn-plus{background:var(--cyan);border-color:var(--cyan);color:#052221}
+        .btn-plus:hover{background:#63dcd1;box-shadow:0 0 24px rgba(79,209,197,.15)}
+        .btn-pro{background:var(--violet);border-color:var(--violet);color:#100D24}
+        .btn-pro:hover{background:#9a8ff0;box-shadow:0 0 24px rgba(139,127,232,.17)}
+        .current{display:flex;align-items:center;justify-content:center;gap:7px;font-size:11px;color:var(--mint);margin-top:9px}
+        .current::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--mint)}
+
+        .compare{
+            margin:0 0 55px;background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden
+        }
+        .compare-head{padding:21px 22px;border-bottom:1px solid var(--border-soft)}
+        .compare-head h2{font:700 19px var(--font-display);margin-bottom:5px}
+        .compare-head p{font-size:12px;color:var(--text-secondary)}
+        .table-wrap{overflow-x:auto}
+        table{width:100%;border-collapse:collapse;min-width:720px}
+        th,td{padding:13px 20px;text-align:left;border-bottom:1px solid var(--border-soft);font-size:12.5px}
+        th{color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+        td:first-child{color:var(--text-secondary);font-weight:600}
+        td:not(:first-child){text-align:center}
+        tr:last-child td{border-bottom:0}
+        .yes{color:var(--mint);font-weight:700}.no{color:var(--text-muted)}.best{color:var(--cyan);font-weight:700}
+
+        .faq{
+            display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:70px
+        }
+        .faq-item{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+        .faq-q{width:100%;padding:16px 18px;background:none;border:0;color:var(--text-primary);
+            display:flex;justify-content:space-between;text-align:left;font-weight:600;font-size:13px;cursor:pointer}
+        .faq-q span{color:var(--text-muted);transition:.2s}
+        .faq-a{max-height:0;overflow:hidden;padding:0 18px;color:var(--text-secondary);font-size:12.5px;line-height:1.6;transition:max-height .25s,padding .25s}
+        .faq-item.open .faq-a{max-height:150px;padding:0 18px 16px}
+        .faq-item.open .faq-q span{transform:rotate(45deg);color:var(--cyan)}
+
+        .footer-note{text-align:center;color:var(--text-muted);font-size:11px;padding:0 0 35px}
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(6,8,12,.72);backdrop-filter:blur(4px);
+            align-items:center;justify-content:center;padding:22px;z-index:30}
+        .modal-overlay.open{display:flex}
+        .modal{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--border);
+            border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.5);padding:24px}
+        .modal h3{font:700 21px var(--font-display);margin:0 0 7px}
+        .modal p{color:var(--text-secondary);font-size:13px;line-height:1.6}
+        .modal-plan{margin:17px 0;padding:13px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;
+            display:flex;justify-content:space-between;align-items:center}
+        .modal-plan strong{font:700 16px var(--font-display)}
+        .modal-price{font:700 20px var(--font-display);color:var(--cyan)}
+        .modal-actions{display:flex;gap:9px;margin-top:18px}
+        .modal-actions button{flex:1}
+        .cancel{background:transparent;color:var(--text-secondary);border:1px solid var(--border)}
+        .cancel:hover{background:var(--surface-2)}
+
+        @media(max-width:900px){
+            .pricing-grid{grid-template-columns:1fr;max-width:560px;margin:auto}
+            .plan{min-height:auto}
+        }
+        @media(max-width:650px){
+            .container{padding:0 16px}.topbar{height:64px}.brand-name{font-size:16px}
+            .hero{padding-top:42px}.hero h1{font-size:35px}
+            .faq{grid-template-columns:1fr}.compare{border-radius:9px}
+        }
+    </style>
+</head>
+<body>
+
+<header class="topbar">
+    <div class="container" style="width:100%;display:flex;justify-content:space-between;align-items:center">
+        <a class="brand" href="#">
+            <div class="brand-mark">AI</div>
+            <div><div class="brand-name">AI Coding Tutor</div><small>THE SOCRATIC IDE</small></div>
+        </a>
+        <button class="back-btn"><a style="text-decoration: none" href="student-dashboard.html">← Back to Dashboard</a></button>
+    </div>
+</header>
+
+<main class="container">
+    <section class="hero">
+        <div class="eyebrow"><span></span> Upgrade your learning</div>
+        <h1>Choose the plan that fits<br>your coding journey.</h1>
+        <p>Start free, compete with your university, or unlock the complete competitive coding experience with advanced AI guidance.</p>
+        <div class="mono">No hidden setup fees · Upgrade anytime · Built for students</div>
+    </section>
+
+    <div class="billing-toggle" aria-label="Billing period">
+        <button class="active" onclick="setBilling('monthly',this)">Monthly</button>
+        <button onclick="setBilling('yearly',this)">Yearly <span class="save">SAVE 20%</span></button>
+    </div>
+
+    <section class="pricing-grid">
+        <article class="plan free">
+            <div class="plan-icon">◈</div>
+            <h2>FREE</h2>
+            <p class="plan-desc">Everything you need to start practicing and learning with your AI coding tutor.</p>
+            <div class="price"><span class="amount">$0</span><span class="period">/ month</span></div>
+            <div class="price-note">Free forever</div>
+            <div class="divider"></div>
+            <div class="feature-label">Included</div>
+            <ul class="features">
+                <li><span class="check">✓</span><span>Access to core coding sessions</span></li>
+                <li><span class="check">✓</span><span>Basic AI-guided hints with a daily limit</span></li>
+                <li><span class="check">✓</span><span>Code execution and result feedback</span></li>
+                <li><span class="check">✓</span><span>Session history and basic progress tracking</span></li>
+                <li><span class="check">✓</span><span>Basic performance ratings</span></li>
+            </ul>
+            <div class="plan-footer">
+                <button class="btn btn-free" disabled>Current Plan</button>
+                <div class="current">Included with every student account</div>
+            </div>
+        </article>
+
+        <article class="plan plus">
+            <div class="popular">Most Popular</div>
+            <div class="plan-icon">✦</div>
+            <h2>PLUS</h2>
+            <p class="plan-desc">More AI guidance, deeper analytics, and university-wide competition.</p>
+            <div class="price"><span class="amount price-plus">$20</span><span class="period">/ month</span></div>
+            <div class="price-note plus-note">Billed monthly</div>
+            <div class="divider"></div>
+            <div class="feature-label">Everything in Free, plus</div>
+            <ul class="features">
+                <li><span class="check">✓</span><span><strong>10 AI hints per day</strong> for deeper guided problem solving</span></li>
+                <li><span class="check">✓</span><span>Priority AI responses during busy periods</span></li>
+                <li><span class="check">✓</span><span>Advanced coding performance analytics</span></li>
+                <li><span class="check">✓</span><span>Personal topic-strength and weakness insights</span></li>
+                <li><span class="check">✓</span><span>Extended session history and progress trends</span></li>
+                <li><span class="check">✓</span><span>University competition and ranking access</span></li>
+            </ul>
+            <div class="feature-highlight">
+                <strong>University leaderboard</strong>
+                Compete for your university among others. All universities are ranked on a leaderboard according to the average rating performance of their students.
+            </div>
+            <div class="plan-footer">
+                <button class="btn btn-plus" onclick="openUpgrade('PLUS')">Upgrade to PLUS →</button>
+            </div>
+        </article>
+
+        <article class="plan pro">
+            <div class="popular">Best Value</div>
+            <div class="plan-icon">◆</div>
+            <h2>PRO</h2>
+            <p class="plan-desc">The full competitive coding experience for students who want to push further.</p>
+            <div class="price"><span class="amount price-pro">$50</span><span class="period">/ month</span></div>
+            <div class="price-note pro-note">Billed monthly</div>
+            <div class="divider"></div>
+            <div class="feature-label">Everything in Plus, plus</div>
+            <ul class="features">
+                <li><span class="check">✓</span><span><strong>15 AI hints per day</strong> for intensive practice</span></li>
+                <li><span class="check">✓</span><span>Priority access to advanced AI tutoring</span></li>
+                <li><span class="check">✓</span><span>Unlimited access to detailed performance analytics</span></li>
+                <li><span class="check">✓</span><span>Advanced personalized learning recommendations</span></li>
+                <li><span class="check">✓</span><span>Full coding session archive and insights</span></li>
+                <li><span class="check">✓</span><span>University leaderboard participation</span></li>
+                <li><span class="check">✓</span><span>Individual student leaderboard</span></li>
+            </ul>
+            <div class="feature-highlight">
+                <strong>Individual leaderboard</strong>
+                There will also be an individual student leaderboard. Keep improving your rating and try to get into the <b>TOP!</b>
+            </div>
+            <div class="plan-footer">
+                <button class="btn btn-pro" onclick="openUpgrade('PRO')">Upgrade to PRO →</button>
+            </div>
+        </article>
+    </section>
+
+    <section class="compare">
+        <div class="compare-head">
+            <h2>Compare all features</h2>
+            <p>A quick view of what each plan unlocks as you level up.</p>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Feature</th><th>Free</th><th>Plus</th><th>Pro</th></tr></thead>
+                <tbody>
+                <tr><td>AI coding hints</td><td>10 / day</td><td class="best">50 / day</td><td class="best">150 / day</td></tr>
+                <tr><td>Code execution</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                <tr><td>Session history</td><td>Basic</td><td>Extended</td><td>Full</td></tr>
+                <tr><td>Performance analytics</td><td>Basic</td><td class="yes">Advanced</td><td class="best">Advanced+</td></tr>
+                <tr><td>University leaderboard</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                <tr><td>Individual student leaderboard</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+                <tr><td>Personalized learning insights</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+                <tr><td>Priority AI access</td><td class="no">—</td><td class="yes">✓</td><td class="best">Highest priority</td></tr>
+                <tr><td>Competitive progress tracking</td><td class="no">—</td><td class="yes">University</td><td class="best">University + Individual</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section>
+        <div class="feature-label" style="text-align:center;margin-bottom:14px">Questions</div>
+        <div class="faq">
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Can I upgrade at any time?<span>+</span></button>
+                <div class="faq-a">Yes. Your account can move from Free to Plus or Pro whenever you are ready. Connect these buttons to your payment endpoint when your backend is ready.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">What happens to my existing sessions?<span>+</span></button>
+                <div class="faq-a">Your existing coding sessions and progress remain associated with your account. The upgrade simply unlocks the features available to the new plan.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Which plan is best for competition?<span>+</span></button>
+                <div class="faq-a">Plus is designed for university-level competition. Pro adds the individual student leaderboard, giving students an additional ranking target.</div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-q" onclick="toggleFaq(this)">Can the hint limits be changed later?<span>+</span></button>
+                <div class="faq-a">Yes. The displayed limits are easy to change in the page and should ultimately be enforced by your backend subscription logic rather than JavaScript.</div>
+            </div>
+        </div>
+    </section>
+
+    <p class="footer-note">AI Coding Tutor · Choose a plan, practice smarter, and keep improving.</p>
+</main>
+
+<div class="modal-overlay" id="upgradeModal" onclick="closeIfBackdrop(event)">
+    <div class="modal">
+        <h3>Ready to upgrade?</h3>
+        <p>You selected a premium plan. This demo confirms the selection; connect the button to your real payment/checkout endpoint in production.</p>
+        <div class="modal-plan">
+            <strong id="selectedPlan">PLUS</strong>
+            <span class="modal-price" id="selectedPrice">$20 / month</span>
+        </div>
+        <div class="modal-actions">
+            <button class="btn cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn btn-plus" id="confirmBtn" onclick="confirmUpgrade()">Continue →</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let billing = 'monthly';
+    let selected = '';
+
+    function setBilling(type, button){
+        billing = type;
+        document.querySelectorAll('.billing-toggle button').forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+
+        const plus = document.querySelector('.price-plus');
+        const pro = document.querySelector('.price-pro');
+        const plusNote = document.querySelector('.plus-note');
+        const proNote = document.querySelector('.pro-note');
+
+        if(type === 'yearly'){
+            plus.textContent = '$16';
+            pro.textContent = '$40';
+            plusNote.textContent = 'per month, billed yearly ($192/year)';
+            proNote.textContent = 'per month, billed yearly ($480/year)';
+        }else{
+            plus.textContent = '$20';
+            pro.textContent = '$50';
+            plusNote.textContent = 'Billed monthly';
+            proNote.textContent = 'Billed monthly';
+        }
+    }
+
+    function openUpgrade(plan){
+        selected = plan;
+        document.getElementById('selectedPlan').textContent = plan;
+        const monthlyPrice = plan === 'PLUS' ? 20 : 50;
+        const price = billing === 'yearly' ? monthlyPrice * .8 : monthlyPrice;
+        const total = billing === 'yearly' ? monthlyPrice * .8 * 12 : monthlyPrice;
+        document.getElementById('selectedPrice').textContent =
+            billing === 'yearly'
+                ? '$' + price.toFixed(0) + ' / month · $' + total.toFixed(0) + '/year'
+                : '$' + monthlyPrice + ' / month';
+
+        const confirm = document.getElementById('confirmBtn');
+        confirm.className = 'btn ' + (plan === 'PLUS' ? 'btn-plus' : 'btn-pro');
+        document.getElementById('upgradeModal').classList.add('open');
+    }
+
+    function closeModal(){
+        document.getElementById('upgradeModal').classList.remove('open');
+    }
+
+    function closeIfBackdrop(e){
+        if(e.target.id === 'upgradeModal') closeModal();
+    }
+
+    function confirmUpgrade(){
+        // Replace this with your real checkout/payment URL or API call.
+        alert('Upgrade selected: ' + selected + ' (' + billing + ' billing).');
+        closeModal();
+    }
+
+    function toggleFaq(button){
+        button.parentElement.classList.toggle('open');
+    }
+
+    // function goBack(){
+    //     // Replace with your dashboard URL if needed.
+    //     if(history.length > 1) history.back();
+    //     else window.location.href = 'dashboard.html';
+    // }
+</script>
+</body>
+</html>
