@@ -1,9 +1,6 @@
 package com.ijse.AI_Coding_Tutor_Springboot.service;
 
-import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.GetUserPasswordAndEmailDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.*;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.User;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserStatus;
@@ -26,4 +23,6 @@ public interface StudentService {
     public double getAverageRating(long userId);
 
     public StudentDTO getStudentById(long userId);
+
+    public void updateStudentDetails(UpdateStudentDetailsDTO updateStudentDetailsDTO);
 }

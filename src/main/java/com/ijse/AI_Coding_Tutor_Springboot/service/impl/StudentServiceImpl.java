@@ -1,16 +1,15 @@
 package com.ijse.AI_Coding_Tutor_Springboot.service.impl;
 
-import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.GetUserPasswordAndEmailDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.*;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.User;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserStatus;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.*;
 import com.ijse.AI_Coding_Tutor_Springboot.service.StudentService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,13 +24,17 @@ public class StudentServiceImpl implements StudentService {
     private CodingSessionRepository codingSessionRepository;
     private final RatingRepository ratingRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public StudentServiceImpl(StudentRepository studentRepository, CodingSessionRepository codingSessionRepository, HintRepository hintRepository, RatingRepository ratingRepository, UserRepository userRepository) {
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
+    public StudentServiceImpl(StudentRepository studentRepository, CodingSessionRepository codingSessionRepository, HintRepository hintRepository, RatingRepository ratingRepository, UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.studentRepository = studentRepository;
         this.codingSessionRepository = codingSessionRepository;
         this.hintRepository = hintRepository;
         this.ratingRepository = ratingRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<GetStudentDetailsDTO> getAllStudents(){
@@ -122,6 +125,57 @@ public class StudentServiceImpl implements StudentService {
             }
             GetUserPasswordAndEmailDTO getUserPasswordAndEmailDTO = optionalDTO.get();
             return new StudentDTO(student.getStudentId(),student.getStudentFullName(),getUserPasswordAndEmailDTO.getEmail(),student.getStudentContact(),getUserPasswordAndEmailDTO.getPassword());
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
+
+    @Transactional
+    public void updateStudentDetails(UpdateStudentDetailsDTO updateStudentDetailsDTO){
+        try{
+            Optional<Student> studentOptional = studentRepository.getStudentByUserId(updateStudentDetailsDTO.getUserId());
+            if(!studentOptional.isPresent()){
+                throw new RuntimeException("Sorry Student not found");
+            }
+
+            Student student = studentOptional.get();
+
+            if(updateStudentDetailsDTO.getNewStudentName() != null){
+                student.setStudentFullName(updateStudentDetailsDTO.getNewStudentName());
+            }
+
+            if(updateStudentDetailsDTO.getNewPhoneNumber() != null){
+                student.setStudentContact(updateStudentDetailsDTO.getNewPhoneNumber());
+            }
+
+            studentRepository.save(student);
+
+            if(!updateStudentDetailsDTO.getNewPassword().isEmpty() && !updateStudentDetailsDTO.getOldPassword().isEmpty()){
+                Optional<GetUserPasswordAndEmailDTO> optionalOldPassword = studentRepository.getUserPasswordAndEmail(student.getStudentId());
+
+                if(!optionalOldPassword.isPresent()){
+                    throw new RuntimeException("Sorry Password not found");
+                }
+
+                GetUserPasswordAndEmailDTO emailPasswordDTO = optionalOldPassword.get();
+                String oldPassword = emailPasswordDTO.getPassword();
+                String userName = emailPasswordDTO.getEmail();
+                System.out.println("old Password" + updateStudentDetailsDTO.getOldPassword());
+                System.out.println("New password" + updateStudentDetailsDTO.getNewPassword());
+
+                if (!passwordEncoder.matches(updateStudentDetailsDTO.getOldPassword(), oldPassword)) {
+                    throw new RuntimeException("Sorry, Old Password does not match");
+                }
+
+                Optional<User> optionalUser = userRepository.findByUserName(userName);
+                if(!optionalUser.isPresent()){
+                    throw new RuntimeException("Sorry User not found");
+                }
+                User user = optionalUser.get();
+                user.setPassword(encoder.encode(updateStudentDetailsDTO.getNewPassword()));
+                userRepository.save(user);
+            }
         }
         catch(Exception e){
             throw e;

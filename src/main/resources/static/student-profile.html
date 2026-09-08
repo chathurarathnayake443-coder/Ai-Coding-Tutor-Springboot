@@ -108,16 +108,16 @@
                                     <input class="input" type="tel" id="phone" placeholder="+94 7X XXX XXXX" autocomplete="tel">
                                     <div class="field-note">Include the Country code with the Phone Number.</div></div>
                                 <div class="field full"><label for="old-password">Old Password</label>
-                                    <input class="input" type="tel" id="old-password" placeholder="XXXXXXXX" autocomplete="old-pwd"></div>
+                                    <input type="password" class="input" id="old-password" placeholder="XXXXXXXX" autocomplete="old-pwd"></div>
                                 <div class="field full"><label for="new-password">New Password</label>
-                                    <input class="input" type="tel" id="new-password" placeholder="XXXXXXXX" autocomplete="new-pwd"></div>
+                                    <input type="password" class="input" id="new-password" placeholder="XXXXXXXX" autocomplete="new-pwd"></div>
                                 <div class="field full"><label for="confirm-password">Confirm Password</label>
-                                    <input class="input" type="tel" id="confirm-password" placeholder="XXXXXXXX" autocomplete="confirm-pwd">
+                                    <input type="password" class="input" id="confirm-password" placeholder="XXXXXXXX" autocomplete="confirm-pwd">
                                     <div class="field-note">To Update the Password, You have to Provide the Old Password First.</div></div>
                             </div>
                             <div class="form-actions">
                                 <button type="button" class="btn btn-outline" onclick="resetForm()">Cancel</button>
-                                <button type="submit" class="btn btn-primary" id="save-btn">Save changes</button>
+                                <button type="submit" class="btn btn-primary" id="save-btn" onclick="editStudentDetails()">Save changes</button>
                             </div>
                         </form>
                     </div>
@@ -271,15 +271,38 @@
         let newPassword = $('#new-password').val();
         let confirmPassword = $('#confirm-password').val();
 
-        const obj = {};
+        if(newPassword !== confirmPassword){
+            alert("Passwords do not match!");
+            return;
+        }
 
-        if(oldPassword !== "" && newPassword !== "" && confirmPassword !== ""){
-            if(oldPassword === existingPassword){
-                if(newPassword === confirmPassword){
-
+        const obj = JSON.stringify({"userId":userId,"newStudentName":newStudentName,"newPhoneNumber":newPhoneNumber,"oldPassword":oldPassword,"newPassword":newPassword});
+        $.ajax({
+            url:"http://localhost:8080/updateStudentProfile",
+            type:"PUT",
+            contentType:"application/json",
+            data:obj,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success:function(response){
+                console.log(response.body);
+            },
+            error: function (response){
+                if (response.status === 403){
+                    alert("Error 403 - Sorry, Forbidden!");
+                }
+                else if (response.status === 400){
+                    alert("Error 400 - Bad JSON");
+                }
+                else if (response.status === 401){
+                    alert("Error 401 - Unauthorized!");
+                }
+                else if (response.status === 500){
+                    alert("Error 500 - Internal Server Error");
                 }
             }
-        }
+        })
     }
 
 

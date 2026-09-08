@@ -4,6 +4,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.constants.CommonResponse;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.UpdateStudentDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
 import com.ijse.AI_Coding_Tutor_Springboot.service.StudentService;
 import com.ijse.AI_Coding_Tutor_Springboot.service.UserService;
@@ -74,5 +75,14 @@ public class StudentController {
         System.out.println(studentDTO.getStudentFullName());
         System.out.println(studentDTO.getStudentEmail());
         return new CommonResponse(OPERATION_SUCCESS, studentDTO, SUCCESS_MESSAGE);
+    }
+
+    @PutMapping("/updateStudentProfile")
+    public CommonResponse updateStudentProfile(@RequestBody UpdateStudentDetailsDTO updateStudentDetailsDTO){
+        System.out.println(updateStudentDetailsDTO.getUserId());
+        System.out.println(updateStudentDetailsDTO.getNewStudentName());
+        System.out.println(updateStudentDetailsDTO.getNewPhoneNumber());
+        studentService.updateStudentDetails(updateStudentDetailsDTO);
+        return new CommonResponse(OPERATION_SUCCESS, SUCCESS_MESSAGE);
     }
 }
