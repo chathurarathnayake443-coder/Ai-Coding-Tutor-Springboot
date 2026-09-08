@@ -23,7 +23,7 @@
         <button class="btn btn-outline btn-block js-logout"><a style="text-decoration: none" href="packages.html">⚡ Upgrade to Premium</a></button>
 
         <div class="sidebar-foot">
-            <button class="btn btn-outline btn-block js-logout">Log out</button>
+            <button class="btn btn-outline btn-block" id="open-logout-modal">Log out</button>
         </div>
     </aside>
 
@@ -119,6 +119,25 @@
         </div>
     </div>
 </div>
+
+<!-- Logout confirmation modal -->
+<div class="modal-overlay" id="logout-overlay">
+    <div class="modal">
+        <div class="modal-head">
+            <h3>Log out?</h3>
+            <button class="modal-close" id="close-logout-modal">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);">
+                You'll need to sign in again to access your sessions and progress.
+            </p>
+        </div>
+        <div class="modal-foot">
+            <button class="btn btn-ghost" id="cancel-logout-btn">Cancel</button>
+            <button class="btn btn-danger" id="confirm-logout-btn">Log out</button>
+        </div>
+    </div>
+</div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="js/mockApi.js"></script>
 <script src="js/ui.js"></script>
@@ -168,6 +187,18 @@
     document.getElementById("close-chat-modal").addEventListener("click", closeChatModal);
     document.getElementById("close-chat-modal-2").addEventListener("click", closeChatModal);
     chatOverlay.addEventListener("click", (e) => { if (e.target === chatOverlay) closeChatModal(); });
+
+    const logoutOverlay = document.getElementById("logout-overlay");
+
+    function openLogoutModal() { logoutOverlay.classList.add("open"); }
+    function closeLogoutModal() { logoutOverlay.classList.remove("open"); }
+
+    document.getElementById("open-logout-modal").addEventListener("click", openLogoutModal);
+    document.getElementById("close-logout-modal").addEventListener("click", closeLogoutModal);
+    document.getElementById("cancel-logout-btn").addEventListener("click", closeLogoutModal);
+    logoutOverlay.addEventListener("click", (e) => { if (e.target === logoutOverlay) closeLogoutModal(); });
+
+    document.getElementById("confirm-logout-btn").addEventListener("click", logOut);
 
     // My Code
 
@@ -343,6 +374,12 @@
         const first = parts[0].charAt(0);
         const last = parts[parts.length - 1].charAt(0);
         return (first + last).toUpperCase();
+    }
+
+    function logOut(){
+        localStorage.removeItem("userId");
+        localStorage.removeItem("JWT");
+        window.location.href = "index.html";
     }
 
 

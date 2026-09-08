@@ -19,7 +19,7 @@
         </nav>
 
         <div class="sidebar-foot">
-            <button class="btn btn-outline btn-block js-logout">Log out</button>
+            <button class="btn btn-outline btn-block" id="open-logout-modal">Log out</button>
         </div>
     </aside>
 
@@ -120,6 +120,26 @@
         </form>
     </div>
 </div>
+
+<!-- Logout confirmation modal -->
+<div class="modal-overlay" id="logout-overlay">
+    <div class="modal">
+        <div class="modal-head">
+            <h3>Log out?</h3>
+            <button class="modal-close" id="close-logout-modal">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:13.5px;line-height:1.6;color:var(--text-secondary);">
+                You'll need to sign in again to access your sessions and progress.
+            </p>
+        </div>
+        <div class="modal-foot">
+            <button class="btn btn-ghost" id="cancel-logout-btn">Cancel</button>
+            <button class="btn btn-danger" id="confirm-logout-btn">Log out</button>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="js/ui.js"></script>
 <script>
@@ -145,46 +165,21 @@
     document.getElementById("cancel-add-admin").addEventListener("click", closeModal);
     overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
 
+    const logoutOverlay = document.getElementById("logout-overlay");
+
+    function openLogoutModal() { logoutOverlay.classList.add("open"); }
+    function closeLogoutModal() { logoutOverlay.classList.remove("open"); }
+
+    document.getElementById("open-logout-modal").addEventListener("click", openLogoutModal);
+    document.getElementById("close-logout-modal").addEventListener("click", closeLogoutModal);
+    document.getElementById("cancel-logout-btn").addEventListener("click", closeLogoutModal);
+    logoutOverlay.addEventListener("click", (e) => { if (e.target === logoutOverlay) closeLogoutModal(); });
+
+    document.getElementById("confirm-logout-btn").addEventListener("click", logOut);
+
     // My Code
 
     let studentRecords = [];
-
-    // function loadStudentTable(){
-    //     $.ajax({
-    //         url: "http://localhost:8080/students",
-    //         type: "GET",
-    //         contentType: "application/json",
-    //         headers: {
-    //             'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
-    //         },
-    //         success: function (response) {
-    //             studentRecords = response.body;
-    //             console.log(response.body);
-    //             let html = "";
-    //             for(const responseElement of response.body) {
-    //                 html += `<tr><td id="studentName">${responseElement.studentName}<br>${responseElement.studentEmail}</td>
-    //                     <td id="studentPhone">${responseElement.studentPhone}</td>
-    //                     <td id="sessionCount">${responseElement.sessionCount}</td>
-    //                     <td id="averageRating">${(responseElement.ratings/responseElement.sessionCount)}</td>
-    //                     <td id="joinedDate">${responseElement.joinedDate}</td>
-    //                     <td id="status">${responseElement.studentStatus}</td>
-    //                     </tr>`
-    //             }
-    //             $('#students-tbody').html(html);
-    //         },
-    //         error: function (response) {
-    //             if (response.status === 403) {
-    //                 alert("Error 403 - Sorry, Forbidden!");
-    //             } else if (response.status === 400) {
-    //                 alert("Error 400 - Bad JSON");
-    //             } else if (response.status === 401) {
-    //                 alert("Error 401 - Unauthorized!");
-    //             } else if (response.status === 500) {
-    //                 alert("Error 500 - Internal Server Error");
-    //             }
-    //         }
-    //     })
-    // }
 
     function loadStudentTable(){
         $.ajax({
@@ -196,17 +191,6 @@
             },
             success: function (response) {
                 studentRecords = response.body;
-                // let totalRating = 0;
-                // let ratedCount = 0;
-                // studentRecords.forEach(student => {
-                //     if (student.avgRating != null && student.avgRating > 0) {
-                //         totalRating += student.avgRating;
-                //         ratedCount++;
-                //     }
-                // });
-                // const overallAverage = ratedCount > 0 ? (totalRating / ratedCount) : 0;
-                // console.log("Average rating - " + overallAverage);
-                // $('#stat-rating').text(overallAverage);
                 renderStudentTable(studentRecords);
                 renderStats(studentRecords);
             },
@@ -315,6 +299,12 @@
         const first = parts[0].charAt(0);
         const last = parts[parts.length - 1].charAt(0);
         return (first + last).toUpperCase();
+    }
+
+    function logOut(){
+        localStorage.removeItem("userId");
+        localStorage.removeItem("JWT");
+        window.location.href = "index.html";
     }
 </script>
 </body>
