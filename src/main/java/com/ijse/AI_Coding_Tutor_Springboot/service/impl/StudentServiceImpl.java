@@ -181,4 +181,14 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
+
+    public List<GetStudentDetailsDTO> searchFilterStudents(String studentName){
+        try{
+            List<GetStudentDetailsDTO> studentList = studentRepository.searchFilterStudents(studentName);
+            return studentList;
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
 }

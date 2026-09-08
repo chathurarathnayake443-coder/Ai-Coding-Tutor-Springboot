@@ -582,6 +582,41 @@
         localStorage.removeItem("JWT");
         window.location.href = "login.html";
     }
+
+    $('#search-input').on('input', searchStudents);
+
+    function searchStudents(){
+        let studentName = $('#search-input').val().trim();
+
+        let studentSearch_Param = {}
+        if(studentName){
+            studentSearch_Param.studentName = studentName;
+        }
+        let studentQueryParam = $.param(studentSearch_Param);
+        $.ajax({
+            url: "http://localhost:8080/searchNames?" + studentQueryParam,
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                studentRecords = response.body;
+                renderStudentTable(studentRecords);
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
 </script>
 </body>
 </html>

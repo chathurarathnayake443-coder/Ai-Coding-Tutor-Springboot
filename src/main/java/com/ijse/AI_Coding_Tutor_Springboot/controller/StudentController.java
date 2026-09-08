@@ -85,4 +85,10 @@ public class StudentController {
         studentService.updateStudentDetails(updateStudentDetailsDTO);
         return new CommonResponse(OPERATION_SUCCESS, SUCCESS_MESSAGE);
     }
+
+    @GetMapping("/searchNames")
+    public CommonResponse searchFilterNames(@RequestParam(value = "studentName",required = false) String studentName){
+        List<GetStudentDetailsDTO> studentList = studentService.searchFilterStudents(studentName);
+        return new CommonResponse(OPERATION_SUCCESS, studentList, SUCCESS_MESSAGE);
+    }
 }

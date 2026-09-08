@@ -36,4 +36,23 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
 
     @Query("SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.GetUserPasswordAndEmailDTO(s.user.userName,s.user.password) FROM Student s WHERE s.studentId = ?1")
     Optional<GetUserPasswordAndEmailDTO> getUserPasswordAndEmail(long studentId);
+
+    @Query("""
+    SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO(
+        s.studentId,
+        s.studentFullName,
+        s.user.userName,
+        s.studentContact,
+        COUNT(DISTINCT cs.sessionId),
+        COALESCE(AVG(r.ratingValue), 0.0),
+        s.user.joinedDate,
+        s.user.userStatus
+    )
+    FROM Student s
+    LEFT JOIN s.codingSessions cs
+    LEFT JOIN cs.rating r
+    WHERE (?1 IS NULL OR s.studentFullName LIKE %?1%)
+    GROUP BY s.studentId, s.studentFullName, s.user.userName, s.studentContact, s.user.joinedDate, s.user.userStatus
+    """)
+    List<GetStudentDetailsDTO> searchFilterStudents(String studentName);
 }

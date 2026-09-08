@@ -25,4 +25,6 @@ public interface StudentService {
     public StudentDTO getStudentById(long userId);
 
     public void updateStudentDetails(UpdateStudentDetailsDTO updateStudentDetailsDTO);
+
+    public List<GetStudentDetailsDTO> searchFilterStudents(String studentName);
 }
