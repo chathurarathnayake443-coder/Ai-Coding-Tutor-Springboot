@@ -102,12 +102,18 @@
                                 <div class="field full"><label for="full-name">Full name</label>
                                     <input class="input" type="text" id="full-name" placeholder="Enter your full name" autocomplete="name" required></div>
                                 <div class="field"><label for="email">Email address</label>
-                                    <input class="input" type="email" id="email" placeholder="student@example.com" autocomplete="email" required>
+                                    <input class="input" type="email" id="email" disabled placeholder="student@example.com" autocomplete="email" required>
                                     <div class="field-note">Your login email may be managed separately by the system.</div></div>
                                 <div class="field"><label for="phone">Phone number</label>
-                                    <input class="input" type="tel" id="phone" placeholder="+94 7X XXX XXXX" autocomplete="tel"></div>
-                                <div class="field full"><label for="address">Address</label>
-                                    <textarea class="input" id="address" placeholder="Enter your current address" autocomplete="street-address"></textarea></div>
+                                    <input class="input" type="tel" id="phone" placeholder="+94 7X XXX XXXX" autocomplete="tel">
+                                    <div class="field-note">Include the Country code with the Phone Number.</div></div>
+                                <div class="field full"><label for="old-password">Old Password</label>
+                                    <input class="input" type="tel" id="old-password" placeholder="XXXXXXXX" autocomplete="old-pwd"></div>
+                                <div class="field full"><label for="new-password">New Password</label>
+                                    <input class="input" type="tel" id="new-password" placeholder="XXXXXXXX" autocomplete="new-pwd"></div>
+                                <div class="field full"><label for="confirm-password">Confirm Password</label>
+                                    <input class="input" type="tel" id="confirm-password" placeholder="XXXXXXXX" autocomplete="confirm-pwd">
+                                    <div class="field-note">To Update the Password, You have to Provide the Old Password First.</div></div>
                             </div>
                             <div class="form-actions">
                                 <button type="button" class="btn btn-outline" onclick="resetForm()">Cancel</button>
@@ -217,7 +223,7 @@
     document.addEventListener("DOMContentLoaded",loadProfile);
 
     // My Code
-
+    let existingPassword = "";
     function getStudentDetails(){
         let userId = localStorage.getItem("userId");
 
@@ -234,7 +240,14 @@
                 $('#profile-email').text(response.body.studentEmail);
                 let letters = initials(response.body.studentFullName);
                 $('#topbar-avatar').text(letters);
+                $('#profile-avatar').text(letters);
                 $('#topbar-name').text(response.body.studentFullName);
+                $('#student-id').text(response.body.studentId);
+                $('#username').text(response.body.studentEmail);
+                $('#full-name').val(response.body.studentFullName);
+                $('#email').val(response.body.studentEmail);
+                $('#phone').val(response.body.studentContact);
+                existingPassword = response.body.password;
             },
             error: function (response) {
                 if (response.status === 403) {
@@ -250,18 +263,26 @@
         })
     }
 
-    function initials(fullName) {
-        if (!fullName) return "?";
+    function editStudentDetails(){
+        let userId = localStorage.getItem("userId");
+        let newStudentName = $('#full-name').val();
+        let newPhoneNumber = $('#phone').val();
+        let oldPassword = $('#old-password').val();
+        let newPassword = $('#new-password').val();
+        let confirmPassword = $('#confirm-password').val();
 
-        const parts = fullName.trim().split(/\s+/);
-        if (parts.length === 1) {
-            return parts[0].slice(0, 2).toUpperCase();
+        const obj = {};
+
+        if(oldPassword !== "" && newPassword !== "" && confirmPassword !== ""){
+            if(oldPassword === existingPassword){
+                if(newPassword === confirmPassword){
+
+                }
+            }
         }
-
-        const first = parts[0].charAt(0);
-        const last = parts[parts.length - 1].charAt(0);
-        return (first + last).toUpperCase();
     }
+
+
 </script>
 </body>
 </html>

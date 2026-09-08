@@ -12,6 +12,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.repository.SubscriptionPlanRepository
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserSubscriptionRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.UserService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,8 @@ public class UserServiceImpl implements UserService {
     private final UserSubscriptionRepository userSubscriptionRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+
     public UserServiceImpl(UserRepository userRepository, SubscriptionPlanRepository subscriptionPlanRepository, UserSubscriptionRepository userSubscriptionRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.subscriptionPlanRepository = subscriptionPlanRepository;
@@ -36,11 +39,15 @@ public class UserServiceImpl implements UserService {
 
     public UserDTO getUserDetails(String userName, String password, String userRole) {
         try{
-            Optional<User> optionalUser = userRepository.findByUserNameAndPassword(userName, password);
+            Optional<User> optionalUser = userRepository.findByUserName(userName);
             if(!optionalUser.isPresent()){
                 throw new RuntimeException("Sorry, User Not Found");
             }
             User user = optionalUser.get();
+
+            if (!passwordEncoder.matches(password, user.getPassword())) {
+                throw new RuntimeException("Sorry, Invalid Password");
+            }
 
             if(!user.getUserRole().contains(userRole.toUpperCase())){
                 throw new RuntimeException("Sorry, Invalid UserRole");
@@ -58,7 +65,7 @@ public class UserServiceImpl implements UserService {
             User user = new User();
 
             user.setUserName(studentDTO.getStudentEmail());
-            user.setPassword(studentDTO.getPassword());
+            user.setPassword(encoder.encode(studentDTO.getPassword()));
             user.setUserStatus(UserStatus.ACTIVE);
             user.setUserRole("STUDENT");
             user.setJoinedDate(LocalDateTime.now());
