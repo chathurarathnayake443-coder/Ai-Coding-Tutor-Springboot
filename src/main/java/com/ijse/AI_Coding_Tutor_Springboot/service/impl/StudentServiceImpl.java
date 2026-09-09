@@ -191,4 +191,19 @@ public class StudentServiceImpl implements StudentService {
             throw e;
         }
     }
+
+    public void deleteStudent(long userId){
+        try{
+            Optional<User> optionalUser = userRepository.findById(userId);
+            if(!optionalUser.isPresent()){
+                throw new RuntimeException("Sorry User not found");
+            }
+            User user = optionalUser.get();
+            user.setUserStatus(UserStatus.INACTIVE);
+            userRepository.save(user);
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
 }

@@ -91,4 +91,10 @@ public class StudentController {
         List<GetStudentDetailsDTO> studentList = studentService.searchFilterStudents(studentName);
         return new CommonResponse(OPERATION_SUCCESS, studentList, SUCCESS_MESSAGE);
     }
+
+    @DeleteMapping("/deleteStudent/{userId}")
+    public CommonResponse deleteStudent(@PathVariable long userId){
+        studentService.deleteStudent(userId);
+        return new CommonResponse(OPERATION_SUCCESS, SUCCESS_MESSAGE);
+    }
 }
