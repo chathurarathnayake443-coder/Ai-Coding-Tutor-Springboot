@@ -388,8 +388,8 @@
                     </div>
                 </div>
                 <div class="panel-foot">
-                    <button type="button" class="btn btn-ghost" id="details-reset-btn">Discard changes</button>
-                    <button type="submit" class="btn btn-primary" id="details-save-btn">Save changes</button>
+                    <button type="button" class="btn btn-ghost" id="details-reset-btn" onclick="getAdminDetails()">Discard changes</button>
+                    <button type="button" class="btn btn-primary" id="details-save-btn" onclick="updateAdmin()">Save changes</button>
                 </div>
             </form>
 
@@ -672,6 +672,43 @@
     }
 
     function updateAdmin(){
+        let userId = localStorage.getItem("userId");
+        let adminName = $('#pf-full-name').val().trim();
+        let adminContact = $('#pf-phone').val().trim();
+        let oldPassword = $('#pf-old-password').val().trim();
+        let newPassword = $('#pf-new-password').val().trim();
+        let confirmPassword = $('#pf-confirm-password').val().trim();
+
+        if(newPassword !== confirmPassword){
+            alert("Passwords do not match!");
+            return;
+        }
+
+        const obj = JSON.stringify({"userId":userId,"adminName":adminName,"adminContact":adminContact,"oldPassword":oldPassword,"newPassword":newPassword});
+        $.ajax({
+            url: "http://localhost:8080/updateAdminDetails",
+            type: "PUT",
+            contentType: "application/json",
+            data: obj,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                console.log(response.body);
+                alert("Admin Updated successfully!");
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
 
     }
 

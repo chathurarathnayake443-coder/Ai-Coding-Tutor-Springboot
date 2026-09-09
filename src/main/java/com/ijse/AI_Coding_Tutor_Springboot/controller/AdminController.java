@@ -3,6 +3,7 @@ package com.ijse.AI_Coding_Tutor_Springboot.controller;
 import com.ijse.AI_Coding_Tutor_Springboot.constants.CommonResponse;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.AdminDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetAdminDetailsDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.UpdateAdminDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Admin;
 import com.ijse.AI_Coding_Tutor_Springboot.service.AdminService;
 import org.springframework.web.bind.annotation.*;
@@ -44,5 +45,11 @@ public class AdminController {
     public CommonResponse getAdmin(@PathVariable long userId) {
         GetAdminDetailsDTO adminDTO = adminService.getAdminDetailById(userId);
         return new CommonResponse(OPERATION_SUCCESS,adminDTO,SUCCESS_MESSAGE);
+    }
+
+    @PutMapping("/updateAdminDetails")
+    public CommonResponse updateAdminDetails(@RequestBody UpdateAdminDetailsDTO updateAdminDetailsDTO) {
+        adminService.updateAdmin(updateAdminDetailsDTO);
+        return new CommonResponse(OPERATION_SUCCESS,SUCCESS_MESSAGE);
     }
 }

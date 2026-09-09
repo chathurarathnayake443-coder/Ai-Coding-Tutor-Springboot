@@ -2,6 +2,7 @@ package com.ijse.AI_Coding_Tutor_Springboot.service;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.AdminDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetAdminDetailsDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.UpdateAdminDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Admin;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.User;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserStatus;
@@ -19,4 +20,6 @@ public interface AdminService {
     public List<GetAdminDetailsDTO> getAdminDetails();
 
     public GetAdminDetailsDTO getAdminDetailById(long userId);
+
+    public void updateAdmin(UpdateAdminDetailsDTO updateAdminDetailsDTO);
 }
