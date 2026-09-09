@@ -133,4 +133,14 @@ public class UserServiceImpl implements UserService {
         }
         return null;
     }
+
+    public UserStatus getUserStatus(String userName) {
+        try{
+            UserStatus userStatus = userRepository.getUserStatus(userName);
+            return userStatus;
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
 }

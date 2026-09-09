@@ -17,4 +17,6 @@ public interface UserService {
     public void signupUserStudent(StudentDTO studentDTO);
 
     public UserDTO findOrCreateByGoogleEmail(String email, String name);
+
+    public UserStatus getUserStatus(String userName);
 }
