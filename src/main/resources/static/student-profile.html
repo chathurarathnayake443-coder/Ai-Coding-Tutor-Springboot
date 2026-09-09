@@ -66,6 +66,30 @@
         .message{display:none;margin-bottom:16px;padding:11px 13px;border-radius:6px;font-size:12.5px}
         .message.show{display:block}.message.success{background:var(--mint-dim);border:1px solid rgba(110,231,183,.25);color:var(--mint)}
         .message.error{background:rgba(58,33,30,.8);border:1px solid rgba(242,104,92,.3);color:#F3A79E}
+        .btn-danger{background:transparent;color:var(--coral);border-color:rgba(242,104,92,.4)}
+        .btn-danger:hover:not(:disabled){background:rgba(58,33,30,.5)}
+        .btn-danger-solid{background:var(--coral);color:#1c0a08;border-color:var(--coral)}
+        .btn-danger-solid:hover:not(:disabled){background:#f4837a}
+
+        .danger-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0}
+        .danger-row .dr-copy h4{font-size:14px;margin-bottom:4px;font-family:var(--display)}
+        .danger-row .dr-copy p{font-size:12.5px;color:var(--text-secondary);max-width:400px}
+
+        .modal-overlay{position:fixed;inset:0;background:rgba(6,8,12,.65);backdrop-filter:blur(3px);
+            display:none;align-items:center;justify-content:center;z-index:50;padding:24px}
+        .modal-overlay.open{display:flex}
+        .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+            width:100%;max-width:420px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+        .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border-soft)}
+        .modal-head h3{font-size:16px;font-family:var(--display)}
+        .modal-close{background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:4px}
+        .modal-close:hover{color:var(--text-primary)}
+        .modal-body{padding:22px}
+        .modal-body p{font-size:13.5px;line-height:1.6;color:var(--text-secondary)}
+        .modal-foot{display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid var(--border-soft)}
+        .confirm-input{margin-top:14px}
+
+        @media(max-width:650px){.danger-row{flex-direction:column;align-items:flex-start;gap:12px}.danger-row .btn{width:100%}}
         @media(max-width:900px){.profile-grid{grid-template-columns:1fr}}
         @media(max-width:650px){.topbar{padding:16px 18px}.topbar-sub{display:none}.main{padding:20px 16px 40px}
             .profile-hero{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}
@@ -119,6 +143,19 @@
                                 <button type="button" class="btn btn-outline" onclick="resetForm()">Cancel</button>
                                 <button type="submit" class="btn btn-primary" id="save-btn" onclick="editStudentDetails()">Save changes</button>
                             </div>
+
+                            <div class="panel" style="margin-top:20px;">
+                                <div class="panel-head"><div><h3>Danger zone</h3><p>Irreversible account actions</p></div></div>
+                                <div class="panel-body" style="padding-top:6px;padding-bottom:6px;">
+                                    <div class="danger-row">
+                                        <div class="dr-copy">
+                                            <h4>Delete this account</h4>
+                                            <p>Permanently delete your student account. This action cannot be undone.</p>
+                                        </div>
+                                        <button type="button" class="btn btn-danger" id="open-delete-modal">Delete account</button>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </section>
@@ -135,6 +172,26 @@
                 </aside>
             </div>
         </main>
+    </div>
+</div>
+
+<div class="modal-overlay" id="delete-overlay">
+    <div class="modal">
+        <div class="modal-head">
+            <h3>Delete account?</h3>
+            <button class="modal-close" id="close-delete-modal">✕</button>
+        </div>
+        <div class="modal-body">
+            <p>This will permanently delete your student account, including your session history and progress. This action <strong style="color:var(--coral);">cannot be undone</strong>.</p>
+            <div class="field confirm-input">
+                <label for="delete-confirm-input">Type <strong>DELETE</strong> to confirm</label>
+                <input type="text" id="delete-confirm-input" class="input" placeholder="DELETE" autocomplete="off">
+            </div>
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn btn-outline" id="cancel-delete-btn">Cancel</button>
+            <button type="button" class="btn btn-danger-solid" id="confirm-delete-btn" disabled>Delete my account</button>
+        </div>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -221,6 +278,60 @@
     function resetForm(){setUI(originalProfile);message("Your changes have been discarded.","success");}
     function logout(){localStorage.removeItem("JWT");localStorage.removeItem("userId");window.location.href="index.html";}
     document.addEventListener("DOMContentLoaded",loadProfile);
+
+    const deleteOverlay = document.getElementById("delete-overlay");
+    const deleteConfirmInput = document.getElementById("delete-confirm-input");
+    const confirmDeleteBtn = document.getElementById("confirm-delete-btn");
+
+    function openDeleteModal() {
+        deleteOverlay.classList.add("open");
+        deleteConfirmInput.value = "";
+        confirmDeleteBtn.disabled = true;
+    }
+    function closeDeleteModal() {
+        deleteOverlay.classList.remove("open");
+    }
+
+    document.getElementById("open-delete-modal").addEventListener("click", openDeleteModal);
+    document.getElementById("close-delete-modal").addEventListener("click", closeDeleteModal);
+    document.getElementById("cancel-delete-btn").addEventListener("click", closeDeleteModal);
+    deleteOverlay.addEventListener("click", (e) => { if (e.target === deleteOverlay) closeDeleteModal(); });
+
+    deleteConfirmInput.addEventListener("input", () => {
+        confirmDeleteBtn.disabled = deleteConfirmInput.value.trim() !== "DELETE";
+    });
+
+    confirmDeleteBtn.addEventListener("click", () => {
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.textContent = "Deleting…";
+
+        $.ajax({
+            url: "http://localhost:8080/deleteStudent/" + userId,
+            type: "DELETE",
+            contentType: "application/json",
+            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('JWT') },
+            success: function () {
+                localStorage.removeItem("JWT");
+                localStorage.removeItem("userId");
+                window.location.href = "index.html";
+            },
+            error: function (response) {
+                confirmDeleteBtn.disabled = false;
+                confirmDeleteBtn.textContent = "Delete my account";
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                } else {
+                    alert("Unable to delete account. Please try again.");
+                }
+            }
+        });
+    });
 
     // My Code
     let existingPassword = "";
