@@ -502,38 +502,6 @@
         document.getElementById("status-pill").textContent = statusLabel;
         document.getElementById("status-pill").className = "pill " + (isActive ? "pill-mint" : "pill-violet");
     }
-
-    /* =================================================================
-       Load current admin details
-       TODO: point this at your real "get admin details" endpoint.
-       Expected shape (adjust field names to match your DTO):
-       { fullName, email, phone, status }
-       ================================================================= */
-    function loadAdminProfile() {
-        $.ajax({
-            url: `${API_BASE}/getAdminDetails/${userId}`,
-            type: "GET",
-            contentType: "application/json",
-            headers: { 'Authorization': 'Bearer ' + jwt },
-            success: function (response) {
-                const admin = response.body || {};
-
-                originalDetails = {
-                    fullName: admin.fullName || admin.adminFullName || "",
-                    email: admin.email || admin.adminEmail || "",
-                    phone: admin.phone || admin.adminContact || ""
-                };
-
-                document.getElementById("pf-full-name").value = originalDetails.fullName;
-                document.getElementById("pf-email").value = originalDetails.email;
-                document.getElementById("pf-phone").value = originalDetails.phone;
-
-                applyIdentityToUI(originalDetails.fullName, originalDetails.email, admin.status || admin.adminStatus);
-            },
-            error: handleAjaxError
-        });
-    }
-
     /* =================================================================
        Save account details
        TODO: point this at your real "update admin details" endpoint.
@@ -615,8 +583,10 @@
         confirmDeleteBtn.disabled = true;
         confirmDeleteBtn.textContent = "Deleting…";
 
+        let userId = localStorage.getItem("userId");
+
         $.ajax({
-            url: `${API_BASE}/deleteAdmin/${userId}`,
+            url: `http://localhost:8080/deleteAdmin/` + userId,
             type: "DELETE",
             contentType: "application/json",
             headers: { 'Authorization': 'Bearer ' + jwt },

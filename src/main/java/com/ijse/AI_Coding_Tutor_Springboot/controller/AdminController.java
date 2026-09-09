@@ -52,4 +52,10 @@ public class AdminController {
         adminService.updateAdmin(updateAdminDetailsDTO);
         return new CommonResponse(OPERATION_SUCCESS,SUCCESS_MESSAGE);
     }
+
+    @DeleteMapping("deleteAdmin/{userId}")
+    public CommonResponse deleteAdmin(@PathVariable long userId) {
+        adminService.deleteAdmin(userId);
+        return new CommonResponse(OPERATION_SUCCESS,SUCCESS_MESSAGE);
+    }
 }

@@ -22,4 +22,6 @@ public interface AdminService {
     public GetAdminDetailsDTO getAdminDetailById(long userId);
 
     public void updateAdmin(UpdateAdminDetailsDTO updateAdminDetailsDTO);
+
+    public void deleteAdmin(long userId);
 }
