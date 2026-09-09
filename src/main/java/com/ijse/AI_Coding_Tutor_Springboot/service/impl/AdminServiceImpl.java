@@ -52,6 +52,7 @@ public class AdminServiceImpl implements AdminService {
 
             Admin admin = new Admin();
             admin.setAdminFullName(adminDTO.getAdminFullName());
+            admin.setAdminContact(adminDTO.getAdminContact());
             admin.setUser(user);
             user.setAdmin(admin);
             userRepository.save(user);

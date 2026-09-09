@@ -15,4 +15,11 @@ public class GetAdminDetailsDTO {
     private String adminName;
     private String adminEmail;
     private UserStatus adminStatus;
+    private String adminContact;
+
+    public GetAdminDetailsDTO(String adminName, String adminEmail, UserStatus adminStatus) {
+        this.adminName = adminName;
+        this.adminEmail = adminEmail;
+        this.adminStatus = adminStatus;
+    }
 }

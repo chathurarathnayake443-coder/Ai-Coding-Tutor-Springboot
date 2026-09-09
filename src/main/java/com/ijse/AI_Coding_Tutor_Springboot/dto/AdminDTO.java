@@ -13,5 +13,6 @@ import lombok.Setter;
 public class AdminDTO {
     private String adminFullName;
     private String adminEmail;
+    private String adminContact;
     private String adminPassword;
 }

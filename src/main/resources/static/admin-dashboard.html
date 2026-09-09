@@ -33,7 +33,7 @@
             </div>
             <div class="user-chip">
                 <div class="who">
-                    <div class="name" id="admin-name">—</div>
+                    <a href="admin-profile.html"><div class="name" id="admin-name">-</div></a>
                     <div class="role">admin</div>
                 </div>
                 <div class="avatar role-admin" id="admin-avatar">A</div>
@@ -109,6 +109,10 @@
                 <div class="field">
                     <label for="aa-email">Email</label>
                     <input type="email" id="aa-email" class="input" placeholder="admin@aitutor.dev" required>
+                </div>
+                <div class="field">
+                    <label for="aa-contact">Contact</label>
+                    <input type="tel" id="aa-contact" class="input" placeholder="+94 XX XXX XXXX" required>
                 </div>
                 <div class="field" style="margin-bottom:0;">
                     <label for="aa-password">Password</label>
@@ -560,6 +564,7 @@
     function saveAdmin(){
         let adminFullName = $('#aa-name').val().trim();
         let adminEmail = $('#aa-email').val().trim();
+        let adminContact = $('#aa-contact').val().trim();
         let adminPassword = $('#aa-password').val().trim();
         let adminConfirmPassword = $('#aa-confirm-password').val().trim();
 
@@ -568,7 +573,7 @@
             return;
         }
 
-        const obj = JSON.stringify({"adminFullName": adminFullName, "adminEmail": adminEmail, "adminPassword": adminPassword});
+        const obj = JSON.stringify({"adminFullName": adminFullName, "adminEmail": adminEmail, "adminContact": adminContact,"adminPassword": adminPassword});
         $.ajax({
             url: "http://localhost:8080/saveAdmin",
             type: "POST",
