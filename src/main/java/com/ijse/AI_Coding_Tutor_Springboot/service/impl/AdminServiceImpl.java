@@ -1,6 +1,7 @@
 package com.ijse.AI_Coding_Tutor_Springboot.service.impl;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.AdminDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.GetAdminDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Admin;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.User;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserStatus;
@@ -11,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -53,6 +55,16 @@ public class AdminServiceImpl implements AdminService {
             admin.setUser(user);
             user.setAdmin(admin);
             userRepository.save(user);
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
+
+    public List<GetAdminDetailsDTO> getAdminDetails() {
+        try{
+            List<GetAdminDetailsDTO> adminList = adminRepository.getAdminDetails();
+            return adminList;
         }
         catch(Exception e){
             throw e;

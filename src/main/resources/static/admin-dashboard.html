@@ -224,6 +224,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         loadStudentTable();
         loadAdminName();
+        loadAdminTable();
     });
 
     function escapeHtml(str) {
@@ -266,7 +267,7 @@
         viewAdminOverlay.classList.add("open");
 
         // Load latest admins every time modal opens
-        loadAdmins();
+        loadAdminTable();
     }
 
     function closeViewAdminModal() {
@@ -301,74 +302,8 @@
 
 
     // ============================================================
-    // Load admins
+    // Render admins
     // ============================================================
-
-    function loadAdmins() {
-
-        const adminsList = document.getElementById("admins-list");
-
-        adminsList.innerHTML = `
-        <div class="empty-state">
-            <div class="empty-icon">⏳</div>
-            <h4>Loading administrators...</h4>
-        </div>
-    `;
-
-        $.ajax({
-            url: "http://localhost:8080/admins",
-            type: "GET",
-            contentType: "application/json",
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('JWT')
-            },
-
-            success: function(response) {
-
-                console.log("Admins response:", response);
-
-                const admins = response.body || [];
-
-                renderAdmins(admins);
-
-            },
-
-            error: function(response) {
-
-                console.error("Failed to load admins:", response);
-
-                if (response.status === 403) {
-                    adminsList.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🔒</div>
-                        <h4>Access denied</h4>
-                        <p>You don't have permission to view administrators.</p>
-                    </div>
-                `;
-                }
-
-                else if (response.status === 401) {
-                    adminsList.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🔐</div>
-                        <h4>Unauthorized</h4>
-                        <p>Please sign in again.</p>
-                    </div>
-                `;
-                }
-
-                else {
-                    adminsList.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">⚠️</div>
-                        <h4>Unable to load administrators</h4>
-                        <p>Please try again later.</p>
-                    </div>
-                `;
-                }
-            }
-        });
-    }
 
     function renderAdmins(admins) {
 
@@ -645,6 +580,38 @@
             success: function (response) {
                 console.log(response);
                 alert("Admin Successfully Saved!");
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    function loadAdminTable(){
+        $('#admins-list').html(`
+        <div class="empty-state">
+            <div class="empty-icon">⏳</div>
+            <h4>Loading administrators...</h4>
+        </div>
+    `);
+        $.ajax({
+            url: "http://localhost:8080/loadAdminTable",
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                console.log(response);
+                renderAdmins(response.body);
             },
             error: function (response) {
                 if (response.status === 403) {
