@@ -71,4 +71,18 @@ public class AdminServiceImpl implements AdminService {
             throw e;
         }
     }
+
+    public GetAdminDetailsDTO getAdminDetailById(long userId) {
+        try{
+            Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(userId);
+            if(!optionalAdmin.isPresent()){
+                throw new RuntimeException("Sorry, Admin Not Found");
+            }
+            Admin admin = optionalAdmin.get();
+            return new GetAdminDetailsDTO(admin.getAdminFullName(), admin.getUser().getUserName(), admin.getUser().getUserStatus(), admin.getAdminContact());
+        }
+        catch(Exception e){
+            throw e;
+        }
+    }
 }

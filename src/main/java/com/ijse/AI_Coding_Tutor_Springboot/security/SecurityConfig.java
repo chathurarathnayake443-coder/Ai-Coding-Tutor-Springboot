@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET,
                                 "/", "/index.html", "/signup.html",
-                                "/css/**", "/js/**", "/images/**", "/student-dashboard.html","/admin-dashboard.html"
+                                "/css/**", "/js/**", "/images/**", "/student-dashboard.html","/admin-dashboard.html","/admin-profile.html","/student-profile.html"
                         ).permitAll()
                         .requestMatchers(HttpMethod.POST, "/login","/students/signUpStudent","/auth/google").permitAll()// by using this .requestMatches method, we can give another API to be called here.
                         .requestMatchers(HttpMethod.GET, "/testing","/test").permitAll()// by using this .requestMatches method, we can give another API to be called here.

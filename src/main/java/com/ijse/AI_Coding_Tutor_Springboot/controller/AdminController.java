@@ -39,4 +39,10 @@ public class AdminController {
         List<GetAdminDetailsDTO> adminList = adminService.getAdminDetails();
         return new CommonResponse(OPERATION_SUCCESS,adminList,SUCCESS_MESSAGE);
     }
+
+    @GetMapping("/getAdmin/{userId}")
+    public CommonResponse getAdmin(@PathVariable long userId) {
+        GetAdminDetailsDTO adminDTO = adminService.getAdminDetailById(userId);
+        return new CommonResponse(OPERATION_SUCCESS,adminDTO,SUCCESS_MESSAGE);
+    }
 }

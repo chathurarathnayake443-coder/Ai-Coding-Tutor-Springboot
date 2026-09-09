@@ -17,4 +17,6 @@ public interface AdminService {
     public void saveAdmin(AdminDTO adminDTO);
 
     public List<GetAdminDetailsDTO> getAdminDetails();
+
+    public GetAdminDetailsDTO getAdminDetailById(long userId);
 }

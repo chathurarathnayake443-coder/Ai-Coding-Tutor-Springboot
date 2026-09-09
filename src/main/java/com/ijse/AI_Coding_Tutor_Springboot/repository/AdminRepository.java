@@ -17,4 +17,7 @@ public interface AdminRepository extends JpaRepository<Admin,Long> {
 
     @Query("SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.GetAdminDetailsDTO(a.adminFullName,a.user.userName,a.user.userStatus) FROM Admin a")
     List<GetAdminDetailsDTO> getAdminDetails();
+
+    @Query("SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.GetAdminDetailsDTO(a.adminFullName,a.user.userName,a.user.userStatus,a.adminContact) FROM Admin a where a.user.userId = ?1")
+    Optional<GetAdminDetailsDTO> getAdminDetails(long userId);
 }

@@ -423,6 +423,10 @@
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
+
+    document.addEventListener("DOMContentLoaded", () => {
+        getAdminDetails();
+    });
     /* =================================================================
        CONFIG — adjust to match your backend
        ================================================================= */
@@ -431,10 +435,6 @@
     const jwt = localStorage.getItem("JWT");
 
     let originalDetails = { fullName: "", email: "", phone: "" };
-
-    document.addEventListener("DOMContentLoaded", () => {
-        loadAdminProfile();
-    });
 
     /* =================================================================
        Helpers
@@ -629,6 +629,7 @@
             },
             success: function (response) {
                 console.log(response.body)
+                $('#topbar-admin-name').text(response.body.adminName);
             },
             error: function (response) {
                 if (response.status === 403) {
