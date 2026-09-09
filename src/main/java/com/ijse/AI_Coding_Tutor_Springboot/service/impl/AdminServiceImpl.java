@@ -79,6 +79,7 @@ public class AdminServiceImpl implements AdminService {
                 throw new RuntimeException("Sorry, Admin Not Found");
             }
             Admin admin = optionalAdmin.get();
+            System.out.println("Admin contact - " + admin.getAdminContact());
             return new GetAdminDetailsDTO(admin.getAdminFullName(), admin.getUser().getUserName(), admin.getUser().getUserStatus(), admin.getAdminContact());
         }
         catch(Exception e){

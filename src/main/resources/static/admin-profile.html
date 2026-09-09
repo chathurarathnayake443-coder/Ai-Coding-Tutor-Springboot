@@ -358,6 +358,7 @@
                         <div class="field">
                             <label for="pf-phone">Telephone number</label>
                             <input type="tel" id="pf-phone" class="input" placeholder="+94 7X XXX XXXX">
+                            <div class="field-note">Include Country code to contact number when changing.</div>
                         </div>
                     </div>
 
@@ -630,6 +631,14 @@
             success: function (response) {
                 console.log(response.body)
                 $('#topbar-admin-name').text(response.body.adminName);
+                $('#hero-name').text(response.body.adminName)
+                $('#hero-email').text(response.body.adminEmail)
+                let letters = initials(response.body.adminName)
+                $('#topbar-admin-avatar').text(letters)
+                $('#hero-avatar').text(letters)
+                $('#pf-full-name').val(response.body.adminName)
+                $('#pf-email').val(response.body.adminEmail)
+                $('#pf-phone').val(response.body.adminContact)
             },
             error: function (response) {
                 if (response.status === 403) {
@@ -643,6 +652,19 @@
                 }
             }
         })
+    }
+
+    function initials(fullName) {
+        if (!fullName) return "?";
+
+        const parts = fullName.trim().split(/\s+/);
+        if (parts.length === 1) {
+            return parts[0].slice(0, 2).toUpperCase();
+        }
+
+        const first = parts[0].charAt(0);
+        const last = parts[parts.length - 1].charAt(0);
+        return (first + last).toUpperCase();
     }
 </script>
 </body>
