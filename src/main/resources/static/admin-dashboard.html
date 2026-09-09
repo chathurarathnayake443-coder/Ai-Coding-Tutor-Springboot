@@ -111,13 +111,17 @@
                     <input type="email" id="aa-email" class="input" placeholder="admin@aitutor.dev" required>
                 </div>
                 <div class="field" style="margin-bottom:0;">
-                    <label for="aa-password">Temporary password</label>
+                    <label for="aa-password">Password</label>
                     <input type="password" id="aa-password" class="input" placeholder="At least 8 characters" required>
+                </div>
+                <div class="field" style="margin-bottom:0;">
+                    <label for="aa-confirm-password">Confirm Password</label>
+                    <input type="password" id="aa-confirm-password" class="input" placeholder="At least 8 characters" required>
                 </div>
             </div>
             <div class="modal-foot">
                 <button type="button" class="btn btn-ghost" id="cancel-add-admin">Cancel</button>
-                <button type="submit" class="btn btn-primary">Create admin account</button>
+                <button type="button" class="btn btn-primary" onclick="saveAdmin()">Create admin account</button>
             </div>
         </form>
     </div>
@@ -603,6 +607,44 @@
             success: function (response) {
                 studentRecords = response.body;
                 renderStudentTable(studentRecords);
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    function saveAdmin(){
+        let adminFullName = $('#aa-name').val().trim();
+        let adminEmail = $('#aa-email').val().trim();
+        let adminPassword = $('#aa-password').val().trim();
+        let adminConfirmPassword = $('#aa-confirm-password').val().trim();
+
+        if(adminPassword !== adminConfirmPassword){
+            alert("Sorry, Passwords do not match");
+            return;
+        }
+
+        const obj = JSON.stringify({"adminFullName": adminFullName, "adminEmail": adminEmail, "adminPassword": adminPassword});
+        $.ajax({
+            url: "http://localhost:8080/saveAdmin",
+            type: "POST",
+            contentType: "application/json",
+            data: obj,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                console.log(response);
+                alert("Admin Successfully Saved!");
             },
             error: function (response) {
                 if (response.status === 403) {
