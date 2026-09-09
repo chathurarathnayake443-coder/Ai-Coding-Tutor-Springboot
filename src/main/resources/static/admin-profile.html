@@ -360,6 +360,23 @@
                             <input type="tel" id="pf-phone" class="input" placeholder="+94 7X XXX XXXX">
                             <div class="field-note">Include Country code to contact number when changing.</div>
                         </div>
+
+                        <div class="field">
+                            <label for="pf-old-password">Old Password</label>
+                            <input type="password" id="pf-old-password" class="input" placeholder="XXXXXXXXXX">
+                            <div class="field-note">You have to Provide the Old Password too when you are changing the Password here.</div>
+                        </div>
+
+                        <div class="field">
+                            <label for="pf-new-password">new Password</label>
+                            <input type="password" id="pf-new-password" class="input" placeholder="XXXXXXXXXX">
+                            <div class="field-note">Type the New Password here.</div>
+                        </div>
+
+                        <div class="field">
+                            <label for="pf-confirm-password">Confirm Password</label>
+                            <input type="password" id="pf-confirm-password" class="input" placeholder="XXXXXXXXXX">
+                        </div>
                     </div>
 
                     <div class="status-row">
@@ -654,18 +671,10 @@
         })
     }
 
-    function initials(fullName) {
-        if (!fullName) return "?";
+    function updateAdmin(){
 
-        const parts = fullName.trim().split(/\s+/);
-        if (parts.length === 1) {
-            return parts[0].slice(0, 2).toUpperCase();
-        }
-
-        const first = parts[0].charAt(0);
-        const last = parts[parts.length - 1].charAt(0);
-        return (first + last).toUpperCase();
     }
+
 </script>
 </body>
 </html>
