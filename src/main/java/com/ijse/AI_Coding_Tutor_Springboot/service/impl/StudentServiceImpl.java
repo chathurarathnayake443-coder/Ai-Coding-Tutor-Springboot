@@ -42,22 +42,35 @@ public class StudentServiceImpl implements StudentService {
 
     public List<GetStudentDetailsDTO> getAllStudents(){
         log.info("Executing method getAllStudents()");
+        try{
             return studentRepository.getStudentDetails();
+        }
+        catch(Exception e){
+            log.error("Error in method getAllStudents()",e);
+            throw e;
+        }
     }
 
     public String getStudentNameById(long userId){
         log.info("Executing method getStudentNameById()");
-        Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
-        if(!studentOptional.isPresent()){
-            throw new CustomException(404,"Sorry Student not found");
+        try{
+            Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
+            if(!studentOptional.isPresent()){
+                throw new CustomException(404,"Sorry Student not found");
+            }
+            Student student = studentOptional.get();
+            String studentName = student.getStudentFullName();
+            return studentName;
         }
-        Student student = studentOptional.get();
-        String studentName = student.getStudentFullName();
-        return studentName;
+        catch(Exception e){
+            log.error("Error in method getStudentNameById()",e);
+            throw e;
+        }
     }
 
     public long getCompletedSessionCount(long userId){
         log.info("Executing method getCompletedSessionCount()");
+        try{
             System.out.println(userId);
             Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
             if(!studentOptional.isPresent()){
@@ -68,11 +81,17 @@ public class StudentServiceImpl implements StudentService {
             long sessionCount = codingSessionRepository.getCompletedSessionCount(student.getStudentId());
             System.out.println(sessionCount);
             return sessionCount;
+        }
+        catch(Exception e){
+            log.error("Error in method getCompletedSessionCount()",e);
+            throw e;
+        }
     }
 
 
     public List<SessionHistoryDTO> getSessionHistory(long userId){
         log.info("Executing method getSessionHistory()");
+        try{
             Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
             if(!studentOptional.isPresent()){
                 throw new CustomException(404,"Sorry Student not found");
@@ -84,10 +103,16 @@ public class StudentServiceImpl implements StudentService {
                 System.out.println(sessionHistoryDTO.getSessionId());
             }
             return sessionHistoryDTOList;
+        }
+        catch(Exception e){
+            log.error("Error in method getSessionHistory()",e);
+            throw e;
+        }
     }
 
     public double getAverageRating(long userId){
         log.info("Executing method getAverageRating()");
+        try{
             Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
             if(!studentOptional.isPresent()){
                 throw new CustomException(404,"Sorry Student not found");
@@ -95,10 +120,16 @@ public class StudentServiceImpl implements StudentService {
             Student student = studentOptional.get();
             double avgRating = ratingRepository.findAvgRatingByStudentId(student.getStudentId());
             return avgRating;
+        }
+        catch(Exception e){
+            log.error("Error in method getAverageRating()",e);
+            throw e;
+        }
     }
 
     public StudentDTO getStudentById(long userId){
         log.info("Executing method getStudentById()");
+        try{
             Optional<Student> optionalStudent = studentRepository.getStudentByUserId(userId);
             if(!optionalStudent.isPresent()){
                 throw new CustomException(404,"Sorry Student not found");
@@ -110,11 +141,17 @@ public class StudentServiceImpl implements StudentService {
             }
             GetUserPasswordAndEmailDTO getUserPasswordAndEmailDTO = optionalDTO.get();
             return new StudentDTO(student.getStudentId(),student.getStudentFullName(),getUserPasswordAndEmailDTO.getEmail(),student.getStudentContact(),getUserPasswordAndEmailDTO.getPassword());
+        }
+        catch(Exception e){
+            log.error("Error in method getStudentById()",e);
+            throw e;
+        }
     }
 
     @Transactional
     public void updateStudentDetails(UpdateStudentDetailsDTO updateStudentDetailsDTO){
         log.info("Executing method updateStudentDetails()");
+        try{
             Optional<Student> studentOptional = studentRepository.getStudentByUserId(updateStudentDetailsDTO.getUserId());
             if(!studentOptional.isPresent()){
                 throw new CustomException(404,"Sorry Student not found");
@@ -157,16 +194,28 @@ public class StudentServiceImpl implements StudentService {
                 user.setPassword(encoder.encode(updateStudentDetailsDTO.getNewPassword()));
                 userRepository.save(user);
             }
+        }
+        catch(Exception e){
+            log.error("Error in method updateStudentDetails()",e);
+            throw e;
+        }
     }
 
     public List<GetStudentDetailsDTO> searchFilterStudents(String studentName){
         log.info("Executing method searchFilterStudents()");
+        try{
             List<GetStudentDetailsDTO> studentList = studentRepository.searchFilterStudents(studentName);
             return studentList;
+        }
+        catch(Exception e){
+            log.error("Error in method searchFilterStudents()",e);
+            throw e;
+        }
     }
 
     public void deleteStudent(long userId){
         log.info("Executing method deleteStudent()");
+        try{
             Optional<User> optionalUser = userRepository.findById(userId);
             if(!optionalUser.isPresent()){
                 throw new CustomException(404,"Sorry User not found");
@@ -174,5 +223,10 @@ public class StudentServiceImpl implements StudentService {
             User user = optionalUser.get();
             user.setUserStatus(UserStatus.INACTIVE);
             userRepository.save(user);
+        }
+        catch(Exception e){
+            log.error("Error in method deleteStudent()",e);
+            throw e;
+        }
     }
 }
