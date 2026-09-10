@@ -37,16 +37,23 @@ public class AdminServiceImpl implements AdminService {
 
     public Admin getAdminNameByUserId(long userId) {
             log.info("Executing method getAdminNameByUserId()");
-            Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(userId);
-            if(!optionalAdmin.isPresent()){
-                throw new CustomException(404,"Sorry, Admin Not Found");
+            try{
+                Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(userId);
+                if(!optionalAdmin.isPresent()){
+                    throw new CustomException(404,"Sorry, Admin Not Found");
+                }
+                Admin admin = optionalAdmin.get();
+                return admin;
             }
-            Admin admin = optionalAdmin.get();
-            return admin;
+            catch(Exception e){
+                log.error("Error in getAdminNameByUserId()",e);
+                throw e;
+            }
     }
 
     public void saveAdmin(AdminDTO adminDTO) {
         log.info("Executing method saveAdmin()");
+        try{
             User user = new User();
             user.setUserName(adminDTO.getAdminEmail());
             user.setPassword(encoder.encode(adminDTO.getAdminPassword()));
@@ -60,16 +67,28 @@ public class AdminServiceImpl implements AdminService {
             admin.setUser(user);
             user.setAdmin(admin);
             userRepository.save(user);
+        }
+        catch(Exception e){
+            log.error("Error in saveAdmin()",e);
+            throw e;
+        }
     }
 
     public List<GetAdminDetailsDTO> getAdminDetails() {
         log.info("Executing method getAdminDetails()");
+        try{
             List<GetAdminDetailsDTO> adminList = adminRepository.getAdminDetails();
             return adminList;
+        }
+        catch(Exception e){
+            log.error("Error in getAdminDetails()",e);
+            throw e;
+        }
     }
 
     public GetAdminDetailsDTO getAdminDetailById(long userId) {
         log.info("Executing method getAdminDetailById()");
+        try{
             Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(userId);
             if(!optionalAdmin.isPresent()){
                 throw new CustomException(404,"Sorry, Admin Not Found");
@@ -77,11 +96,17 @@ public class AdminServiceImpl implements AdminService {
             Admin admin = optionalAdmin.get();
             System.out.println("Admin contact - " + admin.getAdminContact());
             return new GetAdminDetailsDTO(admin.getAdminFullName(), admin.getUser().getUserName(), admin.getUser().getUserStatus(), admin.getAdminContact());
+        }
+        catch(Exception e){
+            log.error("Error in getAdminDetailById()",e);
+            throw e;
+        }
     }
 
     @Transactional
     public void updateAdmin(UpdateAdminDetailsDTO updateAdminDetailsDTO) {
         log.info("Executing method updateAdmin()");
+        try{
             Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(updateAdminDetailsDTO.getUserId());
             if(!optionalAdmin.isPresent()){
                 throw new CustomException(404,"Sorry, Admin Not Found");
@@ -115,10 +140,16 @@ public class AdminServiceImpl implements AdminService {
                 user.setPassword(encoder.encode(updateAdminDetailsDTO.getNewPassword()));
                 userRepository.save(user);
             }
+        }
+        catch(Exception e){
+            log.error("Error in updateAdmin()",e);
+            throw e;
+        }
     }
 
     public void deleteAdmin(long userId) {
         log.info("Executing method deleteAdmin()");
+        try{
             Optional<User> optionalUser = userRepository.findById(userId);
             if(!optionalUser.isPresent()){
                 throw new CustomException(404,"Sorry, User Not Found");
@@ -126,5 +157,10 @@ public class AdminServiceImpl implements AdminService {
             User user = optionalUser.get();
             user.setUserStatus(UserStatus.INACTIVE);
             userRepository.save(user);
+        }
+        catch(Exception e){
+            log.error("Error in deleteAdmin()",e);
+            throw e;
+        }
     }
 }
