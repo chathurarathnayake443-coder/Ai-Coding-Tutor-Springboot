@@ -7,6 +7,7 @@ import com.google.genai.types.GenerateContentResponse;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.*;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.*;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.ExecutionStatus;
+import com.ijse.AI_Coding_Tutor_Springboot.exceptions.CustomException;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.CodeAttemptRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.CodingSessionRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.HintRepository;
@@ -51,7 +52,6 @@ public class GeminiServiceImpl implements GeminiService {
     }
 
     public CodeExecutionResult executeCode(long sessionId,String code, String language) throws JsonProcessingException {
-        try{
             String prompt = """
             You are a programming code execution and analysis assistant.
 
@@ -111,7 +111,7 @@ public class GeminiServiceImpl implements GeminiService {
 
             Optional<CodingSession> optionalCodingSession = codingSessionRepository.findById(sessionId);
             if (!optionalCodingSession.isPresent()) {
-                throw new RuntimeException("Sorry, session not found");
+                throw new CustomException(404,"Sorry, session not found");
             }
             CodingSession codingSession = optionalCodingSession.get();
             codeAttempt.setCodingSession(codingSession);
@@ -123,14 +123,9 @@ public class GeminiServiceImpl implements GeminiService {
             codeExecution.setCodeAttempt(codeAttempt);
             codeAttemptRepository.save(codeAttempt);
             return codeResult;
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 
     public HintResponseDTO generateHint(HintRequestDTO hintRequestDTO) throws JsonProcessingException {
-        try {
             System.out.println("========== HINT REQUEST ==========");
             System.out.println("Session ID: " + hintRequestDTO.getSessionId());
             System.out.println("Hint Number: " + hintRequestDTO.getHintNumber());
@@ -204,19 +199,15 @@ public class GeminiServiceImpl implements GeminiService {
 
             Optional<CodingSession> optionalCodingSession = codingSessionRepository.findById(hintRequestDTO.getSessionId());
             if (!optionalCodingSession.isPresent()) {
-                throw new RuntimeException("Sorry, session not found");
+                throw new CustomException(404,"Sorry, session not found");
             }
             CodingSession codingSession = optionalCodingSession.get();
             hint.setCodingSession(codingSession);
             hintRepository.save(hint);
             return hintResult;
-        } catch (Exception e) {
-            throw e;
-        }
     }
 
     public ResponseSolutionDTO generateActualSolution(RequestSolutionDTO requestSolutionDTO) throws JsonProcessingException {
-        try{
             String prompt = """
         You are an AI Coding Tutor.
 
@@ -264,16 +255,12 @@ public class GeminiServiceImpl implements GeminiService {
 
             Optional<CodingSession> optionalCodingSession = codingSessionRepository.findById(requestSolutionDTO.getSessionId());
             if (!optionalCodingSession.isPresent()) {
-                throw new RuntimeException("Sorry, session not found");
+                throw new CustomException(404,"Sorry, session not found");
             }
             CodingSession codingSession = optionalCodingSession.get();
             solution.setCodingSession(codingSession);
             solutionRepository.save(solution);
 
             return responseSolutionDTO;
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 }
