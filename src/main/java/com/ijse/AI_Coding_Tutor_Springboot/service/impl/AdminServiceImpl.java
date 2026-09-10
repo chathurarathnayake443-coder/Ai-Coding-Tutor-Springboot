@@ -6,6 +6,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.dto.UpdateAdminDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Admin;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.User;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserStatus;
+import com.ijse.AI_Coding_Tutor_Springboot.exceptions.CustomException;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.AdminRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.AdminService;
@@ -33,21 +34,15 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public Admin getAdminNameByUserId(long userId) {
-        try{
             Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(userId);
             if(!optionalAdmin.isPresent()){
-                throw new RuntimeException("Sorry, Admin Not Found");
+                throw new CustomException(404,"Sorry, Admin Not Found");
             }
             Admin admin = optionalAdmin.get();
             return admin;
-        }
-        catch(Exception e) {
-            throw e;
-        }
     }
 
     public void saveAdmin(AdminDTO adminDTO) {
-        try{
             User user = new User();
             user.setUserName(adminDTO.getAdminEmail());
             user.setPassword(encoder.encode(adminDTO.getAdminPassword()));
@@ -61,43 +56,28 @@ public class AdminServiceImpl implements AdminService {
             admin.setUser(user);
             user.setAdmin(admin);
             userRepository.save(user);
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 
     public List<GetAdminDetailsDTO> getAdminDetails() {
-        try{
             List<GetAdminDetailsDTO> adminList = adminRepository.getAdminDetails();
             return adminList;
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 
     public GetAdminDetailsDTO getAdminDetailById(long userId) {
-        try{
             Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(userId);
             if(!optionalAdmin.isPresent()){
-                throw new RuntimeException("Sorry, Admin Not Found");
+                throw new CustomException(404,"Sorry, Admin Not Found");
             }
             Admin admin = optionalAdmin.get();
             System.out.println("Admin contact - " + admin.getAdminContact());
             return new GetAdminDetailsDTO(admin.getAdminFullName(), admin.getUser().getUserName(), admin.getUser().getUserStatus(), admin.getAdminContact());
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 
     @Transactional
     public void updateAdmin(UpdateAdminDetailsDTO updateAdminDetailsDTO) {
-        try{
             Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(updateAdminDetailsDTO.getUserId());
             if(!optionalAdmin.isPresent()){
-                throw new RuntimeException("Sorry, Admin Not Found");
+                throw new CustomException(404,"Sorry, Admin Not Found");
             }
             Admin admin = optionalAdmin.get();
 
@@ -114,7 +94,7 @@ public class AdminServiceImpl implements AdminService {
             if(!updateAdminDetailsDTO.getOldPassword().isEmpty() && !updateAdminDetailsDTO.getNewPassword().isEmpty()){
                 Optional<User> optionalUser = userRepository.findById(updateAdminDetailsDTO.getUserId());
                 if(!optionalUser.isPresent()){
-                    throw new RuntimeException("Sorry, User Not Found");
+                    throw new CustomException(404,"Sorry, User Not Found");
                 }
                 User user = optionalUser.get();
 
@@ -122,30 +102,21 @@ public class AdminServiceImpl implements AdminService {
                 String oldPassword = updateAdminDetailsDTO.getOldPassword();
 
                 if (!passwordEncoder.matches(existingPassword, oldPassword)) {
-                    throw new RuntimeException("Sorry, Old Password does not match");
+                    throw new CustomException(404,"Sorry, Old Password does not match");
                 }
 
                 user.setPassword(encoder.encode(updateAdminDetailsDTO.getNewPassword()));
                 userRepository.save(user);
             }
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 
     public void deleteAdmin(long userId) {
-        try{
             Optional<User> optionalUser = userRepository.findById(userId);
             if(!optionalUser.isPresent()){
-                throw new RuntimeException("Sorry, User Not Found");
+                throw new CustomException(404,"Sorry, User Not Found");
             }
             User user = optionalUser.get();
             user.setUserStatus(UserStatus.INACTIVE);
             userRepository.save(user);
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 }
