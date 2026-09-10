@@ -253,17 +253,7 @@
                 let letters = initials($('#student-name').text());
                 $('#student-avatar').text(letters);
             },
-            error: function (response) {
-                if (response.status === 403) {
-                    alert("Error 403 - Sorry, Forbidden!");
-                } else if (response.status === 400) {
-                    alert("Error 400 - Bad JSON");
-                } else if (response.status === 401) {
-                    alert("Error 401 - Unauthorized!");
-                } else if (response.status === 500) {
-                    alert("Error 500 - Internal Server Error");
-                }
-            }
+            error: handleAjaxError,
         })
     }
 
@@ -281,17 +271,7 @@
                 let sessionCount = response.body;
                 $('#an-total').text(sessionCount);
             },
-            error: function (response) {
-                if (response.status === 403) {
-                    alert("Error 403 - Sorry, Forbidden!");
-                } else if (response.status === 400) {
-                    alert("Error 400 - Bad JSON");
-                } else if (response.status === 401) {
-                    alert("Error 401 - Unauthorized!");
-                } else if (response.status === 500) {
-                    alert("Error 500 - Internal Server Error");
-                }
-            }
+            error: handleAjaxError,
         })
     }
 
@@ -334,17 +314,7 @@
                 }
                 $('#session-timeline').html(html);
             },
-            error: function (response) {
-                if (response.status === 403) {
-                    alert("Error 403 - Sorry, Forbidden!");
-                } else if (response.status === 400) {
-                    alert("Error 400 - Bad JSON");
-                } else if (response.status === 401) {
-                    alert("Error 401 - Unauthorized!");
-                } else if (response.status === 500) {
-                    alert("Error 500 - Internal Server Error");
-                }
-            }
+            error: handleAjaxError,
         })
     }
 
@@ -368,17 +338,7 @@
                 let ratingFeedback = generateRatingFeedback(response.body);
                 $('#an-feedback').text(ratingFeedback);
             },
-            error: function (response) {
-                if (response.status === 403) {
-                    alert("Error 403 - Sorry, Forbidden!");
-                } else if (response.status === 400) {
-                    alert("Error 400 - Bad JSON");
-                } else if (response.status === 401) {
-                    alert("Error 401 - Unauthorized!");
-                } else if (response.status === 500) {
-                    alert("Error 500 - Internal Server Error");
-                }
-            }
+            error: handleAjaxError,
         })
     }
 
@@ -425,17 +385,7 @@
                 $('#stat-hints').text(stats.totalHintCount);
                 $('#stat-time').text(formatDuration(stats.totalTimeSpent));
             },
-            error: function (response) {
-                if (response.status === 403) {
-                    alert("Error 403 - Sorry, Forbidden!");
-                } else if (response.status === 400) {
-                    alert("Error 400 - Bad JSON");
-                } else if (response.status === 401) {
-                    alert("Error 401 - Unauthorized!");
-                } else if (response.status === 500) {
-                    alert("Error 500 - Internal Server Error");
-                }
-            }
+            error: handleAjaxError,
         });
     }
 
@@ -443,6 +393,14 @@
         localStorage.removeItem("userId");
         localStorage.removeItem("JWT");
         window.location.href = "index.html";
+    }
+
+    function handleAjaxError(jqXHR){
+        let message = "Something went wrong. Please try again.";
+        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+            message = jqXHR.responseJSON.message;
+        }
+        alert(message);
     }
 
 

@@ -16,10 +16,18 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
         return new CommonResponse(500,"UNEXPECTED_SERVER_ERROR");
     }
 
-    @ExceptionHandler(value = {CustomException.class})
-    public ResponseEntity<CommonResponse> handleCustomException(CustomException ex , WebRequest webRequest){
-        ex.printStackTrace();
+//    @ExceptionHandler(value = {CustomException.class})
+//    public ResponseEntity<CommonResponse> handleCustomException(CustomException ex , WebRequest webRequest){
+//        ex.printStackTrace();
+//
+//        return ResponseEntity.ok(new CommonResponse(ex.getStatus(), ex.getMessage()));
+//    }
 
-        return ResponseEntity.ok(new CommonResponse(ex.getStatus(), ex.getMessage()));
+    @ExceptionHandler(value = {CustomException.class})
+    public ResponseEntity<CommonResponse> handleCustomException(CustomException ex, WebRequest webRequest){
+        ex.printStackTrace();
+        return ResponseEntity
+                .status(ex.getStatus())
+                .body(new CommonResponse(ex.getStatus(), ex.getMessage()));
     }
 }

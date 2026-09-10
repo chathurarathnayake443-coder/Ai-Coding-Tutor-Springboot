@@ -265,7 +265,7 @@
 
     </div>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
     const otpBoxes = document.querySelectorAll(".otp-box");
     const verifyBtn = document.getElementById("verify-btn");
@@ -422,6 +422,16 @@
             }
         }, 1000);
     });
+
+    // My Code
+
+    function handleAjaxError(jqXHR){
+        let message = "Something went wrong. Please try again.";
+        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+            message = jqXHR.responseJSON.message;
+        }
+        alert(message);
+    }
 </script>
 
 </body>
