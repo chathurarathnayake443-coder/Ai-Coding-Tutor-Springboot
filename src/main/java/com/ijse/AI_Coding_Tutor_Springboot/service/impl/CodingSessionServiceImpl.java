@@ -6,6 +6,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.dto.GetSessionHistoryViewDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.ResponseCodingSessionDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.*;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.CodingSessionStatus;
+import com.ijse.AI_Coding_Tutor_Springboot.exceptions.CustomException;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.*;
 import com.ijse.AI_Coding_Tutor_Springboot.service.CodingSessionService;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,6 @@ public class CodingSessionServiceImpl implements CodingSessionService {
 
     @Transactional
     public ResponseCodingSessionDTO createNewCodingSession(CodingSessionDTO codingSessionDTO){
-        try{
             CodingSession codingSession = new CodingSession();
 
             codingSession.setStartTime(LocalDateTime.now());
@@ -46,7 +46,7 @@ public class CodingSessionServiceImpl implements CodingSessionService {
 
             Optional<Student> optionalStudent = studentRepository.getStudentByUserId(codingSessionDTO.getStudentId());
             if(!optionalStudent.isPresent()){
-                throw new RuntimeException("Sorry, Student Not Found!");
+                throw new CustomException(404,"Sorry, Student Not Found!");
             }
 
             Student student = optionalStudent.get();
@@ -56,7 +56,7 @@ public class CodingSessionServiceImpl implements CodingSessionService {
 
             Optional<ProgrammingLanguage> optionalProgrammingLanguage = programmingLanguageRepository.findByLanguageNameIgnoreCase(codingSessionDTO.getProgrammingLanguage());
             if(!optionalProgrammingLanguage.isPresent()){
-                throw new RuntimeException("Sorry, Programming Language Not Found!");
+                throw new CustomException(404,"Sorry, Programming Language Not Found!");
             }
             ProgrammingLanguage programmingLanguage = optionalProgrammingLanguage.get();
             System.out.println(programmingLanguage.getLanguageName());
@@ -71,17 +71,12 @@ public class CodingSessionServiceImpl implements CodingSessionService {
             codingSession.setProblem(problem);
             CodingSession newCodingSession = codingSessionRepository.save(codingSession);
             return new ResponseCodingSessionDTO(newCodingSession.getSessionId(),newCodingSession.getStartTime(),newCodingSession.getEndTime(),newCodingSession.getSessionStatus(),newCodingSession.getProgrammingLanguage().getLanguageId(),newCodingSession.getStudent().getStudentId());
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 
     public void endSession(EndSessionDTO endSessionDTO){
-        try{
             Optional<CodingSession> optionalCodingSession = codingSessionRepository.findById(endSessionDTO.getSessionId());
             if(!optionalCodingSession.isPresent()){
-                throw new RuntimeException("Sorry, Session Not Found!");
+                throw new CustomException(404,"Sorry, Session Not Found!");
             }
             CodingSession codingSession = optionalCodingSession.get();
             codingSession.setEndTime(LocalDateTime.now());
@@ -94,17 +89,12 @@ public class CodingSessionServiceImpl implements CodingSessionService {
             rating.setRatingValue(endSessionDTO.getRatingValue());
             rating.setFeedbackText(endSessionDTO.getRatingFeedback());
             ratingRepository.save(rating);
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
     }
 
     public GetSessionHistoryViewDTO getSessionHistoryView(long sessionId){
-        try{
             Optional<GetSessionHistoryViewDTO> optionalSessionView = codingSessionRepository.getSessionHistoryView(sessionId);
             if(!optionalSessionView.isPresent()){
-                throw new RuntimeException("Sorry, Session Not Found!");
+                throw new CustomException(404,"Sorry, Session Not Found!");
             }
             GetSessionHistoryViewDTO sessionView = optionalSessionView.get();
 
@@ -124,10 +114,5 @@ public class CodingSessionServiceImpl implements CodingSessionService {
             sessionView.setLastExecutedCode(lastCode);
 
             return sessionView;
-
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 }
