@@ -534,3 +534,8 @@ textarea.code-editor::placeholder{ color: var(--text-muted); }
 }
 .hint-bubble.is-final .bubble-tag{ color:#C0453A; }
 .hint-bubble .option-chips{ margin-top:9px; }
+
+.stat-icon.icon-violet{ background: var(--accent-violet-dim); color: var(--accent-violet); }
+.stat-icon.icon-cyan{ background: var(--accent-cyan-dim); color: var(--accent-cyan); }
+.stat-icon.icon-amber{ background: var(--accent-amber-dim); color: var(--accent-amber); }
+.stat-icon.icon-mint{ background: var(--accent-mint-dim); color: var(--accent-mint); }

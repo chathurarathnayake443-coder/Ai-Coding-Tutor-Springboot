@@ -81,10 +81,37 @@
                     </div>
 
                     <div class="panel" style="margin-bottom:20px;">
-                        <div class="panel-head"><h3>Topics to focus on</h3></div>
+                        <div class="panel-head"><h3>Overall Analyzed Statistics</h3></div>
                         <div class="panel-body">
-                            <div class="topic-list" id="topic-list">
-                                <p class="muted" style="font-size:13px;">Loading…</p>
+                            <div class="stat-grid" id="topic-list">
+                                <div class="stat-card">
+                                    <div class="stat-top">
+                                        <span class="stat-label">Total attempts</span>
+                                        <span class="stat-icon icon-violet">🧩</span>
+                                    </div>
+                                    <div class="stat-value" id="stat-attempts">—</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-top">
+                                        <span class="stat-label">Total executions</span>
+                                        <span class="stat-icon icon-cyan">▶</span>
+                                    </div>
+                                    <div class="stat-value" id="stat-executions">—</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-top">
+                                        <span class="stat-label">Total hints used</span>
+                                        <span class="stat-icon icon-amber">💡</span>
+                                    </div>
+                                    <div class="stat-value" id="stat-hints">—</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-top">
+                                        <span class="stat-label">Time spent</span>
+                                        <span class="stat-icon icon-mint">🕒</span>
+                                    </div>
+                                    <div class="stat-value" id="stat-time">—</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -199,6 +226,13 @@
     logoutOverlay.addEventListener("click", (e) => { if (e.target === logoutOverlay) closeLogoutModal(); });
 
     document.getElementById("confirm-logout-btn").addEventListener("click", logOut);
+
+    function formatDuration(totalSeconds){
+        if (!totalSeconds) return "0m";
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+    }
 
     // My Code
 
@@ -374,6 +408,35 @@
         const first = parts[0].charAt(0);
         const last = parts[parts.length - 1].charAt(0);
         return (first + last).toUpperCase();
+    }
+
+    function getAnalyticStats(){
+        let userId = localStorage.getItem("userId");
+        $.ajax({
+            url: "http://localhost:8080/getAnalyticStats/" + userId,
+            type: "GET",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function(response){
+                const stats = response.body;
+                $('#stat-attempts').text(stats.totalAttemptCount);
+                $('#stat-executions').text(stats.totalExecutionCount);
+                $('#stat-hints').text(stats.totalHintCount);
+                $('#stat-time').text(formatDuration(stats.totalTimeSpent));
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        });
     }
 
     function logOut(){
