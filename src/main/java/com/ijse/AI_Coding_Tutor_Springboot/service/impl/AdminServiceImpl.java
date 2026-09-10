@@ -10,6 +10,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.exceptions.CustomException;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.AdminRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.AdminService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class AdminServiceImpl implements AdminService {
 
     private final AdminRepository adminRepository;
@@ -34,6 +36,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public Admin getAdminNameByUserId(long userId) {
+            log.info("Executing method getAdminNameByUserId()");
             Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(userId);
             if(!optionalAdmin.isPresent()){
                 throw new CustomException(404,"Sorry, Admin Not Found");
@@ -43,6 +46,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public void saveAdmin(AdminDTO adminDTO) {
+        log.info("Executing method saveAdmin()");
             User user = new User();
             user.setUserName(adminDTO.getAdminEmail());
             user.setPassword(encoder.encode(adminDTO.getAdminPassword()));
@@ -59,11 +63,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public List<GetAdminDetailsDTO> getAdminDetails() {
+        log.info("Executing method getAdminDetails()");
             List<GetAdminDetailsDTO> adminList = adminRepository.getAdminDetails();
             return adminList;
     }
 
     public GetAdminDetailsDTO getAdminDetailById(long userId) {
+        log.info("Executing method getAdminDetailById()");
             Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(userId);
             if(!optionalAdmin.isPresent()){
                 throw new CustomException(404,"Sorry, Admin Not Found");
@@ -75,6 +81,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Transactional
     public void updateAdmin(UpdateAdminDetailsDTO updateAdminDetailsDTO) {
+        log.info("Executing method updateAdmin()");
             Optional<Admin> optionalAdmin = adminRepository.getAdminByUserId(updateAdminDetailsDTO.getUserId());
             if(!optionalAdmin.isPresent()){
                 throw new CustomException(404,"Sorry, Admin Not Found");
@@ -111,6 +118,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     public void deleteAdmin(long userId) {
+        log.info("Executing method deleteAdmin()");
             Optional<User> optionalUser = userRepository.findById(userId);
             if(!optionalUser.isPresent()){
                 throw new CustomException(404,"Sorry, User Not Found");

@@ -6,6 +6,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.repository.RatingRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.StudentRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.ReportService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Slf4j
 public class ReportServiceImpl implements ReportService {
 
     private final UserRepository userRepository;
@@ -28,6 +30,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     public ReportDTO generateReport(LocalDateTime startDate, LocalDateTime endDate) {
+        log.info("Executing method generateReport()");
             long totalStudentCount = userRepository.getTotalStudentCount();
             GetStatReportDTO getStatReportDTO = codingSessionRepository.getStatReportBetweenDates(startDate, endDate);
             List<RatingCountDTO> ratingList = ratingRepository.getStudentCountsByRatingValue();

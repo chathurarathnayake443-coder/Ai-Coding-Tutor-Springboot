@@ -9,6 +9,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.enumerations.CodingSessionStatus;
 import com.ijse.AI_Coding_Tutor_Springboot.exceptions.CustomException;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.*;
 import com.ijse.AI_Coding_Tutor_Springboot.service.CodingSessionService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class CodingSessionServiceImpl implements CodingSessionService {
 
     private final CodingSessionRepository codingSessionRepository;
@@ -39,6 +41,7 @@ public class CodingSessionServiceImpl implements CodingSessionService {
 
     @Transactional
     public ResponseCodingSessionDTO createNewCodingSession(CodingSessionDTO codingSessionDTO){
+        log.info("Executing method createNewCodingSession()");
             CodingSession codingSession = new CodingSession();
 
             codingSession.setStartTime(LocalDateTime.now());
@@ -74,6 +77,7 @@ public class CodingSessionServiceImpl implements CodingSessionService {
     }
 
     public void endSession(EndSessionDTO endSessionDTO){
+        log.info("Executing method endSession()");
             Optional<CodingSession> optionalCodingSession = codingSessionRepository.findById(endSessionDTO.getSessionId());
             if(!optionalCodingSession.isPresent()){
                 throw new CustomException(404,"Sorry, Session Not Found!");
@@ -92,6 +96,7 @@ public class CodingSessionServiceImpl implements CodingSessionService {
     }
 
     public GetSessionHistoryViewDTO getSessionHistoryView(long sessionId){
+        log.info("Executing method getSessionHistoryView()");
             Optional<GetSessionHistoryViewDTO> optionalSessionView = codingSessionRepository.getSessionHistoryView(sessionId);
             if(!optionalSessionView.isPresent()){
                 throw new CustomException(404,"Sorry, Session Not Found!");

@@ -13,6 +13,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.repository.SubscriptionPlanRepository
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserSubscriptionRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -39,6 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDTO getUserDetails(String userName, String password, String userRole) {
+        log.info("Executing method getUserDetails()");
             Optional<User> optionalUser = userRepository.findByUserName(userName);
             if(!optionalUser.isPresent()){
                 throw new CustomException(404,"Sorry, User Not Found");
@@ -57,6 +60,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public void signupUserStudent(StudentDTO studentDTO) {
+        log.info("Executing method signupUserStudent()");
             User user = new User();
 
             user.setUserName(studentDTO.getStudentEmail());
@@ -93,6 +97,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDTO findOrCreateByGoogleEmail(String email, String name) {
+        log.info("Executing method findOrCreateByGoogleEmail()");
             Optional<User> existing = userRepository.findByUserName(email);
             if (existing.isPresent()) {
                 User user = existing.get();
@@ -121,6 +126,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserStatus getUserStatus(String userName) {
+        log.info("Executing method getUserStatus()");
             UserStatus userStatus = userRepository.getUserStatus(userName);
             return userStatus;
     }

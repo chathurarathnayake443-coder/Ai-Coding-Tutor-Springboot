@@ -7,6 +7,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserStatus;
 import com.ijse.AI_Coding_Tutor_Springboot.exceptions.CustomException;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.*;
 import com.ijse.AI_Coding_Tutor_Springboot.service.StudentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class StudentServiceImpl implements StudentService {
 
     private final HintRepository hintRepository;
@@ -39,10 +41,12 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public List<GetStudentDetailsDTO> getAllStudents(){
+        log.info("Executing method getAllStudents()");
             return studentRepository.getStudentDetails();
     }
 
     public String getStudentNameById(long userId){
+        log.info("Executing method getStudentNameById()");
         Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
         if(!studentOptional.isPresent()){
             throw new CustomException(404,"Sorry Student not found");
@@ -53,6 +57,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public long getCompletedSessionCount(long userId){
+        log.info("Executing method getCompletedSessionCount()");
             System.out.println(userId);
             Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
             if(!studentOptional.isPresent()){
@@ -67,6 +72,7 @@ public class StudentServiceImpl implements StudentService {
 
 
     public List<SessionHistoryDTO> getSessionHistory(long userId){
+        log.info("Executing method getSessionHistory()");
             Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
             if(!studentOptional.isPresent()){
                 throw new CustomException(404,"Sorry Student not found");
@@ -81,6 +87,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public double getAverageRating(long userId){
+        log.info("Executing method getAverageRating()");
             Optional<Student> studentOptional = studentRepository.getStudentByUserId(userId);
             if(!studentOptional.isPresent()){
                 throw new CustomException(404,"Sorry Student not found");
@@ -91,6 +98,7 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public StudentDTO getStudentById(long userId){
+        log.info("Executing method getStudentById()");
             Optional<Student> optionalStudent = studentRepository.getStudentByUserId(userId);
             if(!optionalStudent.isPresent()){
                 throw new CustomException(404,"Sorry Student not found");
@@ -106,6 +114,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Transactional
     public void updateStudentDetails(UpdateStudentDetailsDTO updateStudentDetailsDTO){
+        log.info("Executing method updateStudentDetails()");
             Optional<Student> studentOptional = studentRepository.getStudentByUserId(updateStudentDetailsDTO.getUserId());
             if(!studentOptional.isPresent()){
                 throw new CustomException(404,"Sorry Student not found");
@@ -151,11 +160,13 @@ public class StudentServiceImpl implements StudentService {
     }
 
     public List<GetStudentDetailsDTO> searchFilterStudents(String studentName){
+        log.info("Executing method searchFilterStudents()");
             List<GetStudentDetailsDTO> studentList = studentRepository.searchFilterStudents(studentName);
             return studentList;
     }
 
     public void deleteStudent(long userId){
+        log.info("Executing method deleteStudent()");
             Optional<User> optionalUser = userRepository.findById(userId);
             if(!optionalUser.isPresent()){
                 throw new CustomException(404,"Sorry User not found");

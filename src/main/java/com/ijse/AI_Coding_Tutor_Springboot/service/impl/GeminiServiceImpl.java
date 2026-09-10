@@ -13,6 +13,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.repository.CodingSessionRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.HintRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.SolutionRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.service.GeminiService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class GeminiServiceImpl implements GeminiService {
 
     private final Client geminiClient;
@@ -40,6 +42,7 @@ public class GeminiServiceImpl implements GeminiService {
     }
 
     public String generateResponse(String prompt) {
+        log.info("Executing method generateResponse()");
 
         GenerateContentResponse response =
                 geminiClient.models.generateContent(
@@ -52,6 +55,7 @@ public class GeminiServiceImpl implements GeminiService {
     }
 
     public CodeExecutionResult executeCode(long sessionId,String code, String language) throws JsonProcessingException {
+        log.info("Executing method executeCode()");
             String prompt = """
             You are a programming code execution and analysis assistant.
 
@@ -126,6 +130,7 @@ public class GeminiServiceImpl implements GeminiService {
     }
 
     public HintResponseDTO generateHint(HintRequestDTO hintRequestDTO) throws JsonProcessingException {
+        log.info("Executing method generateHint()");
             System.out.println("========== HINT REQUEST ==========");
             System.out.println("Session ID: " + hintRequestDTO.getSessionId());
             System.out.println("Hint Number: " + hintRequestDTO.getHintNumber());
@@ -208,6 +213,7 @@ public class GeminiServiceImpl implements GeminiService {
     }
 
     public ResponseSolutionDTO generateActualSolution(RequestSolutionDTO requestSolutionDTO) throws JsonProcessingException {
+        log.info("Executing method generateActualSolution()");
             String prompt = """
         You are an AI Coding Tutor.
 
