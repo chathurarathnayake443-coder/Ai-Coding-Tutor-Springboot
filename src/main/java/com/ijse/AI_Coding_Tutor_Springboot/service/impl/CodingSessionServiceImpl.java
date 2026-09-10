@@ -42,6 +42,7 @@ public class CodingSessionServiceImpl implements CodingSessionService {
     @Transactional
     public ResponseCodingSessionDTO createNewCodingSession(CodingSessionDTO codingSessionDTO){
         log.info("Executing method createNewCodingSession()");
+        try{
             CodingSession codingSession = new CodingSession();
 
             codingSession.setStartTime(LocalDateTime.now());
@@ -74,10 +75,16 @@ public class CodingSessionServiceImpl implements CodingSessionService {
             codingSession.setProblem(problem);
             CodingSession newCodingSession = codingSessionRepository.save(codingSession);
             return new ResponseCodingSessionDTO(newCodingSession.getSessionId(),newCodingSession.getStartTime(),newCodingSession.getEndTime(),newCodingSession.getSessionStatus(),newCodingSession.getProgrammingLanguage().getLanguageId(),newCodingSession.getStudent().getStudentId());
+        }
+        catch(Exception e){
+            log.error("Error in createNewCodingSession()",e);
+            throw e;
+        }
     }
 
     public void endSession(EndSessionDTO endSessionDTO){
         log.info("Executing method endSession()");
+        try{
             Optional<CodingSession> optionalCodingSession = codingSessionRepository.findById(endSessionDTO.getSessionId());
             if(!optionalCodingSession.isPresent()){
                 throw new CustomException(404,"Sorry, Session Not Found!");
@@ -93,10 +100,15 @@ public class CodingSessionServiceImpl implements CodingSessionService {
             rating.setRatingValue(endSessionDTO.getRatingValue());
             rating.setFeedbackText(endSessionDTO.getRatingFeedback());
             ratingRepository.save(rating);
+        }
+        catch(Exception e){
+            log.error("Error in endSession()",e);
+        }
     }
 
     public GetSessionHistoryViewDTO getSessionHistoryView(long sessionId){
         log.info("Executing method getSessionHistoryView()");
+        try{
             Optional<GetSessionHistoryViewDTO> optionalSessionView = codingSessionRepository.getSessionHistoryView(sessionId);
             if(!optionalSessionView.isPresent()){
                 throw new CustomException(404,"Sorry, Session Not Found!");
@@ -119,5 +131,10 @@ public class CodingSessionServiceImpl implements CodingSessionService {
             sessionView.setLastExecutedCode(lastCode);
 
             return sessionView;
+        }
+        catch(Exception e){
+            log.error("Error in getSessionHistoryView()",e);
+            throw e;
+        }
     }
 }
