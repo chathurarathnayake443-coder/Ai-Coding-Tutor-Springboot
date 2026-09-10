@@ -16,4 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("SELECT u.userStatus FROM User u WHERE u.userName = ?1")
     UserStatus getUserStatus(String userName);
+
+    @Query("SELECT COUNT(s.studentId) FROM Student s")
+    long getTotalStudentCount();
 }

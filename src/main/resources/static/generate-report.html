@@ -731,7 +731,7 @@
         </main>
     </div>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
     /*
      * Demo data.
@@ -752,14 +752,20 @@
 
     let currentReport = null;
 
+    // function formatDate(dateString){
+    //     if(!dateString) return "—";
+    //     const d = new Date(dateString + "T00:00:00");
+    //     return d.toLocaleDateString("en-GB", {
+    //         day:"2-digit",
+    //         month:"short",
+    //         year:"numeric"
+    //     });
+    // }
+
     function formatDate(dateString){
         if(!dateString) return "—";
-        const d = new Date(dateString + "T00:00:00");
-        return d.toLocaleDateString("en-GB", {
-            day:"2-digit",
-            month:"short",
-            year:"numeric"
-        });
+        const d = dateString.includes("T") ? new Date(dateString) : new Date(dateString + "T00:00:00");
+        return d.toLocaleDateString("en-GB", { day:"2-digit", month:"short", year:"numeric" });
     }
 
     function escapeHtml(value){
@@ -817,34 +823,79 @@
         };
     }
 
-    function renderReport(report,start,end){
+    // function renderReport(report,start,end){
+    //
+    //     currentReport = report;
+    //
+    //     document.getElementById("total-students").textContent = report.totalStudents;
+    //     document.getElementById("total-sessions").textContent = report.totalSessions;
+    //     document.getElementById("period-students").textContent = report.periodStudents;
+    //
+    //     document.getElementById("report-period").textContent =
+    //         "Period: " + formatDate(start) + " — " + formatDate(end);
+    //
+    //     document.getElementById("generated-date").textContent =
+    //         new Date().toLocaleString("en-GB",{
+    //             day:"2-digit",
+    //             month:"short",
+    //             year:"numeric",
+    //             hour:"2-digit",
+    //             minute:"2-digit"
+    //         });
+    //
+    //     document.getElementById("report-id").textContent =
+    //         "RPT-" + Date.now().toString().slice(-6);
+    //
+    //     renderRatings(report.ratings,report.totalStudents);
+    //     renderStudents(report.students);
+    //
+    //     document.getElementById("student-count-label").textContent =
+    //         report.periodStudents + (report.periodStudents === 1 ? " student" : " students");
+    // }
+
+    function renderReport(report, start, end){
 
         currentReport = report;
 
-        document.getElementById("total-students").textContent = report.totalStudents;
-        document.getElementById("total-sessions").textContent = report.totalSessions;
-        document.getElementById("period-students").textContent = report.periodStudents;
+        const totalStudents  = report.totalStudentCount ?? 0;
+        const totalSessions  = report.getStatReportDTO ? report.getStatReportDTO.sessionCount : 0;
+        const periodStudents = report.getStatReportDTO ? report.getStatReportDTO.activeStudentCount : 0;
+
+        document.getElementById("total-students").textContent = totalStudents;
+        document.getElementById("total-sessions").textContent = totalSessions;
+        document.getElementById("period-students").textContent = periodStudents;
 
         document.getElementById("report-period").textContent =
             "Period: " + formatDate(start) + " — " + formatDate(end);
 
         document.getElementById("generated-date").textContent =
             new Date().toLocaleString("en-GB",{
-                day:"2-digit",
-                month:"short",
-                year:"numeric",
-                hour:"2-digit",
-                minute:"2-digit"
+                day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit"
             });
 
         document.getElementById("report-id").textContent =
             "RPT-" + Date.now().toString().slice(-6);
 
-        renderRatings(report.ratings,report.totalStudents);
-        renderStudents(report.students);
+        // Backend gives a list of {ratingValue, studentCount} — convert to {5: n, 4: n, ...}
+        const ratings = {1:0, 2:0, 3:0, 4:0, 5:0};
+        (report.getRatingCountDTOList || []).forEach(r => {
+            ratings[r.ratingValue] = r.studentCount;
+        });
+        renderRatings(ratings, totalStudents);
+
+        // Backend field names differ from the demo shape — map them
+        const students = (report.getReportStudentDTOList || []).map(s => ({
+            name: s.studentName,
+            email: s.studentEmail,
+            sessions: s.sessionCount,
+            rating: s.averageRating,
+            last: s.startTime,        // full ISO datetime, e.g. "2026-08-27T15:22:25.137811"
+            status: s.studentStatus   // enum string, e.g. "ACTIVE"
+        }));
+        renderStudents(students);
 
         document.getElementById("student-count-label").textContent =
-            report.periodStudents + (report.periodStudents === 1 ? " student" : " students");
+            periodStudents + (periodStudents === 1 ? " student" : " students");
     }
 
     function renderRatings(ratings,totalStudents){
@@ -915,25 +966,6 @@
     `).join("");
     }
 
-    function generateReport(){
-
-        const start = document.getElementById("start-date").value;
-        const end = document.getElementById("end-date").value;
-
-        if(!start || !end){
-            alert("Please select both a start date and an end date.");
-            return;
-        }
-
-        if(start > end){
-            alert("The start date cannot be after the end date.");
-            return;
-        }
-
-        const report = generateDemoData(start,end);
-        renderReport(report,start,end);
-    }
-
     function resetReport(){
 
         document.getElementById("start-date").value = "";
@@ -962,7 +994,7 @@
         currentReport = null;
     }
 
-    document.getElementById("generate-btn").addEventListener("click",generateReport);
+    document.getElementById("generate-btn").addEventListener("click",getReportData);
     document.getElementById("reset-btn").addEventListener("click",resetReport);
 
     document.getElementById("print-btn").addEventListener("click",function(){
@@ -973,7 +1005,7 @@
         window.print();
     });
 
-    document.getElementById("download-btn").addEventListener("click",function(){
+    document.getElementById("download-btn").addEventListener("click", function(){
 
         if(!currentReport){
             alert("Generate a report first.");
@@ -982,25 +1014,212 @@
 
         const element = document.getElementById("report-document");
 
+        window.scrollTo(0, 0);
+
         const options = {
-            margin:8,
-            filename:"ai-coding-tutor-report.pdf",
-            image:{type:"jpeg",quality:.98},
-            html2canvas:{
-                scale:2,
-                backgroundColor:"#10151d",
-                useCORS:true
+            margin: 8,
+            filename: "ai-coding-tutor-report.pdf",
+            image: { type: "jpeg", quality: .98 },
+            html2canvas: {
+                scale: 2,
+                backgroundColor: "#10151d",
+                useCORS: true,
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: document.documentElement.scrollWidth,   // full page width, not just the element
+                windowHeight: document.documentElement.scrollHeight, // full page height
+                onclone: function(clonedDoc){
+                    clonedDoc.querySelectorAll('.table-wrap').forEach(el => {
+                        el.style.overflow = 'visible';
+                        el.style.width = 'auto';
+                        el.scrollLeft = 0;
+                    });
+                    clonedDoc.querySelectorAll('td, th').forEach(el => {
+                        el.style.whiteSpace = 'normal';
+                    });
+                }
             },
-            jsPDF:{
-                unit:"mm",
-                format:"a4",
-                orientation:"portrait"
+            jsPDF: {
+                unit: "mm",
+                format: "a4",
+                orientation: "landscape"   // your table is wide — landscape avoids squeezing it
             },
-            pagebreak:{mode:["css","legacy"]}
+            pagebreak: { mode: ["css", "legacy"] }
         };
 
         html2pdf().set(options).from(element).save();
     });
+
+    // document.getElementById("download-btn").addEventListener("click", function(){
+    //
+    //     if(!currentReport){
+    //         alert("Generate a report first.");
+    //         return;
+    //     }
+    //
+    //     const element = document.getElementById("report-document");
+    //
+    //     window.scrollTo(0, 0);
+    //
+    //     const options = {
+    //         margin: 8,
+    //         filename: "ai-coding-tutor-report.pdf",
+    //         image: { type: "jpeg", quality: .98 },
+    //         html2canvas: {
+    //             scale: 2,
+    //             backgroundColor: "#10151d",
+    //             useCORS: true,
+    //             scrollX: 0,
+    //             scrollY: 0,
+    //             windowWidth: element.scrollWidth,
+    //             windowHeight: element.scrollHeight,
+    //             onclone: function(clonedDoc){
+    //                 // Force any inner scrollable containers to expand fully
+    //                 // instead of clipping at their visible width/scroll position.
+    //                 clonedDoc.querySelectorAll('.table-wrap').forEach(el => {
+    //                     el.style.overflow = 'visible';
+    //                     el.style.width = 'auto';
+    //                     el.scrollLeft = 0;
+    //                 });
+    //
+    //                 // Prevent nowrap cells from forcing extra width beyond the page
+    //                 clonedDoc.querySelectorAll('td, th').forEach(el => {
+    //                     el.style.whiteSpace = 'normal';
+    //                 });
+    //
+    //                 // Make sure the report document itself isn't width-constrained
+    //                 // by its normal grid parent when cloned standalone
+    //                 const doc = clonedDoc.getElementById('report-document');
+    //                 if(doc){
+    //                     doc.style.width = doc.scrollWidth + 'px';
+    //                 }
+    //             }
+    //         },
+    //         jsPDF: {
+    //             unit: "mm",
+    //             format: "a4",
+    //             orientation: "portrait"
+    //         },
+    //         pagebreak: { mode: ["css", "legacy"] }
+    //     };
+    //
+    //     html2pdf().set(options).from(element).save();
+    // });
+
+    // document.getElementById("download-btn").addEventListener("click", function(){
+    //
+    //     if(!currentReport){
+    //         alert("Generate a report first.");
+    //         return;
+    //     }
+    //
+    //     const element = document.getElementById("report-document");
+    //
+    //     // Force capture from the very top regardless of current scroll position
+    //     window.scrollTo(0, 0);
+    //
+    //     const options = {
+    //         margin: 8,
+    //         filename: "ai-coding-tutor-report.pdf",
+    //         image: { type: "jpeg", quality: .98 },
+    //         html2canvas: {
+    //             scale: 2,
+    //             backgroundColor: "#10151d",
+    //             useCORS: true,
+    //             scrollX: 0,
+    //             scrollY: 0,                              // ignore any leftover scroll offset
+    //             windowWidth: element.scrollWidth,
+    //             windowHeight: element.scrollHeight        // capture the FULL element height, not just the viewport
+    //         },
+    //         jsPDF: {
+    //             unit: "mm",
+    //             format: "a4",
+    //             orientation: "portrait"
+    //         },
+    //         pagebreak: { mode: ["css", "legacy"] }
+    //     };
+    //
+    //     html2pdf().set(options).from(element).save();
+    // });
+
+    // document.getElementById("download-btn").addEventListener("click",function(){
+    //
+    //     if(!currentReport){
+    //         alert("Generate a report first.");
+    //         return;
+    //     }
+    //
+    //     const element = document.getElementById("report-document");
+    //
+    //     const options = {
+    //         margin:8,
+    //         filename:"ai-coding-tutor-report.pdf",
+    //         image:{type:"jpeg",quality:.98},
+    //         html2canvas:{
+    //             scale:2,
+    //             backgroundColor:"#10151d",
+    //             useCORS:true
+    //         },
+    //         jsPDF:{
+    //             unit:"mm",
+    //             format:"a4",
+    //             orientation:"portrait"
+    //         },
+    //         pagebreak:{mode:["css","legacy"]}
+    //     };
+    //
+    //     html2pdf().set(options).from(element).save();
+    // });
+
+    // My Code
+
+    function getReportData(){
+        let startDate = $('#start-date').val();
+        let endDate = $('#end-date').val();
+
+        if (!startDate || !endDate) {
+            alert("Please select both a start date and an end date.");
+            return;
+        }
+
+        if (startDate > endDate) {
+            alert("The start date cannot be after the end date.");
+            return;
+        }
+
+        let dateParam = {}
+
+        if(startDate){
+            dateParam.startDate = startDate + "T00:00:00";
+        }
+        if(endDate){
+            dateParam.endDate = endDate + "T23:59:59";
+        }
+        let dateQueryParam = $.param(dateParam);
+
+        $.ajax({
+            url: 'http://localhost:8080/getReportData?' + dateQueryParam,
+            type: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function(response){
+                console.log(response.body);
+                renderReport(response.body, startDate, endDate);
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
 </script>
 
 </body>

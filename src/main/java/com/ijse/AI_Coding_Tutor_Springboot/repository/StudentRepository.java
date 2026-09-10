@@ -2,11 +2,13 @@ package com.ijse.AI_Coding_Tutor_Springboot.repository;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetUserPasswordAndEmailDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.ReportStudentDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,4 +57,22 @@ public interface StudentRepository extends JpaRepository<Student,Long> {
     GROUP BY s.studentId, s.studentFullName, s.user.userName, s.studentContact, s.user.joinedDate, s.user.userStatus
     """)
     List<GetStudentDetailsDTO> searchFilterStudents(String studentName);
+
+    @Query("""
+            SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.ReportStudentDTO(
+                s.studentFullName,
+                s.user.userName,
+                COUNT(DISTINCT cs.sessionId),
+                COALESCE(AVG(r.ratingValue), 0.0),
+                MAX(cs.startTime),
+                s.user.userStatus
+            )
+            FROM Student s
+            LEFT JOIN s.codingSessions cs
+            LEFT JOIN cs.rating r
+            WHERE cs.startTime BETWEEN ?1 AND ?2
+            GROUP BY s.studentId, s.studentFullName, s.user.userName, s.user.userStatus
+            """)
+    List<ReportStudentDTO> getStudentReportListBetweenDates(LocalDateTime startDate, LocalDateTime endDate);
+
 }

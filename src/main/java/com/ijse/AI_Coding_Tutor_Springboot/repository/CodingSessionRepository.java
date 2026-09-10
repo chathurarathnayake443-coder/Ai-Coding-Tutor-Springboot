@@ -1,12 +1,14 @@
 package com.ijse.AI_Coding_Tutor_Springboot.repository;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.GetSessionHistoryViewDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStatReportDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.CodeAttempt;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.CodingSession;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,4 +35,7 @@ public interface CodingSessionRepository extends JpaRepository<CodingSession, Lo
             "WHERE cs.sessionId = ?1 " +
             "GROUP BY cs.sessionId, cs.problem.problemText, cs.programmingLanguage.languageName")
     Optional<GetSessionHistoryViewDTO> getSessionHistoryView(long sessionId);
+
+    @Query("SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.GetStatReportDTO(COUNT(cs),COUNT(DISTINCT cs.student.studentId)) FROM CodingSession cs WHERE cs.startTime BETWEEN ?1 AND ?2")
+    GetStatReportDTO getStatReportBetweenDates(LocalDateTime startDate, LocalDateTime endDate);
 }
