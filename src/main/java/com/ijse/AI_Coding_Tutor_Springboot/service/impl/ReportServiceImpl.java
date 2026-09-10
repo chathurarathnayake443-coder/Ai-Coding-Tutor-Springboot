@@ -28,15 +28,10 @@ public class ReportServiceImpl implements ReportService {
     }
 
     public ReportDTO generateReport(LocalDateTime startDate, LocalDateTime endDate) {
-        try{
             long totalStudentCount = userRepository.getTotalStudentCount();
             GetStatReportDTO getStatReportDTO = codingSessionRepository.getStatReportBetweenDates(startDate, endDate);
             List<RatingCountDTO> ratingList = ratingRepository.getStudentCountsByRatingValue();
             List<ReportStudentDTO> reportStudentDTOList = studentRepository.getStudentReportListBetweenDates(startDate, endDate);
             return new ReportDTO(totalStudentCount, getStatReportDTO, ratingList, reportStudentDTOList);
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 }
