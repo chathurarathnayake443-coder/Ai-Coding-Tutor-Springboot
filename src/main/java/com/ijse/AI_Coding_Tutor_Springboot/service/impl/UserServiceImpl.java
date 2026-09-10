@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
 
     public UserDTO getUserDetails(String userName, String password, String userRole) {
         log.info("Executing method getUserDetails()");
+        try{
             Optional<User> optionalUser = userRepository.findByUserName(userName);
             if(!optionalUser.isPresent()){
                 throw new CustomException(404,"Sorry, User Not Found");
@@ -57,10 +58,16 @@ public class UserServiceImpl implements UserService {
             }
 
             return new UserDTO(user.getUserId(), user.getUserName(),user.getPassword(),user.getUserStatus(),user.getJoinedDate(),user.getUserRole());
+        }
+        catch(Exception e){
+            log.error("Error in method getUserDetails()",e);
+            throw e;
+        }
     }
 
     public void signupUserStudent(StudentDTO studentDTO) {
         log.info("Executing method signupUserStudent()");
+        try{
             User user = new User();
 
             user.setUserName(studentDTO.getStudentEmail());
@@ -94,10 +101,16 @@ public class UserServiceImpl implements UserService {
             user.setStudent(student);
 
             userRepository.save(user);
+        }
+        catch(Exception e){
+            log.error("Error in method signupUserStudent()",e);
+            throw e;
+        }
     }
 
     public UserDTO findOrCreateByGoogleEmail(String email, String name) {
         log.info("Executing method findOrCreateByGoogleEmail()");
+        try{
             Optional<User> existing = userRepository.findByUserName(email);
             if (existing.isPresent()) {
                 User user = existing.get();
@@ -123,13 +136,22 @@ public class UserServiceImpl implements UserService {
             user.setStudent(student);
             userRepository.save(user);
             return null;
+        }
+        catch(Exception e){
+            log.error("Error in method findOrCreateByGoogleEmail()",e);
+            throw e;
+        }
     }
 
     public UserStatus getUserStatus(String userName) {
         log.info("Executing method getUserStatus()");
+        try{
             UserStatus userStatus = userRepository.getUserStatus(userName);
             return userStatus;
+        }
+        catch(Exception e){
+            log.error("Error in method getUserStatus()",e);
+            throw e;
+        }
     }
-
-
 }
