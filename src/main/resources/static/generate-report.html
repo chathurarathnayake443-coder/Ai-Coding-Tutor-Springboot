@@ -558,7 +558,7 @@
 
             <div class="user-chip">
                 <div class="who">
-                    <div class="name" id="admin-name">Admin</div>
+                    <a style="text-decoration: none" href="admin-profile.html"><div class="name" id="admin-name">Admin</div></a>
                     <div class="role">admin</div>
                 </div>
                 <div class="avatar" id="admin-avatar">A</div>
@@ -737,6 +737,11 @@
      * Demo data.
      * Replace generateDemoData() with your AJAX/API call later.
      */
+
+    document.addEventListener("DOMContentLoaded", () => {
+        getAdminDetails();
+    });
+
     const demoStudents = [
         {name:"Nayana Wickrama",email:"nayana@example.com",sessions:12,rating:4.8,last:"2026-09-08",status:"Active"},
         {name:"Kasun Perera",email:"kasun@example.com",sessions:9,rating:4.2,last:"2026-09-07",status:"Active"},
@@ -1026,8 +1031,8 @@
                 useCORS: true,
                 scrollX: 0,
                 scrollY: 0,
-                windowWidth: document.documentElement.scrollWidth,   // full page width, not just the element
-                windowHeight: document.documentElement.scrollHeight, // full page height
+                windowWidth: document.documentElement.scrollWidth,
+                windowHeight: document.documentElement.scrollHeight,
                 onclone: function(clonedDoc){
                     clonedDoc.querySelectorAll('.table-wrap').forEach(el => {
                         el.style.overflow = 'visible';
@@ -1042,134 +1047,13 @@
             jsPDF: {
                 unit: "mm",
                 format: "a4",
-                orientation: "landscape"   // your table is wide — landscape avoids squeezing it
+                orientation: "landscape"
             },
             pagebreak: { mode: ["css", "legacy"] }
         };
 
         html2pdf().set(options).from(element).save();
     });
-
-    // document.getElementById("download-btn").addEventListener("click", function(){
-    //
-    //     if(!currentReport){
-    //         alert("Generate a report first.");
-    //         return;
-    //     }
-    //
-    //     const element = document.getElementById("report-document");
-    //
-    //     window.scrollTo(0, 0);
-    //
-    //     const options = {
-    //         margin: 8,
-    //         filename: "ai-coding-tutor-report.pdf",
-    //         image: { type: "jpeg", quality: .98 },
-    //         html2canvas: {
-    //             scale: 2,
-    //             backgroundColor: "#10151d",
-    //             useCORS: true,
-    //             scrollX: 0,
-    //             scrollY: 0,
-    //             windowWidth: element.scrollWidth,
-    //             windowHeight: element.scrollHeight,
-    //             onclone: function(clonedDoc){
-    //                 // Force any inner scrollable containers to expand fully
-    //                 // instead of clipping at their visible width/scroll position.
-    //                 clonedDoc.querySelectorAll('.table-wrap').forEach(el => {
-    //                     el.style.overflow = 'visible';
-    //                     el.style.width = 'auto';
-    //                     el.scrollLeft = 0;
-    //                 });
-    //
-    //                 // Prevent nowrap cells from forcing extra width beyond the page
-    //                 clonedDoc.querySelectorAll('td, th').forEach(el => {
-    //                     el.style.whiteSpace = 'normal';
-    //                 });
-    //
-    //                 // Make sure the report document itself isn't width-constrained
-    //                 // by its normal grid parent when cloned standalone
-    //                 const doc = clonedDoc.getElementById('report-document');
-    //                 if(doc){
-    //                     doc.style.width = doc.scrollWidth + 'px';
-    //                 }
-    //             }
-    //         },
-    //         jsPDF: {
-    //             unit: "mm",
-    //             format: "a4",
-    //             orientation: "portrait"
-    //         },
-    //         pagebreak: { mode: ["css", "legacy"] }
-    //     };
-    //
-    //     html2pdf().set(options).from(element).save();
-    // });
-
-    // document.getElementById("download-btn").addEventListener("click", function(){
-    //
-    //     if(!currentReport){
-    //         alert("Generate a report first.");
-    //         return;
-    //     }
-    //
-    //     const element = document.getElementById("report-document");
-    //
-    //     // Force capture from the very top regardless of current scroll position
-    //     window.scrollTo(0, 0);
-    //
-    //     const options = {
-    //         margin: 8,
-    //         filename: "ai-coding-tutor-report.pdf",
-    //         image: { type: "jpeg", quality: .98 },
-    //         html2canvas: {
-    //             scale: 2,
-    //             backgroundColor: "#10151d",
-    //             useCORS: true,
-    //             scrollX: 0,
-    //             scrollY: 0,                              // ignore any leftover scroll offset
-    //             windowWidth: element.scrollWidth,
-    //             windowHeight: element.scrollHeight        // capture the FULL element height, not just the viewport
-    //         },
-    //         jsPDF: {
-    //             unit: "mm",
-    //             format: "a4",
-    //             orientation: "portrait"
-    //         },
-    //         pagebreak: { mode: ["css", "legacy"] }
-    //     };
-    //
-    //     html2pdf().set(options).from(element).save();
-    // });
-
-    // document.getElementById("download-btn").addEventListener("click",function(){
-    //
-    //     if(!currentReport){
-    //         alert("Generate a report first.");
-    //         return;
-    //     }
-    //
-    //     const element = document.getElementById("report-document");
-    //
-    //     const options = {
-    //         margin:8,
-    //         filename:"ai-coding-tutor-report.pdf",
-    //         image:{type:"jpeg",quality:.98},
-    //         html2canvas:{
-    //             scale:2,
-    //             backgroundColor:"#10151d",
-    //             useCORS:true
-    //         },
-    //         jsPDF:{
-    //             unit:"mm",
-    //             format:"a4",
-    //             orientation:"portrait"
-    //         },
-    //         pagebreak:{mode:["css","legacy"]}
-    //     };
-    //
-    //     html2pdf().set(options).from(element).save();
-    // });
 
     // My Code
 
@@ -1219,6 +1103,50 @@
                 }
             }
         })
+    }
+
+    function getAdminDetails(){
+        let userId = localStorage.getItem("userId");
+
+        $.ajax({
+            url: "http://localhost:8080/getAdmin/" + userId,
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function (response) {
+                console.log(response.body)
+                $('#admin-name').text(response.body.adminName);
+                let letters = initials(response.body.adminName);
+                console.log(letters);
+                $('#admin-avatar').text(letters)
+            },
+            error: function (response) {
+                if (response.status === 403) {
+                    alert("Error 403 - Sorry, Forbidden!");
+                } else if (response.status === 400) {
+                    alert("Error 400 - Bad JSON");
+                } else if (response.status === 401) {
+                    alert("Error 401 - Unauthorized!");
+                } else if (response.status === 500) {
+                    alert("Error 500 - Internal Server Error");
+                }
+            }
+        })
+    }
+
+    function initials(fullName) {
+        if (!fullName) return "?";
+
+        const parts = fullName.trim().split(/\s+/);
+        if (parts.length === 1) {
+            return parts[0].slice(0, 2).toUpperCase();
+        }
+
+        const first = parts[0].charAt(0);
+        const last = parts[parts.length - 1].charAt(0);
+        return (first + last).toUpperCase();
     }
 </script>
 
