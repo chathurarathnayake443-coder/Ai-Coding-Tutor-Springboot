@@ -8,6 +8,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.entity.User;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.UserSubscription;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserStatus;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserSubscriptionPlanStatus;
+import com.ijse.AI_Coding_Tutor_Springboot.exceptions.CustomException;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.SubscriptionPlanRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserRepository;
 import com.ijse.AI_Coding_Tutor_Springboot.repository.UserSubscriptionRepository;
@@ -38,30 +39,24 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDTO getUserDetails(String userName, String password, String userRole) {
-        try{
             Optional<User> optionalUser = userRepository.findByUserName(userName);
             if(!optionalUser.isPresent()){
-                throw new RuntimeException("Sorry, User Not Found");
+                throw new CustomException(404,"Sorry, User Not Found");
             }
             User user = optionalUser.get();
 
             if (!passwordEncoder.matches(password, user.getPassword())) {
-                throw new RuntimeException("Sorry, Invalid Password");
+                throw new CustomException(422,"Sorry, Invalid Password");
             }
 
             if(!user.getUserRole().contains(userRole.toUpperCase())){
-                throw new RuntimeException("Sorry, Invalid UserRole");
+                throw new CustomException(422,"Sorry, Invalid UserRole");
             }
 
             return new UserDTO(user.getUserId(), user.getUserName(),user.getPassword(),user.getUserStatus(),user.getJoinedDate(),user.getUserRole());
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 
     public void signupUserStudent(StudentDTO studentDTO) {
-        try{
             User user = new User();
 
             user.setUserName(studentDTO.getStudentEmail());
@@ -77,7 +72,7 @@ public class UserServiceImpl implements UserService {
             Optional<SubscriptionPlan> optionalSubscriptionPlan = subscriptionPlanRepository.getFreeSubscriptionPlanId();
 
             if(!optionalSubscriptionPlan.isPresent()){
-                throw new RuntimeException("Sorry, SubscriptionPlan Not Found");
+                throw new CustomException(404,"Sorry, SubscriptionPlan Not Found");
             }
 
             SubscriptionPlan subscriptionPlan = optionalSubscriptionPlan.get();
@@ -95,14 +90,9 @@ public class UserServiceImpl implements UserService {
             user.setStudent(student);
 
             userRepository.save(user);
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 
     public UserDTO findOrCreateByGoogleEmail(String email, String name) {
-        try{
             Optional<User> existing = userRepository.findByUserName(email);
             if (existing.isPresent()) {
                 User user = existing.get();
@@ -127,21 +117,12 @@ public class UserServiceImpl implements UserService {
             student.setUser(user);
             user.setStudent(student);
             userRepository.save(user);
-        }
-        catch(Exception e){
-            throw e;
-        }
-        return null;
+            return null;
     }
 
     public UserStatus getUserStatus(String userName) {
-        try{
             UserStatus userStatus = userRepository.getUserStatus(userName);
             return userStatus;
-        }
-        catch(Exception e){
-            throw e;
-        }
     }
 
 
