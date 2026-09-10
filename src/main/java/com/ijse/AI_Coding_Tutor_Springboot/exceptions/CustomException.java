@@ -8,10 +8,17 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 
 public class CustomException extends RuntimeException{
 
-    private int status;
-    private String message;
+    private final int status;
+
+    public CustomException(int status, String message) {
+        super(message);
+        this.status = status;
+    }
+
+    public int getStatus() {
+        return status;
+    }
 }
