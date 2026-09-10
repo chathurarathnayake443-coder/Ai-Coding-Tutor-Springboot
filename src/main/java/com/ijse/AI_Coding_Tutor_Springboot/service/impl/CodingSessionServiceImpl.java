@@ -130,6 +130,9 @@ public class CodingSessionServiceImpl implements CodingSessionService {
 
             sessionView.setLastExecutedCode(lastCode);
 
+            ratingRepository.findByCodingSession_SessionId(sessionId)
+                    .ifPresent(r -> sessionView.setRatingValue(r.getRatingValue()));
+
             return sessionView;
         }
         catch(Exception e){

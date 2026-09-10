@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RatingRepository extends JpaRepository<Rating,Long> {
 
@@ -15,4 +16,6 @@ public interface RatingRepository extends JpaRepository<Rating,Long> {
     @Query("SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.RatingCountDTO(r.ratingValue, COUNT(DISTINCT r.codingSession.student.studentId)) " +
             "FROM Rating r GROUP BY r.ratingValue ORDER BY r.ratingValue")
     List<RatingCountDTO> getStudentCountsByRatingValue();
+
+    Optional<Rating> findByCodingSession_SessionId(long sessionId);
 }

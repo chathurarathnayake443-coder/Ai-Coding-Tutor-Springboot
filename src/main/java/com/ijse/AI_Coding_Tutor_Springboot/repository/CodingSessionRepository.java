@@ -28,12 +28,20 @@ public interface CodingSessionRepository extends JpaRepository<CodingSession, Lo
             "ORDER BY cs.startTime DESC")
     List<SessionHistoryDTO> getSessionHistory(long userId);
 
+//    @Query("SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.GetSessionHistoryViewDTO(" +
+//            "cs.sessionId, cs.problem.problemText, cs.programmingLanguage.languageName, COUNT(h)) " +
+//            "FROM CodingSession cs " +
+//            "LEFT JOIN cs.hints h " +
+//            "WHERE cs.sessionId = ?1 " +
+//            "GROUP BY cs.sessionId, cs.problem.problemText, cs.programmingLanguage.languageName")
+//    Optional<GetSessionHistoryViewDTO> getSessionHistoryView(long sessionId);
+
     @Query("SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.GetSessionHistoryViewDTO(" +
-            "cs.sessionId, cs.problem.problemText, cs.programmingLanguage.languageName, COUNT(h)) " +
+            "cs.sessionId, cs.problem.problemText, cs.programmingLanguage.languageName, COUNT(h), cs.sessionStatus) " +
             "FROM CodingSession cs " +
             "LEFT JOIN cs.hints h " +
             "WHERE cs.sessionId = ?1 " +
-            "GROUP BY cs.sessionId, cs.problem.problemText, cs.programmingLanguage.languageName")
+            "GROUP BY cs.sessionId, cs.problem.problemText, cs.programmingLanguage.languageName, cs.sessionStatus")
     Optional<GetSessionHistoryViewDTO> getSessionHistoryView(long sessionId);
 
     @Query("SELECT new com.ijse.AI_Coding_Tutor_Springboot.dto.GetStatReportDTO(COUNT(cs),COUNT(DISTINCT cs.student.studentId)) FROM CodingSession cs WHERE cs.startTime BETWEEN ?1 AND ?2")

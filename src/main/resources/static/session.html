@@ -159,11 +159,11 @@
         const lines = codeEditor.value.split("\n").length;
         let out = "";
         for (let i = 1; i <= lines; i++) out += i + "\n";
-        lineNumbers.textContent = out;
-        lineNumbers.scrollTop = codeEditor.scrollTop;
+        // lineNumbers.textContent = out;
+        // lineNumbers.scrollTop = codeEditor.scrollTop;
     }
     codeEditor.addEventListener("input", syncLineNumbers);
-    codeEditor.addEventListener("scroll", () => { lineNumbers.scrollTop = codeEditor.scrollTop; });
+    // codeEditor.addEventListener("scroll", () => { lineNumbers.scrollTop = codeEditor.scrollTop; });
     codeEditor.addEventListener("keydown", (e) => {
         if (e.key === "Tab") { e.preventDefault(); const s = codeEditor.selectionStart, en = codeEditor.selectionEnd; codeEditor.value = codeEditor.value.slice(0, s) + "  " + codeEditor.value.slice(en); codeEditor.selectionStart = codeEditor.selectionEnd = s + 2; syncLineNumbers(); }
     });
@@ -484,6 +484,7 @@
             type: "GET",
             headers: { 'Authorization': 'Bearer ' + localStorage.getItem('JWT') },
             success: function (response) {
+                console.log("FULL RESPONSE:", JSON.stringify(response));
                 if (!response || !response.body) {
                     alert("Could not load this session.");
                     return;
@@ -494,7 +495,8 @@
                 currentSession = {
                     id: detail.sessionId,
                     language: detail.programmingLanguage,
-                    hintsUsed: detail.usedHintCount
+                    hintsUsed: detail.usedHintCount,
+                    rating: detail.ratingValue
                 };
 
                 questionInput.value = detail.codingProblem;
@@ -510,6 +512,17 @@
                 setEndedState();
                 renderDial(detail.usedHintCount);
                 syncLineNumbers();
+                if (detail.sessionStatus === "IN_PROGRESS") {
+                    ratingSection.style.display = "none";
+                    setActiveState();
+
+                    if (currentSession.hintsUsed >= 5) {
+                        solutionBtn.disabled = false;
+                        generateActualSolution();
+                    }
+                } else {
+                    setEndedState();
+                }
             },
             error: function () {
                 alert("Could not load this session.");
