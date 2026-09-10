@@ -44,18 +44,25 @@ public class GeminiServiceImpl implements GeminiService {
     public String generateResponse(String prompt) {
         log.info("Executing method generateResponse()");
 
-        GenerateContentResponse response =
-                geminiClient.models.generateContent(
-                        "gemini-3.5-flash",
-                        prompt,
-                        null
-                );
+        try{
+            GenerateContentResponse response =
+                    geminiClient.models.generateContent(
+                            "gemini-3.5-flash",
+                            prompt,
+                            null
+                    );
 
-        return response.text();
+            return response.text();
+        }
+        catch(Exception e){
+            log.error("Error in method generateResponse()",e);
+            throw e;
+        }
     }
 
     public CodeExecutionResult executeCode(long sessionId,String code, String language) throws JsonProcessingException {
         log.info("Executing method executeCode()");
+        try{
             String prompt = """
             You are a programming code execution and analysis assistant.
 
@@ -127,10 +134,16 @@ public class GeminiServiceImpl implements GeminiService {
             codeExecution.setCodeAttempt(codeAttempt);
             codeAttemptRepository.save(codeAttempt);
             return codeResult;
+        }
+        catch(Exception e){
+            log.error("Error in method executeCode()",e);
+            throw e;
+        }
     }
 
     public HintResponseDTO generateHint(HintRequestDTO hintRequestDTO) throws JsonProcessingException {
         log.info("Executing method generateHint()");
+        try{
             System.out.println("========== HINT REQUEST ==========");
             System.out.println("Session ID: " + hintRequestDTO.getSessionId());
             System.out.println("Hint Number: " + hintRequestDTO.getHintNumber());
@@ -210,10 +223,16 @@ public class GeminiServiceImpl implements GeminiService {
             hint.setCodingSession(codingSession);
             hintRepository.save(hint);
             return hintResult;
+        }
+        catch(Exception e){
+            log.error("Error in method generateHint()",e);
+            throw e;
+        }
     }
 
     public ResponseSolutionDTO generateActualSolution(RequestSolutionDTO requestSolutionDTO) throws JsonProcessingException {
         log.info("Executing method generateActualSolution()");
+        try{
             String prompt = """
         You are an AI Coding Tutor.
 
@@ -268,5 +287,10 @@ public class GeminiServiceImpl implements GeminiService {
             solutionRepository.save(solution);
 
             return responseSolutionDTO;
+        }
+        catch(Exception e){
+            log.error("Error in method generateActualSolution()",e);
+            throw e;
+        }
     }
 }
