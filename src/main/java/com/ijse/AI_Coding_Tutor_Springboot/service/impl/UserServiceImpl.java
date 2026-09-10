@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDTO getUserDetails(String userName, String password, String userRole) {
-        log.info("Executing method getUserDetails()");
+        log.info("Executing method getUserDetails()...");
         try{
             Optional<User> optionalUser = userRepository.findByUserName(userName);
             if(!optionalUser.isPresent()){
