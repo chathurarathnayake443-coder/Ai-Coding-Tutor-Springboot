@@ -31,10 +31,16 @@ public class ReportServiceImpl implements ReportService {
 
     public ReportDTO generateReport(LocalDateTime startDate, LocalDateTime endDate) {
         log.info("Executing method generateReport()");
+        try{
             long totalStudentCount = userRepository.getTotalStudentCount();
             GetStatReportDTO getStatReportDTO = codingSessionRepository.getStatReportBetweenDates(startDate, endDate);
             List<RatingCountDTO> ratingList = ratingRepository.getStudentCountsByRatingValue();
             List<ReportStudentDTO> reportStudentDTOList = studentRepository.getStudentReportListBetweenDates(startDate, endDate);
             return new ReportDTO(totalStudentCount, getStatReportDTO, ratingList, reportStudentDTOList);
+        }
+        catch(Exception e){
+            log.error("Error in method generateReport()",e);
+            throw e;
+        }
     }
 }
