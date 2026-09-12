@@ -105,13 +105,6 @@
                                     </div>
                                     <div class="stat-value" id="stat-hints">—</div>
                                 </div>
-                                <div class="stat-card">
-                                    <div class="stat-top">
-                                        <span class="stat-label">Time spent</span>
-                                        <span class="stat-icon icon-mint">🕒</span>
-                                    </div>
-                                    <div class="stat-value" id="stat-time">—</div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -174,6 +167,7 @@
         loadSessionCount();
         getSessionHistory();
         getAvgRating();
+        getAnalyticRecords();
     });
 
     document.getElementById("nav-sessions").addEventListener("click", () => {
@@ -403,7 +397,25 @@
         alert(message);
     }
 
+    function getAnalyticRecords(){
+        let userId = localStorage.getItem("userId");
 
+        $.ajax({
+            url: "http://localhost:8080/getAnalyticRecord/" + userId,
+            type: "GET",
+            contentType: "application/json",
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success: function(response){
+                console.log(response.body);
+                $('#stat-attempts').text(response.body.totalAttemptCount);
+                $('#stat-executions').text(response.body.totalExecutionCount);
+                $('#stat-hints').text(response.body.totalHintCount)
+            },
+            error: handleAjaxError,
+        })
+    }
 </script>
 </body>
 </html>
