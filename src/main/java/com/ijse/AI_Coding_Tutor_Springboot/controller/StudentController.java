@@ -1,11 +1,9 @@
 package com.ijse.AI_Coding_Tutor_Springboot.controller;
 
 import com.ijse.AI_Coding_Tutor_Springboot.constants.CommonResponse;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.GetStudentDetailsDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.SessionHistoryDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.dto.UpdateStudentDetailsDTO;
+import com.ijse.AI_Coding_Tutor_Springboot.dto.*;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
+import com.ijse.AI_Coding_Tutor_Springboot.service.AnalyticRecordService;
 import com.ijse.AI_Coding_Tutor_Springboot.service.StudentService;
 import com.ijse.AI_Coding_Tutor_Springboot.service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +16,14 @@ import static com.ijse.AI_Coding_Tutor_Springboot.constants.ResponseMessage.SUCC
 @RestController
 public class StudentController {
 
-    private StudentService studentService;
-    private UserService userService;
+    private final StudentService studentService;
+    private final UserService userService;
+    private final AnalyticRecordService analyticRecordService;
 
-    public StudentController(StudentService studentService, UserService userService) {
+    public StudentController(StudentService studentService, UserService userService, AnalyticRecordService analyticRecordService) {
         this.studentService = studentService;
         this.userService = userService;
+        this.analyticRecordService = analyticRecordService;
     }
 
     @GetMapping("/students")
@@ -96,5 +96,11 @@ public class StudentController {
     public CommonResponse deleteStudent(@PathVariable long userId){
         studentService.deleteStudent(userId);
         return new CommonResponse(OPERATION_SUCCESS, SUCCESS_MESSAGE);
+    }
+
+    @GetMapping("/getAnalyticRecord/{userId}")
+    public CommonResponse getAnalyticRecord(@PathVariable long userId){
+        AnalyticRecordDTO record = analyticRecordService.getAnalyticRecordForStudent(userId);
+        return new CommonResponse(OPERATION_SUCCESS, record, SUCCESS_MESSAGE);
     }
 }
