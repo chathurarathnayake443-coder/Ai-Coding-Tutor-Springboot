@@ -2,10 +2,7 @@ package com.ijse.AI_Coding_Tutor_Springboot.service.impl;
 
 import com.ijse.AI_Coding_Tutor_Springboot.dto.StudentDTO;
 import com.ijse.AI_Coding_Tutor_Springboot.dto.UserDTO;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.Student;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.SubscriptionPlan;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.User;
-import com.ijse.AI_Coding_Tutor_Springboot.entity.UserSubscription;
+import com.ijse.AI_Coding_Tutor_Springboot.entity.*;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserStatus;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.UserSubscriptionPlanStatus;
 import com.ijse.AI_Coding_Tutor_Springboot.exceptions.CustomException;
@@ -96,8 +93,15 @@ public class UserServiceImpl implements UserService {
 
             userSubscription = userSubscriptionRepository.save(userSubscription);
 
+            AnalyticRecord analyticRecord = new AnalyticRecord();
+            analyticRecord.setTotalAttemptCount(0);
+            analyticRecord.setTotalHintCount(0);
+            analyticRecord.setTotalExecutionCount(0);
+            analyticRecord.setStudent(student);
+
             student.setUserSubscription(userSubscription);
             student.setUser(user);
+            student.setAnalyticRecord(analyticRecord);
             user.setStudent(student);
 
             userRepository.save(user);

@@ -19,7 +19,6 @@ public class AnalyticRecord {
     private long totalAttemptCount;
     private long totalHintCount;
     private long totalExecutionCount;
-    private long totalTimeSpent;
 
     @OneToOne
     @JoinColumn(name = "student_id")

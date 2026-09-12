@@ -33,7 +33,7 @@ public class Student {
     @OneToMany(mappedBy = "student")
     private List<CodingSession> codingSessions;
 
-    @OneToOne(mappedBy = "student")
+    @OneToOne(mappedBy = "student",cascade = CascadeType.ALL)
     private AnalyticRecord analyticRecord;
 
     @OneToOne(mappedBy = "student")

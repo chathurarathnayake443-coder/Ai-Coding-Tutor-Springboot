@@ -118,8 +118,8 @@ public class StudentServiceImpl implements StudentService {
                 throw new CustomException(404,"Sorry Student not found");
             }
             Student student = studentOptional.get();
-            double avgRating = ratingRepository.findAvgRatingByStudentId(student.getStudentId());
-            return avgRating;
+            Double avg = ratingRepository.findAvgRatingByStudentId(student.getStudentId());
+            return (avg != null) ? avg.doubleValue() : 0.0;
         }
         catch(Exception e){
             log.error("Error in method getAverageRating()",e);

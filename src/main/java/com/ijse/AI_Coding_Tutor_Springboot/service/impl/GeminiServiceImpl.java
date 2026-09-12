@@ -8,10 +8,7 @@ import com.ijse.AI_Coding_Tutor_Springboot.dto.*;
 import com.ijse.AI_Coding_Tutor_Springboot.entity.*;
 import com.ijse.AI_Coding_Tutor_Springboot.enumerations.ExecutionStatus;
 import com.ijse.AI_Coding_Tutor_Springboot.exceptions.CustomException;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.CodeAttemptRepository;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.CodingSessionRepository;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.HintRepository;
-import com.ijse.AI_Coding_Tutor_Springboot.repository.SolutionRepository;
+import com.ijse.AI_Coding_Tutor_Springboot.repository.*;
 import com.ijse.AI_Coding_Tutor_Springboot.service.GeminiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,14 +28,16 @@ public class GeminiServiceImpl implements GeminiService {
     private final CodingSessionRepository codingSessionRepository;
     private final HintRepository hintRepository;
     private final SolutionRepository solutionRepository;
+    private final AnalyticRecordRepository analyticRecordRepository;
 
-    public GeminiServiceImpl(Client geminiClient, ObjectMapper objectMapper, CodeAttemptRepository codeAttemptRepository, CodingSessionRepository codingSessionRepository, HintRepository hintRepository, SolutionRepository solutionRepository) {
+    public GeminiServiceImpl(Client geminiClient, ObjectMapper objectMapper, CodeAttemptRepository codeAttemptRepository, CodingSessionRepository codingSessionRepository, HintRepository hintRepository, SolutionRepository solutionRepository, AnalyticRecordRepository analyticRecordRepository) {
         this.geminiClient = geminiClient;
         this.objectMapper = objectMapper;
         this.codeAttemptRepository = codeAttemptRepository;
         this.codingSessionRepository = codingSessionRepository;
         this.hintRepository = hintRepository;
         this.solutionRepository = solutionRepository;
+        this.analyticRecordRepository = analyticRecordRepository;
     }
 
     public String generateResponse(String prompt) {
@@ -112,6 +111,20 @@ public class GeminiServiceImpl implements GeminiService {
             codeExecution.setExecutionStatus(ExecutionStatus.SUCCESSFUL);
             codeExecution.setOutput(codeResult.getOutput());
 
+            Optional<Student> optionalStudent = codingSessionRepository.getStudentBySessionId(sessionId);
+            if(!optionalStudent.isPresent()){
+                throw new CustomException(404, "Sorry Student Not Found");
+            }
+            Student student = optionalStudent.get();
+
+            Optional<AnalyticRecord> optionalAnalyticRecord = analyticRecordRepository.findAnalyticRecordByStudentId(student.getStudentId());
+            if(!optionalAnalyticRecord.isPresent()){
+                throw new CustomException(404, "Sorry AnalyticRecord Not Found");
+            }
+            AnalyticRecord analyticRecord = optionalAnalyticRecord.get();
+            analyticRecord.setTotalExecutionCount(analyticRecord.getTotalExecutionCount()+1);
+            analyticRecord.setTotalAttemptCount(analyticRecord.getTotalAttemptCount()+1);
+
             CodeAttempt codeAttempt = new CodeAttempt();
 
             Integer lastAttempt = codeAttemptRepository.getAttemptNumberBySessionId(sessionId);
@@ -130,6 +143,7 @@ public class GeminiServiceImpl implements GeminiService {
             List<CodeExecution> codeExecutions = new ArrayList<>();
             codeExecutions.add(codeExecution);
 
+            analyticRecordRepository.save(analyticRecord);
             codeAttempt.setCodeExecutions(codeExecutions);
             codeExecution.setCodeAttempt(codeAttempt);
             codeAttemptRepository.save(codeAttempt);
@@ -210,6 +224,19 @@ public class GeminiServiceImpl implements GeminiService {
 
             System.out.println(hintResult);
 
+            Optional<Student> optionalStudent = codingSessionRepository.getStudentBySessionId(hintRequestDTO.getSessionId());
+            if(!optionalStudent.isPresent()){
+                throw new CustomException(404,"Sorry, Student not found");
+            }
+            Student student = optionalStudent.get();
+
+            Optional<AnalyticRecord> optionalAnalyticRecord = analyticRecordRepository.findAnalyticRecordByStudentId(student.getStudentId());
+            if(!optionalAnalyticRecord.isPresent()){
+                throw new CustomException(404,"Sorry, Analytic Record not found");
+            }
+            AnalyticRecord analyticRecord = optionalAnalyticRecord.get();
+            analyticRecord.setTotalHintCount(analyticRecord.getTotalHintCount() + 1);
+
             Hint hint = new Hint();
             hint.setCreatedTime(LocalDateTime.now());
             hint.setHintNumber(hintRequestDTO.getHintNumber());
@@ -221,6 +248,7 @@ public class GeminiServiceImpl implements GeminiService {
             }
             CodingSession codingSession = optionalCodingSession.get();
             hint.setCodingSession(codingSession);
+            analyticRecordRepository.save(analyticRecord);
             hintRepository.save(hint);
             return hintResult;
         }
