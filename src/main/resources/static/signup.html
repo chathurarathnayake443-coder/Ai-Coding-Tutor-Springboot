@@ -191,6 +191,19 @@
         let password = $('#password').val().trim();
         let confirmPassword = $('#confirm-password').val().trim();
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const slMobileRegex = /^(?:\+94|94|0)7[01245678]\d{7}$/;
+
+        if(!emailRegex.test(email)){
+            alert('Please enter a valid email address');
+            return;
+        }
+
+        if(!slMobileRegex.test(studentContact)){
+            alert('Please enter a valid Phone Number');
+            return;
+        }
+
         if (password !== confirmPassword) {
             alert("Passwords do not match. Please re-enter.");
             return;

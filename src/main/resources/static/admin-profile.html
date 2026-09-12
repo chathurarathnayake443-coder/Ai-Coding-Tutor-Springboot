@@ -649,6 +649,12 @@
         let newPassword = $('#pf-new-password').val().trim();
         let confirmPassword = $('#pf-confirm-password').val().trim();
 
+        const slMobileRegex = /^(?:\+94|94|0)7[01245678]\d{7}$/;
+        if(!slMobileRegex.test(adminContact)){
+            alert("Please Enter a Valid Contact Number");
+            return;
+        }
+
         if(newPassword !== confirmPassword){
             alert("Passwords do not match!");
             return;

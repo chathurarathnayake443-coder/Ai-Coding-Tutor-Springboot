@@ -116,6 +116,12 @@
         let userPassword = $('#password').val().trim();
         let userRole = $('#role').val().trim();
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if(!emailRegex.test(userName)){
+            alert("Please enter a valid email address");
+            return;
+        }
+
         const obj = JSON.stringify({"userName": userName, "password": userPassword, "userRoles": userRole.toUpperCase()});
 
         $.ajax({
