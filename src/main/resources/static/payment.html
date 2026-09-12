@@ -66,13 +66,13 @@
                     <button class="method payhere" id="payhere" onclick="selectGateway('payhere')"><span class="logo">PH</span><strong>PayHere</strong><small>Local & card payments</small><i class="check">✓</i></button>
                 </div>
 
-                <div class="gateway active" id="paypalInfo"><b>PayPal checkout</b><br>In production, your Spring Boot backend creates the PayPal order and returns the secure checkout URL.</div>
-                <div class="gateway" id="payhereInfo"><b>PayHere checkout</b><br>In production, your Spring Boot backend creates the PayHere payment request and handles the payment notification.</div>
+                <div class="gateway active" id="paypalInfo"><b>PayPal checkout</b><br>You Selected the Paypal Checkout method to Complete the Transaction.</div>
+                <div class="gateway" id="payhereInfo"><b>PayHere checkout</b><br>You Selected the PayHere Checkout method to Complete the Transaction.</div>
 
                 <div class="form">
                     <div class="field"><label>ACCOUNT EMAIL</label><input class="input" id="email" type="email" placeholder="student@example.com"></div>
                     <div class="field"><label>STUDENT NAME</label><input class="input" id="studentName" type="text" placeholder="Your name"></div>
-                    <div class="secure">✓ Payment information should be handled by the selected gateway. Never put secret API keys or card-processing credentials in browser JavaScript.</div>
+                    <div class="secure">✓ Payment information should be handled by the selected gateway.</div>
                 </div>
             </div>
         </section>
@@ -84,7 +84,7 @@
                 <div class="line"><span>Billing</span><b>Monthly</b></div>
                 <div class="line"><span>Gateway</span><b id="gatewayName">PayPal</b></div>
                 <div class="total"><span>Total</span><b id="price">$20.00</b></div>
-                <button class="cta" id="payBtn" onclick="startPayment()">Continue with PayPal →</button>
+                <button class="cta" id="payBtn" onclick="processPayment()">Continue with PayPal →</button>
                 <button class="cancel" onclick="history.back()">Cancel and return</button>
                 <div class="note">Secure checkout • Payment processed by the selected provider</div>
             </div>
@@ -93,7 +93,7 @@
         </aside>
     </main>
 </div>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
     const plans={PLUS:{price:20,badge:"02"},PRO:{price:50,badge:"03"}};
     let selectedPlan=new URLSearchParams(location.search).get("plan")?.toUpperCase()||"PLUS";
@@ -146,6 +146,37 @@
         },900);
     }
     render();selectGateway("paypal");
+
+    // My Code
+
+    function processPayment(){
+        let userId = localStorage.getItem("userId");
+        let paymentAmount = plans[selectedPlan].price;
+        let planCategory = selectedPlan;
+
+        const obj = JSON.stringify({"userId":userId,"planCategory":planCategory,"paymentAmount":paymentAmount});
+        $.ajax({
+            url:"http://localhost:8080/processPayment",
+            type:"POST",
+            contentType:"application/json",
+            data:obj,
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('JWT'),
+            },
+            success:function(response){
+                console.log(response);
+            },
+            error: handleAjaxError,
+        })
+    }
+
+    function handleAjaxError(jqXHR){
+        let message = "Something went wrong. Please try again.";
+        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
+            message = jqXHR.responseJSON.message;
+        }
+        alert(message);
+    }
 </script>
 </body>
 </html>

@@ -28,7 +28,7 @@ public class Payment {
     @JoinColumn(name = "plan_id")
     private SubscriptionPlan subscriptionPlan;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "student_id")
     private Student student;
 

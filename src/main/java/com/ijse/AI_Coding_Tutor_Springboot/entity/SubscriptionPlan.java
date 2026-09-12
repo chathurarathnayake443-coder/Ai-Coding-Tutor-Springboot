@@ -22,7 +22,7 @@ public class SubscriptionPlan {
     private long planId;
     @Enumerated(EnumType.STRING)
     private SubscriptionPlanCategory subscriptionPlanCategory;
-    private String price;
+    private double price;
     private String description;
     private int maxHintCount;
     @Enumerated(EnumType.STRING)

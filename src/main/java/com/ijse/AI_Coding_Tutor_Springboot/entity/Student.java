@@ -36,6 +36,6 @@ public class Student {
     @OneToOne(mappedBy = "student",cascade = CascadeType.ALL)
     private AnalyticRecord analyticRecord;
 
-    @OneToOne(mappedBy = "student")
-    private Payment payment;
+    @OneToMany(mappedBy = "student")
+    private List<Payment> paymentList;
 }
